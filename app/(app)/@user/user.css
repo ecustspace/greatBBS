@@ -1,0 +1,44 @@
+.postData {
+    width: 30%;
+    padding: 0;
+    margin: 0;
+    margin-top: 20px;
+    height: 50px;
+    font-size: 18px;
+    display: inline-block;
+    text-align: center;
+}
+
+.name {
+    font-size: 15px;
+    color: gray;
+}
+
+.ava {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+.ava_item {
+    text-align: center;
+}
+
+h3 {
+    font-size: 22px;
+}
+
+.SwiperDiv {
+    display: inline-block !important;
+}
+
+.avaDiv {
+    margin: 0 auto;
+    text-align: center;
+}
+
+h2 {
+    font-size: 22px;
+    padding-left: 10px;
+    margin: 10px;
+}

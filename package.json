@@ -1,0 +1,29 @@
+{
+  "name": "greatbbs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.409.0",
+    "@aws-sdk/lib-dynamodb": "^3.409.0",
+    "@rehooks/local-storage": "^2.4.4",
+    "antd-mobile": "^5.32.0",
+    "antd-mobile-icons": "^0.3.0",
+    "compressorjs": "^1.2.1",
+    "eslint": "8.47.0",
+    "eslint-config-next": "13.4.19",
+    "js-sha256": "^0.10.1",
+    "next": "13.4.19",
+    "nodemailer": "^6.9.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-viewer": "^3.2.2",
+    "tua-body-scroll-lock": "^1.4.0",
+    "uuid": "^9.0.0"
+  }
+}

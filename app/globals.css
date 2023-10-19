@@ -1,0 +1,97 @@
+:root:root {
+  --adm-color-primary: #2873d8;
+  --adm-color-text-secondary: #000000;
+  --adm-avatar-border-radius: 32px;
+  --adm-center-popup-z-index: 1010;
+  white-space: pre-wrap;
+}
+
+html {
+  touch-action: pan-x pan-y;
+  min-height: 100%;
+}
+
+body {
+  overscroll-behavior-x: none;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-top: darkgray 1px solid;
+  background-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.top {
+  top: 0;
+  position: fixed;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 18px;
+}
+
+.cardAvatar {
+  margin-right: 14px;
+}
+
+.cardContent {
+  flex-grow: 1;
+  font-size: medium;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.postDetail {
+  margin-left: 24px;
+  margin-right: 24px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.double-line {
+  font-size: medium;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.none-limit {
+  font-size: medium;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: vertical;
+}
+
+.extend-btn {
+  text-align: right;
+  color: var(--adm-color-primary);
+  margin-bottom: 10px;
+}
+
+
+.FloatBubble {
+  right: 24px;
+  position: fixed;
+  text-align: center;
+  background-color: var(--adm-color-primary);
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+  border: solid 6px var(--adm-color-primary);
+}

@@ -1,0 +1,30 @@
+import {useEffect, useRef, useState} from "react";
+import {Grid} from "antd-mobile";
+
+export default function Ellipsis({content,style}) {
+    const ref = useRef(null)
+    const [isExceed,setExceed] = useState(false)
+    const [isExtend,setExtend] = useState(false)
+    useEffect(() => {
+        if (ref.current?.scrollHeight > ref.current?.clientHeight) {
+            setExceed(true)
+        }
+    },[])
+
+    return (
+        <div>
+            <div className={isExtend?'none-limit':'double-line'}
+                 style={{...style}}
+                 ref={ref}>{content}
+            </div>
+            {isExceed ?
+                <div className='extend-btn'
+                     onClick={(e)=>{
+                         setExtend(extend => !extend)
+                         e.stopPropagation()
+                     }}
+                >{isExtend?'收起':'展开'}
+                </div> : ''}
+        </div>
+    )
+}

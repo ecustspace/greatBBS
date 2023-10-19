@@ -4,7 +4,9 @@ import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {docClient} from "@/app/api/server";
 import {NextResponse} from "next/server";
 
-const transporter = nodemailer.createTransport({
+export async function POST(request) {
+    const data = await request.json()
+    const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     secure: true,
@@ -13,13 +15,10 @@ const transporter = nodemailer.createTransport({
         pass: process.env.SMTP_USERPASS,
     },
 });
-
-export async function POST(request) {
-    const data = await request.json()
     const user_email = data.useremail
     const captcha = Math.round(Math.random() * (999999 - 100000)) + 100000;
     const now = Date.now()
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
         from: '1563741036@qq.com', // sender address
         to: user_email + process.env.EMAIL, // list of receivers
         subject: "验证码", // Subject line
@@ -31,6 +30,8 @@ export async function POST(request) {
             return NextResponse.json({error:'发送验证码失败，请重试'},{ status: 500 })
         }
     })
+
+    console.log(info)
 
     const sign_up_token = v4()
 

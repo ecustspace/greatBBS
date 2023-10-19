@@ -3,7 +3,6 @@
 import {useState} from "react";
 import {Button, CenterPopup, Form, Input} from "antd-mobile";
 import './loginModal.css'
-import {responseHandle} from "@/app/component/function";
 
 // eslint-disable-next-line react/display-name
 export default function LoginModal({onSubmit,loginSuccess,root}){

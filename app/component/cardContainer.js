@@ -1,13 +1,13 @@
 'use client'
 
-import React,{useState, useEffect, useRef,createContext,useContext} from "react";
-import {PullToRefresh, InfiniteScroll, Modal, Space, Button, ActionSheet, Toast, Dialog,} from "antd-mobile";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {ActionSheet, Dialog, InfiniteScroll, Toast,} from "antd-mobile";
 import {PostCard} from "@/app/component/postCard";
-import {ContactTa, fetchData, getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
+import {getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
-import {responseHandle, showLoginModal} from "@/app/component/function";
+import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
-import {MessageFill, UndoOutline} from "antd-mobile-icons";
+import {UndoOutline} from "antd-mobile-icons";
 
 export default function CardContainer({post,type}) {
     const [isHasMore, setHasMore] = useState(true)

@@ -1,4 +1,4 @@
-import {docClient,getUserItem} from "@/app/api/server";
+import {docClient, getUserItem} from "@/app/api/server";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";

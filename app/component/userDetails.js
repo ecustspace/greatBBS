@@ -1,16 +1,11 @@
-
 import '@/app/(app)/@user/user.css'
-import React, {forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {AutoCenter, Image, InfiniteScroll, NavBar, Popup} from "antd-mobile";
-import {PostCard} from "@/app/component/postCard";
+import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
+import {Image, InfiniteScroll, NavBar, Popup, Steps} from "antd-mobile";
 import {getUserPost} from "@/app/api/serverAction";
-import {Steps} from "antd-mobile";
 import {timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext} from "@/app/(app)/layout";
-import {LeftOutline} from "antd-mobile-icons";
-import {disableBodyScroll, enableBodyScroll} from "body-scroll-lock";
 import {lock, unlock} from "tua-body-scroll-lock";
 
 const { Step } = Steps

@@ -1,9 +1,8 @@
 'use client'
-import { TabBar } from 'antd-mobile'
-import { CompassOutline, MailOutline, UserOutline, CameraOutline } from 'antd-mobile-icons'
-import { useLocalStorage } from "@rehooks/local-storage";
-import { useRouter } from "next/navigation";
-import {usePathname} from "next/navigation";
+import {TabBar} from 'antd-mobile'
+import {CompassOutline, MailOutline, UserOutline} from 'antd-mobile-icons'
+import {useLocalStorage} from "@rehooks/local-storage";
+import {usePathname, useRouter} from "next/navigation";
 
 export default function BBSTabBar() {
     const [messageCount] = useLocalStorage('messageCount')

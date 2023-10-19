@@ -1,6 +1,6 @@
 import {docClient} from "@/app/api/server";
 import {QueryCommand} from "@aws-sdk/lib-dynamodb";
-import {NextResponse,NextRequest} from "next/server";
+import {NextResponse} from "next/server";
 
 export async function GET(request) {
     const postType = request.nextUrl.searchParams.get('postType')

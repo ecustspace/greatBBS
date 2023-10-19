@@ -1,6 +1,5 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient, GetCommand} from "@aws-sdk/lib-dynamodb";
-import {NextResponse} from "next/server";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 
 const client = new DynamoDBClient({});

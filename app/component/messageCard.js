@@ -1,10 +1,7 @@
-import { Avatar, Space } from "antd-mobile";
-import { DeleteOutline } from "antd-mobile-icons";
-import { timeConclude } from "@/app/component/function";
-import { ImageContainer } from "@/app/component/imageContainer";
-import { useEffect, useRef, useState } from "react";
-import Ellipsis from "@/app/component/ellipsis";
-import { SwitchLike } from "@/app/component/postCard";
+import {Avatar} from "antd-mobile";
+import {DeleteOutline} from "antd-mobile-icons";
+import {timeConclude} from "@/app/component/function";
+import {useEffect, useRef, useState} from "react";
 
 
 export default function MessageCard({ reply, onClickReply, onClick,onDelete }) {

@@ -2,12 +2,10 @@
 /* eslint-disable @next/next/no-async-client-component */
 'use client'
 import './forgetPassword.css'
-import React, { useState } from 'react'
-import { Button, Form, Input, NavBar, Popup } from 'antd-mobile'
-import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
+import React, {useState} from 'react'
+import {Button, Form, Input, NavBar, Popup} from 'antd-mobile'
+import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
-import {sha256} from "js-sha256";
-import {avatarList} from "@/app/(app)/clientConfig";
 
 
 export default function Home() {

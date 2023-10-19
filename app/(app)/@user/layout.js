@@ -4,6 +4,7 @@ import './user.css'
 import {
     Button,
     CenterPopup,
+    Dialog,
     Form,
     Image,
     Input,
@@ -12,20 +13,19 @@ import {
     Popup,
     Space,
     Swiper,
-    TextArea,
-    Toast,
-    SafeArea, Dialog
+    TextArea
 } from "antd-mobile";
 import {
     CloseShieldOutline,
-    EyeInvisibleOutline, EyeOutline,
+    EyeInvisibleOutline,
+    EyeOutline,
     LeftOutline,
     RightOutline,
     TagOutline,
     TeamOutline,
     TextOutline
 } from "antd-mobile-icons";
-import {useEffect, useRef, useState,useContext} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
 import {redirect} from "next/navigation";
 import {avatarList} from "@/app/(app)/clientConfig";

@@ -1,5 +1,4 @@
 import {useEffect, useRef, useState} from "react";
-import {Grid} from "antd-mobile";
 
 export default function Ellipsis({content,style}) {
     const ref = useRef(null)

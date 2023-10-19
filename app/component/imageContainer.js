@@ -1,5 +1,4 @@
 import {Image, Swiper} from "antd-mobile";
-import WxImageViewer from "react-wx-images-viewer";
 import Viewer from 'react-viewer'
 import {imageUrl} from "@/app/(app)/clientConfig";
 import React, {useEffect, useRef, useState} from "react";

@@ -1,12 +1,12 @@
 'use client'
 import '../../globals.css'
 import './signup.css'
-import React, { useEffect, useState } from 'react'
-import { Input, Button, Avatar, Form, Dialog, NavBar, Toast, AutoCenter } from 'antd-mobile'
-import { EyeInvisibleOutline, EyeOutline } from 'antd-mobile-icons'
-import { sha256 } from "js-sha256";
+import React, {useState} from 'react'
+import {AutoCenter, Button, Form, Input, NavBar} from 'antd-mobile'
+import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
+import {sha256} from "js-sha256";
 import TranslationAvatar from "@/app/component/translationAvatar";
-import { avatarList } from "@/app/(app)/clientConfig";
+import {avatarList} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 
 export default function Home() {

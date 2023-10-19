@@ -1,4 +1,4 @@
-import {DeleteCommand, GetCommand, TransactWriteCommand, UpdateCommand,} from "@aws-sdk/lib-dynamodb";
+import {DeleteCommand, GetCommand, UpdateCommand,} from "@aws-sdk/lib-dynamodb";
 import {docClient} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";

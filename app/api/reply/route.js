@@ -1,10 +1,9 @@
-import {docClient, getUserItem} from "@/app/api/server";
+import {docClient, getUserItem, uploadImage} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
-import {BatchGetCommand, GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {sha256} from "js-sha256";
-import {uploadImage} from "@/app/api/server";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {

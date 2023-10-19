@@ -2,8 +2,8 @@
 
 import '../../globals.css'
 import '@/app/(option)/signup/signup.css'
-import React, {useState,useContext} from "react";
-import {Avatar, Button, Input, NavBar, Toast, Form, AutoCenter} from "antd-mobile";
+import React, {useContext, useState} from "react";
+import {AutoCenter, Button, Form, Input, NavBar} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
 import TranslationAvatar from "@/app/component/translationAvatar";

@@ -2,7 +2,7 @@ import {v4} from "uuid";
 import nodemailer from 'nodemailer'
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {docClient} from "@/app/api/server";
-import {NextResponse,NextRequest} from "next/server";
+import {NextResponse} from "next/server";
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,

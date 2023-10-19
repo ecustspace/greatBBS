@@ -1,4 +1,4 @@
-import {NextResponse,NextRequest} from "next/server";
+import {NextResponse} from "next/server";
 import {cookies, headers} from "next/headers";
 import {sha256} from "js-sha256";
 import {docClient} from "@/app/api/server";

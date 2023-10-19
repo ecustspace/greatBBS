@@ -1,7 +1,7 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {docClient, getUserItem, uploadImage} from "@/app/api/server";
-import {PutCommand,UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {

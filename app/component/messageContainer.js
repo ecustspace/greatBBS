@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from "react";
-import { Popup, PullToRefresh, InfiniteScroll, } from "antd-mobile";
+import {useEffect, useState} from "react";
+import {InfiniteScroll, Popup,} from "antd-mobile";
 import PostCard from "@/app/component/postCard";
 
 export default function MessageContainer({ posts }) {

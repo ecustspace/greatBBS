@@ -1,30 +1,33 @@
 import {
+    ActionSheet,
+    Avatar,
+    Button,
+    Dialog,
+    ImageUploader,
+    InfiniteScroll,
+    Mask,
     NavBar,
     Popup,
-    Avatar,
     Space,
     TextArea,
-    Button,
-    Popover,
-    Toast,
-    Mask, ImageUploader, InfiniteScroll, Modal, ActionSheet, Dialog
+    Toast
 } from "antd-mobile";
-import React, {useState, forwardRef, useImperativeHandle, useRef, useEffect, useContext} from "react";
+import React, {forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {
+    ExclamationCircleOutline,
     LoopOutline,
     MoreOutline,
-    UploadOutline,
-    ExclamationCircleOutline,
-    UserAddOutline,
     PictureOutline,
-    SmileOutline} from "antd-mobile-icons";
+    SmileOutline,
+    UploadOutline,
+    UserAddOutline
+} from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
 import {SwitchLike} from "@/app/component/postCard";
-import {timeConclude, mockUpload, responseHandle, share} from "@/app/component/function";
+import {mockUpload, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
 import {ContactTa, getPostLikeList, Report} from "@/app/api/serverAction";
-import {disableBodyScroll, enableBodyScroll} from "body-scroll-lock";
 import {lock, unlock} from "tua-body-scroll-lock";
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post},ref) => {

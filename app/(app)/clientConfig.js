@@ -1,5 +1,5 @@
 export const imageUrl = 'https://d2ekmn0x4fiphu.cloudfront.net'
-export const Url = 'http://localhost:3000'
+export const Url = 'https://ecustspace.chatjbt.top'
 export const avatarList = ['dog.jpg','mice.jpg','panda.jpg','cat.jpg']
 export const names = [
     '洞主','Alice', 'Bob', 'Charlie', 'David', 'Emma', 'Frank', 'Grace', 'Henry', 'Isabella', 'Jack',

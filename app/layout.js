@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
     useEffect(() => {
         if (typeof window !== undefined)
             window.recaptchaOptions = {
-                enterprise: true
+                useRecaptchaNet: true
             }
         if (getCookie('Token') && getCookie('UserName')) {
             if (parseInt(getCookie('Token').split('#')[0]) < Date.now()){

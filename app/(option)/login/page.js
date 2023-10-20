@@ -15,11 +15,14 @@ export default function Home() {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
     const captchaRef = useRef(null)
+    const [isRecaptchaOK,setOK] = useState(false)
     const toLogin = useContext(loginState).toLogin
     useEffect(() => {if (typeof window !== undefined)
         window.recaptchaOptions = {
             useRecaptchaNet: true
-        }},[])
+        }
+        setOK(true)
+    },[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             captchaRef.current.reset()
@@ -42,11 +45,11 @@ export default function Home() {
     }
     return (
         <>
-            <ReCAPTCHA
+            {isRecaptchaOK ? <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            />
+            /> : ''}
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{marginTop:'10px'}}>
                 <TranslationAvatar

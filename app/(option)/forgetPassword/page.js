@@ -8,6 +8,7 @@ import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import ReCAPTCHA from "react-google-recaptcha";
+import {createRoot} from "react-dom";
 
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
     const [visiblePop, setVisiblePop] = useState(false);
     const [visiblePW1, setVisiblePW1] = useState(false)
     const [visiblePW2, setVisiblePW2] = useState(false)
+    const [isRecaptchaOK,setOK] = useState(false)
     const captchaRef = useRef(null)
     const nextStep = () => {
         setVisiblePop(true);
@@ -24,7 +26,9 @@ export default function Home() {
     useEffect(() => {if (typeof window !== undefined)
         window.recaptchaOptions = {
             useRecaptchaNet: true
-        }},[])
+        }
+        setOK(true)
+        },[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             captchaRef.current.reset()
@@ -74,11 +78,11 @@ export default function Home() {
 
     return (
         <>
-            <ReCAPTCHA
+            {isRecaptchaOK ? <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            />
+            /> : ''}
             <NavBar onBack={() => {
                 window.location.replace('/')
             }}></NavBar>

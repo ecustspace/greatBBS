@@ -18,11 +18,14 @@ export default function Home() {
     const [time, setTime] = useState("获取验证码");
     const [form] = Form.useForm()
     const [email, setEmail] = useState("")
+    const [isRecaptchaOK,setOK] = useState(false)
     const captchaRef = useRef(null)
     useEffect(() => {if (typeof window !== undefined)
         window.recaptchaOptions = {
             useRecaptchaNet: true
-        }},[])
+        }
+        setOK(true)
+    },[])
     const onSubmit = () => {    //验证码
         if (email.length === 0) {
             console.log(email)
@@ -118,11 +121,11 @@ export default function Home() {
     }
     return (
         <div>
-            <ReCAPTCHA
+            {isRecaptchaOK ? <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            />
+            /> : ''}
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{ marginTop: '10px' }}>
                 <TranslationAvatar

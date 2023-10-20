@@ -2,23 +2,40 @@
 
 import '../../globals.css'
 import '@/app/(option)/signup/signup.css'
-import React, {useContext, useState} from "react";
-import {AutoCenter, Button, Form, Input, NavBar} from "antd-mobile";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
 import TranslationAvatar from "@/app/component/translationAvatar";
-import {avatarList} from "@/app/(app)/clientConfig";
+import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {responseHandle} from "@/app/component/function";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Home() {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
+    const captchaRef = useRef(null)
     const toLogin = useContext(loginState).toLogin
+    useEffect(() => {
+        window.recaptchaOptions = {
+            useRecaptchaNet: true
+        }
+    },[])
     const onSubmit = () => {
-        const values = form.getFieldsValue(true)
-        toLogin(values).then(res => {
-            if (res.status === 200) {
-                window.location.replace('/')
-            }
+        captchaRef.current.executeAsync().then(token => {
+            captchaRef.current.reset()
+            const values = form.getFieldsValue(true)
+            values.recaptchaToken = token
+            toLogin(values).then(res => {
+                if (res.status === 200) {
+                    window.location.replace('/')
+                } else {
+                    responseHandle(res)
+                }
+            })
+        }).catch(() => {
+            captchaRef.current.reset()
+            Toast.show('未通过人机验证')
         })
     }
     const back = () => {
@@ -26,6 +43,11 @@ export default function Home() {
     }
     return (
         <>
+            <ReCAPTCHA
+                sitekey={recaptcha_site_key_v2}
+                ref={captchaRef}
+                size="invisible"
+            />
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{marginTop:'10px'}}>
                 <TranslationAvatar
@@ -56,7 +78,7 @@ export default function Home() {
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>注 册</div>
                 </Button>
                     <br/>
-                    <a>忘记密码？</a>
+                    <a onClick={() => {window.location.replace('/forgetPassword')}}>忘记密码？</a>
                 </>}
                 >
 

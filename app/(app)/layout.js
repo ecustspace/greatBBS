@@ -11,6 +11,7 @@ import {useSearchParams} from "next/navigation";
 import {TabBar, Toast} from "antd-mobile";
 import {CompassOutline, MailOutline, UserOutline} from "antd-mobile-icons";
 import {getPostData} from "@/app/api/serverAction";
+import {recaptcha_site_key_v3} from "@/app/(app)/clientConfig";
 
 export const likeListContext = createContext(null)
 export const detailsContext = createContext(null)
@@ -142,6 +143,7 @@ export default function RootLayout({ post,message,user }) {
 
   return (
       <div>
+      <script async src={'//recaptcha.net/recaptcha/api.js?render=' + recaptcha_site_key_v3}></script>
       <likeListContext.Provider value={like}>
           <detailsContext.Provider value={detailsRef}>
               <UserDetails user={focusUser} ref={userPopup} />

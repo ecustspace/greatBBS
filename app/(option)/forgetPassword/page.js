@@ -2,64 +2,87 @@
 /* eslint-disable @next/next/no-async-client-component */
 'use client'
 import './forgetPassword.css'
-import React, {useState} from 'react'
-import {Button, Form, Input, NavBar, Popup} from 'antd-mobile'
+import {useEffect, useRef, useState} from 'react'
+import {Button, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
+import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import ReCAPTCHA from "react-google-recaptcha";
 
 
 export default function Home() {
     const [form1] = Form.useForm()
     const [form2] = Form.useForm()
+    const [btnDisable,setDisable] = useState(true)
     const [visiblePop, setVisiblePop] = useState(false);
     const [visiblePW1, setVisiblePW1] = useState(false)
     const [visiblePW2, setVisiblePW2] = useState(false)
-
+    const captchaRef = useRef(null)
+    useEffect(() => {
+        window.recaptchaOptions = {
+            useRecaptchaNet: true
+        }
+    },[])
     const nextStep = () => {
         setVisiblePop(true);
     }
 
     const onSubmit = () => {
-        const values = form1.getFieldsValue(true)
-        fetch(window.location.origin + '/api/register/forCaptcha', {
-            method: 'post',
-            body: JSON.stringify(values),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json()).then(
-            (data) => {
-                document.cookie = `SignUpToken=${data.sign_up_token}`
-                responseHandle(data)
-            }
-        )
+        captchaRef.current.executeAsync().then(token => {
+            captchaRef.current.reset()
+            const values = form1.getFieldsValue(true)
+            values.recaptchaToken = token
+            fetch(window.location.origin + '/api/register/forCaptcha', {
+                method: 'post',
+                body: JSON.stringify(values),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(
+                (data) => {
+                    document.cookie = `SignUpToken=${data.sign_up_token}`
+                    responseHandle(data)
+                }
+            ).catch(() => {Toast.show('error')})
+        }).catch(() => {
+            captchaRef.current.reset()
+            Toast.show('未通过人机验证')})
     }
     const onSubmit1 = () => {
-        const values = {
-            ...form1.getFieldsValue(true),
-            ...form2.getFieldsValue(true)
-        }
-        fetch(window.location.origin + '/api/register/forgetPassword', {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify(values),
-            headers: {
-                'Content-Type': 'application/json'
+        captchaRef.current.executeAsync().then(token => {
+            captchaRef.current.reset()
+            const values = {
+                ...form1.getFieldsValue(true),
+                ...form2.getFieldsValue(true)
             }
-        }).then(res => res.json()).then(
-            (data) => {
-                responseHandle(data)
-                document.cookie = `Token=${data.token}; max-age=` + (30*24*60*60).toString()
-                document.cookie = `UserName=${data.username}; max-age=` + (30*24*60*60).toString()
-                localStorage.setItem('Avatar',data.avatar)
-            }
-        )
+            values.recaptchaToken = token
+            fetch(window.location.origin + '/api/register/forgetPassword', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(values),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(
+                (data) => {
+                    responseHandle(data)
+                }
+            )
+        }).catch(() => {
+            captchaRef.current.reset()
+            Toast.show('人机验证失败')
+        })
     }
 
     return (
         <>
+            <ReCAPTCHA
+                sitekey={recaptcha_site_key_v2}
+                ref={captchaRef}
+                size="invisible"
+            />
             <NavBar onBack={() => {
-                window.location.replace('/post')
+                window.location.replace('/')
             }}></NavBar>
             <center><h2>找回密码</h2></center>
             <Form
@@ -69,6 +92,7 @@ export default function Home() {
                 footer={
                     <Button
                         block
+                        disabled={btnDisable}
                         color={"primary"}
                         shape={"rounded"}
                         size='large'
@@ -93,7 +117,13 @@ export default function Home() {
                     rules={[{ required: true, message: ' ' }]}
                     extra={<Button color='primary' size='small' fill='none' onClick={onSubmit}>获取验证码</Button>}
                 >
-                    <Input placeholder='请输入验证码' />
+                    <Input
+                        onChange={value => {
+                            if (value) {
+                                setDisable(false)
+                            }
+                        }}
+                        placeholder='请输入验证码' />
                 </Form.Item>
             </Form>
             <Popup

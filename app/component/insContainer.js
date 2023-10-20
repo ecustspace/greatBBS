@@ -1,10 +1,10 @@
 'use client'
 
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Image, InfiniteScroll,} from "antd-mobile";
+import {Image, InfiniteScroll, Toast,} from "antd-mobile";
 import {imageUrl} from "@/app/(app)/clientConfig";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
-import {getPostLikeList, getPostList} from "@/app/api/serverAction";
+import {fetchData, getPostLikeList, getPostList} from "@/app/api/serverAction";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
@@ -37,19 +37,30 @@ export default function InsContainer({post}) {
     },[])
 
     function refresh() {
-       fetch(window.location.origin + `/api/getPostData?postType=Image`).then(res => {
-            return res.json()
-        }).then(data => {
+        Toast.show({
+            icon:'loading'
+        })
+       fetchData('Image').then(data => {
+           Toast.clear()
             if (data.posts) {
                 setPostList(data.posts)
                 setLoadRightList([])
+                setLeftHeight(0)
+                setRightHeight(0)
                 setLoadLeftList([])
                 setHasMore(true)
                 if (data.lastKey) {
                     setKey(data.lastKey)
-                } else {setHasMore(false)}
+                }
             } else {setHasMore(false)}
-        }).catch(() => setPostList('err'))
+        }).catch(() => {
+           setPostList('err')
+           Toast.show({
+               icon:'fail',
+               content:'刷新失败'
+           })
+           }
+       )
     }
 
     function height_width(height_width) {

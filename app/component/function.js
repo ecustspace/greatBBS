@@ -4,6 +4,7 @@ import React from "react";
 import './loginModal.css'
 import {createRoot} from "react-dom";
 import LoginModal from "@/app/component/loginModal";
+import {recaptcha_site_key_v3} from "@/app/(app)/clientConfig";
 
 export function timeConclude(time) {
     const recent = Date.now() - time
@@ -106,4 +107,19 @@ export function share (post) {
 快去看看吧：${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
             .then(() => {Toast.show('分享链接已复制到剪切板')})
     }
+}
+
+export function recaptchaExecute() {
+    return new Promise((resolve, reject) => {
+        grecaptcha.ready(() => {
+            grecaptcha
+                .execute(recaptcha_site_key_v3, { action: 'submit' })
+                .then((token) => {
+                    resolve(token);
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        });
+    });
 }

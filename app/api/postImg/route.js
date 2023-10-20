@@ -1,11 +1,15 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
-import {docClient, getUserItem, uploadImage} from "@/app/api/server";
+import {docClient, getUserItem, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {
     const data = await request.json()
+    const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     if (data.images.length > 6 || data.images.length === 0 || data.text.length > 50){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }

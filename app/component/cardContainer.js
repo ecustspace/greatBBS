@@ -3,7 +3,7 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {ActionSheet, Dialog, InfiniteScroll, Toast,} from "antd-mobile";
 import {PostCard} from "@/app/component/postCard";
-import {getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
+import {fetchData, getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
@@ -58,9 +58,11 @@ export default function CardContainer({post,type}) {
    },[])
 
     function refresh() {
-        fetch(window.location.origin + `/api/getPostData?postType=${type}`).then(res => {
-            return res.json()
-        }).then(data => {
+        Toast.show({
+            icon:'loading'
+        })
+        fetchData(type).then(data => {
+            Toast.clear()
             if (data.lastKey) {
                 setKey(data.lastKey)
             }
@@ -69,7 +71,12 @@ export default function CardContainer({post,type}) {
                 setLoadPostList([])
                 setHasMore(true)
             } else {setHasMore(false)}
-        }).catch((err) => {console.log(err);setPostList('err')})
+        }).catch(() => {
+            Toast.show({
+                icon:'fail',
+                content:'刷新失败'
+            })
+            setPostList('err')})
     }
 
     async function loadMore() {

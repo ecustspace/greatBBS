@@ -1,13 +1,14 @@
 'use client'
 import '../../globals.css'
 import './signup.css'
-import React, {useState} from 'react'
-import {AutoCenter, Button, Form, Input, NavBar} from 'antd-mobile'
+import React, {useEffect, useRef, useState} from 'react'
+import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {sha256} from "js-sha256";
 import TranslationAvatar from "@/app/component/translationAvatar";
-import {avatarList} from "@/app/(app)/clientConfig";
+import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Home() {
     const [psw, setPsw] = useState();
@@ -17,6 +18,12 @@ export default function Home() {
     const [time, setTime] = useState("获取验证码");
     const [form] = Form.useForm()
     const [email, setEmail] = useState("")
+    const captchaRef = useRef(null)
+    useEffect(() => {
+        window.recaptchaOptions = {
+            useRecaptchaNet: true
+        }
+    },[])
     const onSubmit = () => {    //验证码
         if (email.length === 0) {
             console.log(email)
@@ -25,21 +32,43 @@ export default function Home() {
         }
         let last = window.localStorage.getItem("time") ? window.localStorage.getItem("time") : 0
         if (last == 0 || (window.localStorage.getItem("time") && (Date.parse(new Date()) - window.localStorage.getItem("time") >= 120000))) {
-            window.localStorage.setItem("time", Date.parse(new Date()))
-            setDisable(true)
-            last = window.localStorage.getItem("time")
-            let now = Date.parse(new Date())
-            let res = now - last
-            setTime(((120000 - res) / 1000).toString() + "s")
-            let djs = setInterval(() => {
-                res += 1000
-                setTime(((120000 - res) / 1000).toString() + "s")
-                if (res == 120000) {
-                    setTime("获取验证码")
-                    setDisable(false)
-                    clearInterval(djs)
-                }
-            }, 1000);
+            captchaRef.current.executeAsync().then(token => {
+                captchaRef.current.reset()
+                let values = form.getFieldsValue(true)
+                values.recaptchaToken = token
+                fetch(window.location.origin + '/api/register/forCaptcha', {
+                    method: 'post',
+                    body: JSON.stringify(values),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(res => res.json()).then(
+                    (data) => {
+                        document.cookie = `SignUpToken=${data.sign_up_token}`
+                        responseHandle(data)
+                        window.localStorage.setItem("time", Date.parse(new Date()))
+                        setDisable(true)
+                        last = window.localStorage.getItem("time")
+                        let now = Date.parse(new Date())
+                        let res = now - last
+                        setTime(((120000 - res) / 1000).toString() + "s")
+                        let djs = setInterval(() => {
+                            res += 1000
+                            setTime(((120000 - res) / 1000).toString() + "s")
+                            if (res == 120000) {
+                                setTime("获取验证码")
+                                setDisable(false)
+                                clearInterval(djs)
+                            }
+                        }, 1000);
+                    }
+                ).catch(() => {
+                    Toast.show('error')
+                })
+            }).catch(() => {
+                captchaRef.current.reset()
+                Toast.show('未通过人机验证')
+            })
         }
         else {
             setDisable(true)
@@ -56,50 +85,45 @@ export default function Home() {
                     clearInterval(djs)
                 }
             }, 1000);
-            return;
         }
-        const values = form.getFieldsValue(true)
-        fetch(window.location.origin + '/api/register/forCaptcha', {
-            method: 'post',
-            body: JSON.stringify(values),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json()).then(
-            (data) => {
-                document.cookie = `SignUpToken=${data.sign_up_token}`
-                responseHandle(data)
-            }
-        )
     }
     const onSubmit1 = () => {
-        const values = form.getFieldsValue(true)
-        const anid = (Math.round(Math.random() * (999999 - 100000)) + 100000).toString();
-        values.anid = sha256(anid)
-        values.avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
-        fetch(window.location.origin + '/api/register/verify', {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify(values),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json()).then(
-            (data) => {
-                responseHandle(data)
-                if (data.status === 200) {
-                    localStorage.setItem('Avatar', data.avatar)
-                    localStorage.setItem('Anid', anid)
-                    window.location.replace('/')
+        captchaRef.current.executeAsync().then(token => {
+            const values = form.getFieldsValue(true)
+            values.recaptchaToken = token
+            const anid = (Math.round(Math.random() * (999999 - 100000)) + 100000).toString();
+            values.anid = sha256(anid)
+            values.avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
+            fetch(window.location.origin + '/api/register/verify', {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify(values),
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            }
-        )
+            }).then(res => res.json()).then(
+                (data) => {
+                    responseHandle(data)
+                    if (data.status === 200) {
+                        localStorage.setItem('Avatar', data.avatar)
+                        localStorage.setItem('Anid', anid)
+                        window.location.replace('/')
+                    }
+                }
+            )
+        }).catch(() => {Toast.show('人机验证失败')})
+        captchaRef.current.reset()
     }
     const back = () => {
         window.location.replace('/')
     }
     return (
         <div>
+            <ReCAPTCHA
+                sitekey={recaptcha_site_key_v2}
+                ref={captchaRef}
+                size="invisible"
+            />
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{ marginTop: '10px' }}>
                 <TranslationAvatar
@@ -118,14 +142,14 @@ export default function Home() {
                 style={{ '--prefix-width': '4.5em' }}
                 requiredMarkStyle='none'
                 footer={
-                    <Button
-                        block
-                        color={"primary"}
-                        shape={"rounded"}
-                        size='large'
-                        type='submit'>
-                        <div style={{ fontWeight: 'bolder', fontSize: 18 }}>注 册</div>
-                    </Button>
+                        <Button
+                            block
+                            color={"primary"}
+                            shape={"rounded"}
+                            size='large'
+                            type='submit'>
+                            <div style={{ fontWeight: 'bolder', fontSize: 18 }}>注 册</div>
+                        </Button>
                 }>
                 <Form.Item
                     label='用户名'

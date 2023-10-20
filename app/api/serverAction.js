@@ -11,11 +11,14 @@ import {
     TransactWriteCommand,
     UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-import {avatarList} from "@/app/(app)/clientConfig";
+import {avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
 
-export async function fetchData(url, tag) {
-    const data = await fetch(url,{next:{tags:[tag]},cache:'no-cache'})
+export async function fetchData(type) {
+    if (!['Image','Post','AnPost'].includes(type)) {
+        return 500
+    }
+    const data = await fetch(Url + `/api/getPostData?postType=${type}`,{next:{tags:[type]}})
     return await data.json()
 }
 

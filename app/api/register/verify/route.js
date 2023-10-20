@@ -1,5 +1,5 @@
 import {DeleteCommand, GetCommand, TransactWriteCommand,} from "@aws-sdk/lib-dynamodb";
-import {docClient} from "@/app/api/server";
+import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {v4} from "uuid";
@@ -12,6 +12,10 @@ export function dataLengthVerify(min,max,data) {
 }
 export async function POST(request) {
     const data = await request.json()
+    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     const jwtSecret = process.env.JWT_SECRET
     if ( data.username.includes('#') ||
     !dataLengthVerify(1,8,data.username) ||
@@ -82,7 +86,7 @@ export async function POST(request) {
             ]
         })
         const res= await docClient.send(TransactWrite).then((res) => {
-            docClient.send(new DeleteCommand({
+              docClient.send(new DeleteCommand({
                 TableName: 'User',
                 Key: {
                     PK: sign_up_token.value,

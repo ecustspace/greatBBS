@@ -1,4 +1,4 @@
-import {docClient, getUserIDItem} from "@/app/api/server";
+import {docClient, getUserIDItem, recaptchaVerify_v2} from "@/app/api/server";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {NextResponse} from "next/server";
 import {v4} from "uuid";
@@ -6,6 +6,10 @@ import {sha256} from "js-sha256";
 
 export async function POST(request) {
     const data = await request.json()
+    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     const jwtSecret = process.env.JWT_SECRET
     const user_item = await getUserIDItem(data.useremail)
     if (user_item === 500 || !user_item){

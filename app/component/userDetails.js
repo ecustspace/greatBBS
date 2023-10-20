@@ -21,11 +21,11 @@ const UserDetails = forwardRef(({user},ref) => {
 
     useEffect(() => {
         if (!isVisible) {
-            unlock(document.getElementById('anPostDetails'))
+            unlock(document.getElementById('userDetails'))
             return
         }
         let timer = setInterval(() => {
-            const element = document.getElementById('anPostDetails');
+            const element = document.getElementById('userDetails');
             if (element) {
                 lock(element)
                 clearInterval(timer)

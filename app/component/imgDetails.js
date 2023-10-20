@@ -24,7 +24,7 @@ import {
 } from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
 import {SwitchLike} from "@/app/component/postCard";
-import {mockUpload, responseHandle, share, timeConclude} from "@/app/component/function";
+import {mockUpload, recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageSwiper} from "@/app/component/imageContainer";
 import Ellipsis from "@/app/component/ellipsis";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
@@ -133,43 +133,48 @@ const PostDetails = forwardRef(({post,like},ref) => {
         setReplyTo({})
     },[post])
     function submitReply() {
-        const data = {
-            post_name: post.PK,
-            post_time: post.SK,
-            content: textContent,
-            images: []
-        }
-        if (replyTo.reply_name !== undefined) {
-            data['reply_name'] = replyTo.reply_name
-            data['reply_time'] = replyTo.reply_time
-        }
-        if (uploadImage === true && fileList.length > 0) {
-            data['images'] = fileList
-        }
         setDisable(true)
-        Toast.show({
-            icon:"loading",
-            content:'正在发布...',
-            duration:0
-        })
-        fetch(window.location.origin + '/api/reply',{
-            method:'POST',
-            body: JSON.stringify(data),
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json'
+        recaptchaExecute().then(token => {
+            const data = {
+                post_name: post.PK,
+                post_time: post.SK,
+                content: textContent,
+                images: [],
+                recaptchaToken: token
             }
-        }).then(res => {
-            return res.json()})
-            .then(data => {
-                setDisable(false)
-                responseHandle(data)
-                if (data.status === 200) {
-                    setMaskVisible(false)
-                    setTextContent('')
-                    setReplyTo({})
-                }
+            if (replyTo.reply_name !== undefined) {
+                data['reply_name'] = replyTo.reply_name
+                data['reply_time'] = replyTo.reply_time
+            }
+            if (uploadImage === true && fileList.length > 0) {
+                data['images'] = fileList
+            }
+            Toast.show({
+                icon:"loading",
+                content:'正在发布...',
+                duration:0
             })
+            fetch(window.location.origin + '/api/reply',{
+                method:'POST',
+                body: JSON.stringify(data),
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                return res.json()})
+                .then(data => {
+                    setDisable(false)
+                    responseHandle(data)
+                    if (data.status === 200) {
+                        setMaskVisible(false)
+                        setTextContent('')
+                        setReplyTo({})
+                    }
+                })
+        }).catch(() => {
+            Toast.show('人机验证失败')
+        })
     }
 
     async function getReply() {

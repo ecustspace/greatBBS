@@ -17,7 +17,7 @@ import {
     TextArea,
     Toast
 } from 'antd-mobile'
-import {mockUpload, responseHandle} from "@/app/component/function";
+import {mockUpload, recaptchaExecute, responseHandle} from "@/app/component/function";
 import {QuestionCircleOutline} from 'antd-mobile-icons'
 
 
@@ -64,47 +64,49 @@ const SendPost = forwardRef((props, ref) => {
                 setBtnDisable(false)
                 return
         }}
-        const xhr = new XMLHttpRequest();
-        if (activePart !== 2) {
-            xhr.open('POST', window.location.origin + '/api/post', true);
-        } else {
-            xhr.open('POST', window.location.origin + '/api/postImg', true);
-        }
-        xhr.upload.addEventListener('progress',function (e) {
-            Toast.show({
-                icon: <ProgressCircle
-                    percent={(e.loaded / e.total) * 75}
-                    style={{'--track-color':'#FFFFFF00','--fill-color':'white'}}
-                />,
-                content: '正在发布...',
-                duration:0
+        recaptchaExecute().then(token => {
+            data.recaptchaToken = token
+            const xhr = new XMLHttpRequest();
+            if (activePart !== 2) {
+                xhr.open('POST', window.location.origin + '/api/post', true);
+            } else {
+                xhr.open('POST', window.location.origin + '/api/postImg', true);
+            }
+            xhr.upload.addEventListener('progress',function (e) {
+                Toast.show({
+                    icon: <ProgressCircle
+                        percent={(e.loaded / e.total) * 75}
+                        style={{'--track-color':'#FFFFFF00','--fill-color':'white'}}
+                    />,
+                    content: '正在发布...',
+                    duration:0
+                })
             })
-        })
-        xhr.withCredentials = true
-        xhr.responseType = 'json';
-        xhr.onreadystatechange = () => {
-            setBtnDisable(false)
-            if (xhr.readyState === 4) {
-                responseHandle(xhr.response)
-                if (xhr.response.status === 200) {
-                    setText('')
-                    setFileList([])
-                    setIsVisible(false)
-                } else {
-                    if (xhr.response.tip === '匿名密钥错误') {
-                        localStorage.setItem('Anid','')
+            xhr.withCredentials = true
+            xhr.responseType = 'json';
+            xhr.onreadystatechange = () => {
+                setBtnDisable(false)
+                if (xhr.readyState === 4) {
+                    responseHandle(xhr.response)
+                    if (xhr.response.status === 200) {
+                        setText('')
+                        setFileList([])
+                        setIsVisible(false)
+                    } else {
+                        if (xhr.response.tip === '匿名密钥错误') {
+                            localStorage.setItem('Anid','')
+                        }
                     }
                 }
+            };
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.ontimeout = function () {
+                Toast.show({
+                    content: '请求超时'
+                })
             }
-        };
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.ontimeout = function () {
-            Toast.show({
-                content: '请求超时'
-            })
-        }
-        xhr.send(JSON.stringify(data));
-
+            xhr.send(JSON.stringify(data));
+        })
     }
 
     return (

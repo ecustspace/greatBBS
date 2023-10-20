@@ -1,5 +1,5 @@
 import {DeleteCommand, GetCommand, UpdateCommand,} from "@aws-sdk/lib-dynamodb";
-import {docClient} from "@/app/api/server";
+import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {v4} from "uuid";
@@ -10,6 +10,10 @@ export function dataLengthVerify(min,max,data) {
 }
 export async function POST(request) {
     const data = await request.json()
+    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     console.log(data)
     if (!dataLengthVerify(5,20,data.useremail) ||
         !dataLengthVerify(5,20,data.password) ||

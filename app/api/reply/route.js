@@ -1,4 +1,4 @@
-import {docClient, getUserItem, uploadImage} from "@/app/api/server";
+import {docClient, getUserItem, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
@@ -8,6 +8,10 @@ import {revalidateTag} from "next/cache";
 
 export async function POST(request) {
     const data = await request.json()
+    const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     if (data.images.length > 3 || data.content.length > 500 || !data.content){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
@@ -211,9 +215,10 @@ export async function POST(request) {
     if (res === 200 && (postData[0].PostType === 'Post' || 'Image')) {
         let image_list = []
         for(let i = 0, len = data.images.length; i < len; i++) {
-            const type = await uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())
+            const type = uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())
             image_list.push(type)
         }
+        image_list = await Promise.all(image_list)
         if (image_list.length !== 0) {
             await docClient.send(new UpdateCommand({
                 TableName: 'BBS',

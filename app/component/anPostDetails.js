@@ -15,7 +15,7 @@ import {
     TextArea,
     Toast
 } from "antd-mobile";
-import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {
     ExclamationCircleOutline,
     LoopOutline,
@@ -28,7 +28,7 @@ import {
 import ReplyCard from "@/app/component/replyCard";
 import {names} from "@/app/(app)/clientConfig";
 import {SwitchLike} from "@/app/component/postCard";
-import {responseHandle, share, timeConclude} from "@/app/component/function";
+import {recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
@@ -115,48 +115,53 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     },[post])
 
     function submitReply() {
-        const data = {
-            post_name: post.PK,
-            post_time: post.SK,
-            content: textContent,
-            images: []
-        }
-        if (!localStorage.getItem('Anid')) {
-            setDialogVisible(true)
-            return
-        }
-        data.isAnonymity = localStorage.getItem('Anid')
-        if (replyTo.reply_name !== undefined) {
-            data['reply_name'] = replyTo.reply_sha_name
-            data['reply_time'] = replyTo.reply_time
-        }
         setDisable(true)
-        Toast.show({
-            icon:"loading",
-            content:'正在发布...',
-            duration:0
-        })
-        fetch(window.location.origin + '/api/reply',{
-            method:'POST',
-            body: JSON.stringify(data),
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json'
+        recaptchaExecute().then(token => {
+            const data = {
+                post_name: post.PK,
+                post_time: post.SK,
+                content: textContent,
+                images: [],
+                recaptchaToken: token
             }
-        }).then(res => {
-            return res.json()})
-            .then(data => {
-                setDisable(false)
-                if (data.tip === '匿名密钥错误') {
-                    localStorage.setItem('Anid','')
-                }
-                if (data.status === 200) {
-                    setMaskVisible(false)
-                    setTextContent('')
-                    setReplyTo({})
-                }
-                responseHandle(data)
+            if (!localStorage.getItem('Anid')) {
+                setDialogVisible(true)
+                return
+            }
+            data.isAnonymity = localStorage.getItem('Anid')
+            if (replyTo.reply_name !== undefined) {
+                data['reply_name'] = replyTo.reply_sha_name
+                data['reply_time'] = replyTo.reply_time
+            }
+            Toast.show({
+                icon:"loading",
+                content:'正在发布...',
+                duration:0
             })
+            fetch(window.location.origin + '/api/reply',{
+                method:'POST',
+                body: JSON.stringify(data),
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                return res.json()})
+                .then(data => {
+                    setDisable(false)
+                    if (data.tip === '匿名密钥错误') {
+                        localStorage.setItem('Anid','')
+                    }
+                    if (data.status === 200) {
+                        setMaskVisible(false)
+                        setTextContent('')
+                        setReplyTo({})
+                    }
+                    responseHandle(data)
+                })
+        }).catch(() => {
+            Toast.show('人机验证失败')
+        })
     }
 
     async function getReply() {

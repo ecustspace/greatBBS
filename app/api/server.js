@@ -76,3 +76,30 @@ export async function uploadImage (image,path,id) {
         }).then(res => {return type})
         .catch(error => {return 'err'})
 }
+
+export async function recaptchaVerify_v2(token) {
+    const response = await fetch('https://recaptcha.net/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `secret=${process.env.RECAPTCHA_KEY_V2}&response=${token}`
+    });
+
+    const data = await response.json();
+    return data.success;
+}
+
+export async function recaptchaVerify_v3(token) {
+    const response = await fetch('https://recaptcha.net/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `secret=${process.env.RECAPTCHA_KEY_V3}&response=${token}`
+    });
+
+    const data = await response.json();
+    return !!(data.score && data.score > 0.5);
+}
+

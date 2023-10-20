@@ -6,10 +6,7 @@ import {NextResponse} from "next/server";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
-    if (isHuman !== true) {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
-    }
+    
     const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,

@@ -87,6 +87,7 @@ export async function recaptchaVerify_v2(token) {
     });
 
     const data = await response.json();
+    console.log(data)
     return data.success;
 }
 

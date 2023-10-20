@@ -16,6 +16,10 @@ export default function Home() {
     const [visible, setVisible] = useState(false)
     const captchaRef = useRef(null)
     const toLogin = useContext(loginState).toLogin
+    useEffect(() => {if (typeof window !== undefined)
+        window.recaptchaOptions = {
+            useRecaptchaNet: true
+        }},[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             captchaRef.current.reset()

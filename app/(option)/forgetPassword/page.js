@@ -21,7 +21,10 @@ export default function Home() {
     const nextStep = () => {
         setVisiblePop(true);
     }
-
+    useEffect(() => {if (typeof window !== undefined)
+        window.recaptchaOptions = {
+            useRecaptchaNet: true
+        }},[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             captchaRef.current.reset()

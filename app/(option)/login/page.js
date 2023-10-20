@@ -25,13 +25,14 @@ export default function Home() {
     },[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
-            captchaRef.current.reset()
             const values = form.getFieldsValue(true)
             values.recaptchaToken = token
             toLogin(values).then(res => {
                 if (res.status === 200) {
                     window.location.replace('/')
+                    captchaRef.current.reset()
                 } else {
+                    captchaRef.current.reset()
                     responseHandle(res)
                 }
             })

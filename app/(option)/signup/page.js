@@ -35,7 +35,6 @@ export default function Home() {
         let last = window.localStorage.getItem("time") ? window.localStorage.getItem("time") : 0
         if (last == 0 || (window.localStorage.getItem("time") && (Date.parse(new Date()) - window.localStorage.getItem("time") >= 120000))) {
             captchaRef.current.executeAsync().then(token => {
-                captchaRef.current.reset()
                 let values = form.getFieldsValue(true)
                 values.recaptchaToken = token
                 fetch(window.location.origin + '/api/register/forCaptcha', {
@@ -44,7 +43,10 @@ export default function Home() {
                     headers: {
                         'Content-Type': 'application/json'
                     }
-                }).then(res => res.json()).then(
+                }).then(res => {
+                    captchaRef.current.reset()
+                    return res.json()
+                }).then(
                     (data) => {
                         document.cookie = `SignUpToken=${data.sign_up_token}`
                         responseHandle(data)
@@ -103,7 +105,10 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(res => res.json()).then(
+            }).then(res => {
+                captchaRef.current.reset()
+                return res.json()
+            }).then(
                 (data) => {
                     responseHandle(data)
                     if (data.status === 200) {
@@ -113,8 +118,10 @@ export default function Home() {
                     }
                 }
             )
-        }).catch(() => {Toast.show('人机验证失败')})
-        captchaRef.current.reset()
+        }).catch(() => {
+            captchaRef.current.reset()
+            Toast.show('人机验证失败')
+        })
     }
     const back = () => {
         window.location.replace('/')

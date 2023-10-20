@@ -40,7 +40,10 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(res => res.json()).then(
+            }).then(res => {
+                captchaRef.current.reset()
+                return res.json()
+            }).then(
                 (data) => {
                     document.cookie = `SignUpToken=${data.sign_up_token}`
                     responseHandle(data)
@@ -52,7 +55,6 @@ export default function Home() {
     }
     const onSubmit1 = () => {
         captchaRef.current.executeAsync().then(token => {
-            captchaRef.current.reset()
             const values = {
                 ...form1.getFieldsValue(true),
                 ...form2.getFieldsValue(true)
@@ -65,7 +67,10 @@ export default function Home() {
                 headers: {
                     'Content-Type': 'application/json'
                 }
-            }).then(res => res.json()).then(
+            }).then(res => {
+                captchaRef.current.reset()
+                return res.json()
+            }).then(
                 (data) => {
                     responseHandle(data)
                 }

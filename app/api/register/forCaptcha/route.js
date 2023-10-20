@@ -7,17 +7,24 @@ import {NextResponse} from "next/server";
 export async function POST(request) {
     const data = await request.json()
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: true,
-        auth: {
-            user: process.env.SMTP_USERNAME,
-            pass: process.env.SMTP_USERPASS,
-        },
-    });
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_USERPASS,
+    },
+});
     const user_email = data.useremail
     const captcha = Math.round(Math.random() * (999999 - 100000)) + 100000;
     const now = Date.now()
+    await transporter.verify(function(error, success) {
+  if (error) {
+    console.log('500')
+  } else {
+    console.log('200')
+  }
+})
     const info = await transporter.sendMail({
         from: '1563741036@qq.com', // sender address
         to: user_email + process.env.EMAIL, // list of receivers

@@ -30,14 +30,16 @@ export default function RootLayout({ children }) {
         isLogin
     }
     useEffect(() => {
-        const cookie = document.cookie
+        if (typeof window !== undefined)
+            window.recaptchaOptions = {
+                enterprise: true
+            }
         if (getCookie('Token') && getCookie('UserName')) {
             if (parseInt(getCookie('Token').split('#')[0]) < Date.now()){
                 setLogin(false)
             } else {setLogin(true)}
         } else {setLogin(false)}
     },[])
-
     return (
         <html>
         <head>

@@ -18,11 +18,6 @@ export default function Home() {
     const [visiblePW1, setVisiblePW1] = useState(false)
     const [visiblePW2, setVisiblePW2] = useState(false)
     const captchaRef = useRef(null)
-    useEffect(() => {
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-    },[])
     const nextStep = () => {
         setVisiblePop(true);
     }

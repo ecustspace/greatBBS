@@ -10,11 +10,6 @@ import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 export default function LoginModal({onSubmit,loginSuccess,root}){
     const [isVisible,setVisible] = useState(true)
     const captchaRef = useRef(null)
-    useEffect(() => {
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-    },[])
     return(
         <CenterPopup
             visible={isVisible}

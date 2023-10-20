@@ -19,11 +19,6 @@ export default function Home() {
     const [form] = Form.useForm()
     const [email, setEmail] = useState("")
     const captchaRef = useRef(null)
-    useEffect(() => {
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-    },[])
     const onSubmit = () => {    //验证码
         if (email.length === 0) {
             console.log(email)

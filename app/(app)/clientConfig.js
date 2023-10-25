@@ -55,9 +55,9 @@ export const AboutUs = () =>
                 <p>后端：node.js dynamodb</p>
             </li>
             <li>
-                <p>团队组长：</p>
+                <p>团队</p>
                 <ul>
-                    <li>化工学院 方昆亮</li>
+                    <li>组长：化工学院 方昆亮</li>
                     <li>成员：不愿意透露姓名</li>
                 </ul>
             </li>

@@ -1,7 +1,6 @@
 'use client'
 
-import '../../globals.css'
-import '@/app/(option)/signup/signup.css'
+import './login.css'
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
@@ -10,19 +9,14 @@ import TranslationAvatar from "@/app/component/translationAvatar";
 import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
+import Script from "next/script";
 
 export default function Home() {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
     const captchaRef = useRef(null)
-    const [isRecaptchaOK,setOK] = useState(false)
     const toLogin = useContext(loginState).toLogin
-    useEffect(() => {if (typeof window !== undefined)
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-        setOK(true)
-    },[])
+
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             const values = form.getFieldsValue(true)
@@ -50,22 +44,25 @@ export default function Home() {
         window.location.replace('/')
     }
     return (
-        <>
-            {isRecaptchaOK ? <ReCAPTCHA
+        <div>
+            <script>
+                window.recaptchaOptions = useRecaptchaNet: true
+            </script>
+            <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            /> : ''}
+            />
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{marginTop:'10px'}}>
                 <TranslationAvatar
                     avatarList={avatarList}
                     size={'96px'}/>
+
             </AutoCenter>
             <div>
                 <h1>登录账号</h1>
             </div>
-
             <Form
                 form={form}
                 onFinish={onSubmit}
@@ -122,6 +119,6 @@ export default function Home() {
                     />
                 </Form.Item>
             </Form>
-        </>
+        </div>
     )
 }

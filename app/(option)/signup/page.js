@@ -20,12 +20,6 @@ export default function Home() {
     const [email, setEmail] = useState("")
     const [isRecaptchaOK,setOK] = useState(false)
     const captchaRef = useRef(null)
-    useEffect(() => {if (typeof window !== undefined)
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-        setOK(true)
-    },[])
     const onSubmit = () => {    //验证码
         if (email.length === 0) {
             console.log(email)
@@ -128,11 +122,14 @@ export default function Home() {
     }
     return (
         <div>
-            {isRecaptchaOK ? <ReCAPTCHA
+            <script>
+                window.recaptchaOptions = useRecaptchaNet: true
+            </script>
+             <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            /> : ''}
+            />
             <NavBar onBack={back}></NavBar>
             <AutoCenter style={{ marginTop: '10px' }}>
                 <TranslationAvatar
@@ -189,6 +186,11 @@ export default function Home() {
                     }]}
                     name='useremail'
                     label='邮箱'
+                    help={<>
+                        <div>只接受学校邮箱，输入学号即可</div>
+                        <a href='https://stu.mail.ecust.edu.cn/' target="_blank">学校邮箱网址：https://stu.mail.ecust.edu.cn/</a>
+                        <div>邮箱初始密码：身份证后八位加上Ecust#</div>
+                    </>}
                     extra={
                         <div>@mail.ecust.edu.cn</div>
                     }

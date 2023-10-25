@@ -4,7 +4,7 @@ import SendPost from "@/app/component/sendPost";
 import React, {useContext, useRef, useState} from 'react'
 import {Button, NavBar, Tabs, Toast} from 'antd-mobile'
 import Image from 'next/image'
-import {MessageFill} from 'antd-mobile-icons'
+import {AddOutline, MessageFill} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
 import {showLoginModal} from "@/app/component/function";
 
@@ -41,7 +41,7 @@ export default function RootLayout({ post,anPost,ins }) {
     return (
         <div>
                 <div className='FloatBubble' onClick={showPopup} style={{bottom:'65px'}}>
-                    <MessageFill fontSize={32} color='#fff' />
+                    <AddOutline fontSize={32} color='#fff' />
                 </div>
             <SendPost ref={popup} />
                 <div className='TopItem'>

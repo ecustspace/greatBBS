@@ -1,0 +1,43 @@
+
+.password {
+    align-items: center;
+    margin: 20px;
+    margin-top: 40px;
+}
+
+.input {
+    flex: auto;
+    display: inline-block;
+}
+
+.eye {
+    display: inline;
+    padding: 4px;
+    cursor: pointer;
+}
+
+h1 {
+    text-align: center;
+    color: #2873d8;
+}
+
+.logo {
+    font-size: 32px;
+    text-align: center;
+}
+
+.button {
+    margin: 30px;
+}
+
+.button Button {
+    border-color: gray;
+    margin-top: 20px;
+}
+
+.avatar {
+    margin: 40px auto;
+    margin-bottom: 20px;
+    width: 30px;
+    height: 30px;
+}

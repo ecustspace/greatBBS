@@ -63,7 +63,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         data.name = decodeURI(getCookie('UserName'))
         setAvatar(localStorage.getItem('Avatar'))
         if (isLogin === false) {
-            redirect('/login','push')
+            window.location.replace('/login')
         } else {
             getUserData(document.cookie).then(res => {
                 data.count = res

@@ -22,12 +22,6 @@ export default function Home() {
     const nextStep = () => {
         setVisiblePop(true);
     }
-    useEffect(() => {if (typeof window !== undefined)
-        window.recaptchaOptions = {
-            useRecaptchaNet: true
-        }
-        setOK(true)
-        },[])
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             captchaRef.current.reset()
@@ -82,11 +76,14 @@ export default function Home() {
 
     return (
         <>
-            {isRecaptchaOK ? <ReCAPTCHA
+            <script>
+                window.recaptchaOptions = useRecaptchaNet: true
+            </script>
+            <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}
                 size="invisible"
-            /> : ''}
+            />
             <NavBar onBack={() => {
                 window.location.replace('/')
             }}></NavBar>

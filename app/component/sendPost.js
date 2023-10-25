@@ -5,10 +5,10 @@ import {
     AutoCenter,
     Button,
     CenterPopup,
+    Dialog,
     Form,
     ImageUploader,
     Input,
-    Modal,
     NavBar,
     Popup,
     ProgressCircle,
@@ -18,8 +18,8 @@ import {
     Toast
 } from 'antd-mobile'
 import {mockUpload, recaptchaExecute, responseHandle} from "@/app/component/function";
-import {QuestionCircleOutline} from 'antd-mobile-icons'
-
+import {EyeOutline, QuestionCircleOutline, UserOutline} from "antd-mobile-icons";
+import {AboutAnonymity} from "@/app/(app)/clientConfig";
 
 // eslint-disable-next-line react/display-name
 const SendPost = forwardRef((props, ref) => {
@@ -140,6 +140,8 @@ const SendPost = forwardRef((props, ref) => {
                         </>}
                 >
                     <Form.Item
+                        label='匿名密钥'
+                        help={<>请到上次注册/修改密钥的设备(浏览器)→个人中心<UserOutline />→修改资料匿名密钥栏，点击 <EyeOutline /> 查看</>}
                     >
                         <Input placeholder='匿名密钥' onChange={setAnid}/>
                     </Form.Item>
@@ -167,11 +169,11 @@ const SendPost = forwardRef((props, ref) => {
                 <div>
                     <Selector
                         style={{
+                            display:'inline-block',
                             '--border-radius': '100px',
                             '--border': 'solid transparent 1px',
                             '--checked-border': 'solid var(--adm-color-primary) 1px',
                             '--padding': '8px 24px',
-                            display: "inline-block"
                         }}
                         showCheckMark={false}
                         options={[
@@ -207,15 +209,13 @@ const SendPost = forwardRef((props, ref) => {
                             }
                         }}
                     />
-
                     <div style={{ display: "inline-block", marginLeft: '40px' }}>
                         <QuestionCircleOutline
                             style={{ paddingBottom: "15px" }}
                             fontSize={20}
                             onClick={() => {
-                                Modal.show({
-                                    content: '树洞就是个洞！树洞就是个洞！树洞就是个洞！树洞就是个洞！树洞就是个洞！树洞就是个洞！',
-                                    closeOnMaskClick: true,
+                                Dialog.alert({
+                                    content:<AboutAnonymity />
                                 })
                             }}
                         />
@@ -229,7 +229,9 @@ const SendPost = forwardRef((props, ref) => {
                                 maxCount={3}
                                 style={{ "--cell-size": "100px" }}
                                 value={fileList}
-                                onChange={setFileList}
+                                onChange={(fileList) => {
+                                    console.log(fileList)
+                                    setFileList(fileList)}}
                                 upload={mockUpload}
                                 preview={false}
                             ></ImageUploader> :

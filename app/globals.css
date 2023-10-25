@@ -93,6 +93,7 @@ body {
   border-radius: 50%;
   height: 32px;
   width: 32px;
+  z-index: 2;
   border: solid 6px var(--adm-color-primary);
 }
 

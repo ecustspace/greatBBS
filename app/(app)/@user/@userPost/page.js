@@ -15,7 +15,7 @@ export default function Home() {
     const actionSheet = useRef()
 
     function deletePost(post) {
-        deleteOperation(document.cookie,post.SK).then((res) => {
+        deleteOperation(document.cookie,post.SK,null,null,post.PostType).then((res) => {
             if (res === 200) {
                 setList(
                     list.filter(t => t !== post)

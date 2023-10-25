@@ -22,13 +22,13 @@ export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
         <div style={{display:"flex",alignItems:"center",justifyContent:"center"}} onClick={(event) => event.stopPropagation()}>
             <HeartOutline onClick={
                 () => {
+                    reply ? setReplyLikeList([...replyLikeList,postID]) : addLike([postID])
                     like(document.cookie,PK,SK,localStorage.getItem('Avatar')).then(res => {
                         if (res === 200) {
-                            reply ? setReplyLikeList([...replyLikeList,postID]) : addLike([postID])
                             if (typeof initialLikeCount === "number") {
                                 setLikeCount(likeCount => likeCount+1)
                             }
-                        } else {alert(res)}
+                        }
                     })
                 }}
             fontSize={size}/>

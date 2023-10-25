@@ -1,0 +1,23 @@
+.container {
+    text-align: center;
+    height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    position: absolute;
+}
+
+.load {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+}
+
+.image {
+    margin-top: 50px;
+}
+
+.spinloading {
+    margin-top: 50px;
+}

@@ -171,7 +171,13 @@ const PostDetails = forwardRef(({post,like},ref) => {
                         setTextContent('')
                         setReplyTo({})
                     }
+                }).catch(() => {
+                setDisable(false)
+                Toast.show({
+                    icon:"fail",
+                    content:'error'
                 })
+            })
         }).catch(() => {
             Toast.show('人机验证失败')
         })
@@ -216,7 +222,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                 }
                 }
                 visible={isPopupVisible}
-                bodyStyle={{height:'80vh'}}
+                bodyStyle={{height:'100%'}}
             >
                 <NavBar onBack={() => setIsVisible(false)}>
                     帖子详情

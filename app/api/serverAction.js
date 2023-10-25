@@ -365,7 +365,7 @@ export async function getPostLikeList(cookie,from,to,reply){
     }).catch(err => {console.log(err)})
 }
 
-export async function deleteOperation(cookie,SK,string,where) {
+export async function deleteOperation(cookie,SK,string,where,type) {
     const jwt = getCookie('JWT',cookie)
     const username = decodeURI(getCookie('UserName',cookie))
     const token = getCookie('Token',cookie)
@@ -394,6 +394,9 @@ export async function deleteOperation(cookie,SK,string,where) {
             ':where': where
         }
         input.ConditionExpression = 'InWhere = :where'
+    }
+    if (['AnPost','Post','Image'].includes(type)) {
+        revalidateTag(type)
     }
     return await docClient.send(new DeleteCommand(input)).then(() => {
         if (string === 'Like#') {
@@ -487,13 +490,13 @@ export async function Report(cookie,PK,SK) {
                     PK:'Report#' + PK,
                     SK: SK
                 },
-                UpdateExpression: 'SET #attrName = if_not_exists(#attrName, :zero) + :increment',
+                UpdateExpression: 'PostType = :post_type,#ttl = :ttl',
                 ExpressionAttributeNames: {
-                    '#attrName': 'ReportCount'
+                    '#ttl' : 'ttl'
                 },
                 ExpressionAttributeValues: {
-                    ':increment': 1,
-                    ':zero': 0
+                    ':post_type': 'Report',
+                    ':ttl' : Date.now()/1000 + 60*60*24*7
                 },
                 ReturnValues:'NONE'
             }))
@@ -552,7 +555,7 @@ export async function getPostList(cookie,postType,lastKey) {
     if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
-    const queryPost = new QueryCommand({
+    const queryPost = {
         TableName:'BBS',
         IndexName:'PostType-SK-index',
         KeyConditionExpression: 'PostType = :post_type',
@@ -560,10 +563,12 @@ export async function getPostList(cookie,postType,lastKey) {
             ':post_type' : postType
         },
         ScanIndexForward:false,
-        Limit:20,
-        ExclusiveStartKey:lastKey
-    })
-    return await docClient.send(queryPost).then(res => {
+        Limit:20
+    }
+    if (lastKey) {
+        queryPost.ExclusiveStartKey = lastKey
+    }
+    return await docClient.send(new QueryCommand(queryPost)).then(res => {
         return {
             posts: res.Items,
             lastKey: res.LastEvaluatedKey

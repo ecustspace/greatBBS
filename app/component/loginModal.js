@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {Button, CenterPopup, Form, Input} from "antd-mobile";
 import './loginModal.css'
 import ReCAPTCHA from "react-google-recaptcha";
@@ -70,10 +70,10 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                     </>
                 }>
                 <Form.Item
-                    label='用户名'
+                    label='邮箱'
                     name='useremail'>
                     <div style={{display:"flex"}}>
-                        <Input placeholder='请输入用户名' clearable></Input>
+                        <Input placeholder='你的学号' clearable></Input>
                         <span >@mail.ecust.edu.cn</span>
                     </div>
                 </Form.Item>

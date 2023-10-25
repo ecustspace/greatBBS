@@ -18,12 +18,14 @@ import {
 import {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {
     ExclamationCircleOutline,
+    EyeOutline,
     LoopOutline,
     MoreOutline,
     PictureOutline,
     SmileOutline,
     UploadOutline,
-    UserAddOutline
+    UserAddOutline,
+    UserOutline
 } from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
 import {names} from "@/app/(app)/clientConfig";
@@ -158,7 +160,13 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         setReplyTo({})
                     }
                     responseHandle(data)
+                }).catch(() => {
+                setDisable(false)
+                Toast.show({
+                    icon:"fail",
+                    content:'error'
                 })
+            })
         }).catch(() => {
             Toast.show('人机验证失败')
         })
@@ -274,6 +282,8 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         </>}
                 >
                     <Form.Item
+                        label='匿名密钥'
+                        help={<>请到上次注册/修改密钥的设备(浏览器)→个人中心<UserOutline />→修改资料匿名密钥栏，点击 <EyeOutline /> 查看</>}
                     >
                         <Input placeholder='匿名密钥' onChange={setAnid}/>
                     </Form.Item>
@@ -286,7 +296,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                 }
                 }
                 visible={isPopupVisible}
-                bodyStyle={{height:'80vh'}}
+                bodyStyle={{height:'100%'}}
             >
                 <NavBar onBack={() => setIsVisible(false)}>
                     帖子详情

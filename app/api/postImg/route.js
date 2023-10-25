@@ -1,15 +1,12 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
-import {docClient, getUserItem, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
+import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {
     const data = await request.json()
     const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
-    if (isHuman !== true) {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
-    }
     if (data.images.length > 6 || data.images.length === 0 || data.text.length > 50){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
@@ -27,6 +24,19 @@ export async function POST(request) {
         return NextResponse.json({tip:'登录信息过期，请重新登录',status:401})
     }
 
+    const is_ban = await isBan(username)
+    if (is_ban !== false) {
+        return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
+    }
+
+    if (typeof isHuman !== 'number') {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
+
+    if (isHuman < 0.5) {
+        await ban(username,(now/1000 + 60*60*2))
+        return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
+    }
     const updatePostCountCommand = new UpdateCommand({
         TableName:'User',
         Key:{
@@ -47,10 +57,10 @@ export async function POST(request) {
 
     let image_list = []
     for(let i = 0, len = data.images.length; i < len; i++) {
-        const type = await uploadImage(data.images[i],'/@post',post_id + '-' + i.toString())
+        const type = uploadImage(data.images[i],'/@post',post_id + '-' + i.toString())
         image_list.push(type)
     }
-
+    image_list = await Promise.all(image_list)
 
         return await docClient.send(new PutCommand({
             TableName: 'BBS',

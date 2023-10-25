@@ -8,7 +8,6 @@ import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import ReCAPTCHA from "react-google-recaptcha";
-import {createRoot} from "react-dom";
 
 
 export default function Home() {

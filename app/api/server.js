@@ -1,5 +1,5 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {DynamoDBDocumentClient, GetCommand} from "@aws-sdk/lib-dynamodb";
+import {DynamoDBDocumentClient, GetCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 
 const client = new DynamoDBClient({});
@@ -50,7 +50,7 @@ export async function getUserItem(name,expect){
     })
 }
 
-export async function uploadImage (image,path,id) {
+export async function uploadImage(image,path,id) {
     const imageDate = image.extra.base64.split(",")
     let type
     if (imageDate[0] === 'data:image/png;base64') {
@@ -100,6 +100,45 @@ export async function recaptchaVerify_v3(token) {
     });
 
     const data = await response.json();
-    return !!(data.score && data.score > 0.5);
+    if (data.score) {
+        return data.score
+    } else {
+        return false
+    }
+}
+
+export async function ban(username,time) {
+    return await docClient.send(new PutCommand({
+        TableName:'User',
+        Item: {
+            PK: 'ban',
+            SK: username,
+            ttl: time
+        }
+    })).then(() => {
+        return 200
+    })
+}
+
+export async function isBan(username) {
+    return await docClient.send(new GetCommand({
+        TableName:'User',
+        Key: {
+            PK:'ban',
+            SK:username
+        },
+        ProjectionExpression:'#ttl',
+        ExpressionAttributeNames: {
+            '#ttl' : 'ttl'
+        }
+    })).then(res => {
+        if (res.Item.ttl) {
+            return res.Item.ttl
+        } else {
+            return false
+        }
+    }).catch(() => {
+        return false
+    })
 }
 

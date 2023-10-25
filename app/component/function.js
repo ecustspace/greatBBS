@@ -29,28 +29,38 @@ export function timeConclude(time) {
     }
 }
 
-export function mockUpload(file) {
-    let res = {};
-    new Compressor(file, {
-        quality: 0.4,
-        success(result) {
-            let reader = new FileReader();
-            reader.readAsDataURL(result);
-            reader.onload = function () {
-                let image = new Image()
-                image.onload = function () {
-                    res['height'] = image.height
-                    res['width'] = image.width
+export async function mockUpload(file) {
+    try {
+        return await new Promise((resolve,reject) => {
+            new Compressor(file, {
+                maxHeight:1080,
+                maxWidth:1080,
+                success(result) {
+                    let res = {}
+                    let reader = new FileReader();
+                    reader.readAsDataURL(result);
+                    reader.onload = function () {
+                        let image = new Image()
+                        image.onload = function () {
+                            res['height'] = image.height
+                            res['width'] = image.width
+                        }
+                        image.src = reader.result
+                        res['base64'] = reader.result
+                    }
+                    resolve({
+                        url:URL.createObjectURL(file),
+                        extra:res
+                    })
+                },
+                error(error) {
+                    reject(error)
                 }
-                image.src = reader.result
-                res['base64'] = reader.result
-            }
-        }
-    })
-    return  {
-        url: URL.createObjectURL(file),
-        extra: res
-    };
+            })
+        })
+    } catch (err) {
+        throw new Error(err)
+    }
 }
 
 export function responseHandle(data) {

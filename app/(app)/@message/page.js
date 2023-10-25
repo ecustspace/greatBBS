@@ -1,7 +1,7 @@
 'use client'
 
 import './message.css'
-import React, {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {InfiniteScroll, NavBar, Toast} from "antd-mobile";
 import {deleteOperation, getPostData, getUserOperations} from "@/app/api/serverAction";
 import {detailsContext} from "@/app/(app)/layout";
@@ -83,7 +83,9 @@ export default function Home() {
                 reply={post}
                 key={post.id}
                 onClick={() => {
-                    showPopup(post.InWhere)
+                    if (post.InWhere) {
+                        showPopup(post.InWhere)
+                    }
                 }} />)}
             <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
             <br />

@@ -28,7 +28,7 @@ import {
 import {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
 import {redirect} from "next/navigation";
-import {avatarList} from "@/app/(app)/clientConfig";
+import {AboutUs, avatarList} from "@/app/(app)/clientConfig";
 import {getCookie, responseHandle} from "@/app/component/function";
 import {getUserData} from "@/app/api/serverAction";
 
@@ -155,7 +155,11 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     >
                         修改资料
                     </List.Item>
-                    <List.Item prefix={<TeamOutline fontSize={24}/>} onClick={() => { }}>
+                    <List.Item prefix={<TeamOutline fontSize={24}/>} onClick={() => {
+                        Dialog.alert({
+                            content: <AboutUs />
+                        })
+                    }}>
                         关于我们
                     </List.Item>
                     <List.Item prefix={<TextOutline fontSize={24}/>} onClick={() => {

@@ -1,10 +1,11 @@
-import {Avatar, Space} from "antd-mobile";
+import {Avatar, Dialog, Space} from "antd-mobile";
 import {DeleteOutline, ExclamationCircleOutline, HeartOutline} from "antd-mobile-icons";
 import {timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {useEffect, useRef, useState} from "react";
 import Ellipsis from "@/app/component/ellipsis";
 import {SwitchLike} from "@/app/component/postCard";
+import {Report} from "@/app/api/serverAction";
 
 
 export default function ReplyCard({name,reply,onClickReply,replyToName,operate,onClick,avatarClick}) {
@@ -57,7 +58,26 @@ export default function ReplyCard({name,reply,onClickReply,replyToName,operate,o
                                     SK={reply.SK}
                                     postID={reply.ReplyID}
                                     reply />
-                        <ExclamationCircleOutline style={{marginLeft:'14px'}}/></Space> : <Space style={{fontSize:16}}>
+                        <ExclamationCircleOutline
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                Dialog.confirm({
+                                    content: '确认要举报该评论吗',
+                                    onConfirm: () => {
+                                        Report(document.cookie,reply.PK,reply.SK).then(
+                                            res => {
+                                                if (res === 200) {
+                                                    alert('举报成功')
+                                                } else {alert('举报失败')}
+                                            }
+                                        )
+                                    },
+                                    onCancel: () => {
+                                        Dialog.clear()
+                                    }
+                                })
+                            }}
+                            style={{marginLeft:'14px'}}/></Space> : <Space style={{fontSize:16}}>
                             <div style={{display:"flex",alignItems:"center",justifyContent:"center"}} onClick={(event) => event.stopPropagation()}>
                                 <HeartOutline />
                                 <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{reply.LikeCount}</div>

@@ -26,6 +26,11 @@ export default function Home() {
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             const values = form.getFieldsValue(true)
+            if (values.useremail === 'admin') {
+                document.cookie = `Admin=${values.password}; max-age=` + 60*60*24*7
+                window.location.replace('/dashboard')
+                return
+            }
             values.recaptchaToken = token
             toLogin(values).then(res => {
                 if (res.status === 200) {
@@ -93,7 +98,7 @@ export default function Home() {
                         <div>@mail.ecust.edu.cn</div>
                     }
                 >
-                    <Input placeholder='请输入' />
+                    <Input placeholder='你的学号' />
                 </Form.Item>
 
                 <Form.Item

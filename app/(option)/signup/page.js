@@ -55,11 +55,11 @@ export default function Home() {
                         last = window.localStorage.getItem("time")
                         let now = Date.parse(new Date())
                         let res = now - last
-                        setTime(((120000 - res) / 1000).toString() + "s")
+                        setTime(((60000 - res) / 1000).toString() + "s")
                         let djs = setInterval(() => {
                             res += 1000
-                            setTime(((120000 - res) / 1000).toString() + "s")
-                            if (res == 120000) {
+                            setTime(((60000 - res) / 1000).toString() + "s")
+                            if (res == 60000) {
                                 setTime("获取验证码")
                                 setDisable(false)
                                 clearInterval(djs)
@@ -79,11 +79,11 @@ export default function Home() {
             last = window.localStorage.getItem("time")
             let now = Date.parse(new Date())
             let res = now - last
-            setTime(((120000 - res) / 1000).toString() + "s")
+            setTime(((60000 - res) / 1000).toString() + "s")
             let djs = setInterval(() => {
                 res += 1000
-                setTime(((120000 - res) / 1000).toString() + "s")
-                if (res == 120000) {
+                setTime(((60000 - res) / 1000).toString() + "s")
+                if (res == 60000) {
                     setTime("获取验证码")
                     setDisable(false)
                     clearInterval(djs)

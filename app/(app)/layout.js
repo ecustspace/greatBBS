@@ -150,7 +150,7 @@ export default function RootLayout({ post,message,user }) {
               <PostDetails post={focusPost} ref={postPopup} />
               <AnPostDetails post={focusAnPost} ref={anPostPopup} />
               <ImgDetails post={focusImg} ref={imgPopup} />
-              <div>{pages[activeIndex]}</div>
+              <div>{login.isLogin === false && activeIndex !== 0 ? window.location.replace('/login') : pages[activeIndex]}</div>
               <TabBar defaultActiveKey={0} className='bottom' onChange={
                   key => setIndex(key)
               }>

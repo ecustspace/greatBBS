@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-async-client-component */
 'use client'
 import './forgetPassword.css'
-import {useEffect, useRef, useState} from 'react'
+import {useRef, useState} from 'react'
 import {Button, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
@@ -17,7 +17,6 @@ export default function Home() {
     const [visiblePop, setVisiblePop] = useState(false);
     const [visiblePW1, setVisiblePW1] = useState(false)
     const [visiblePW2, setVisiblePW2] = useState(false)
-    const [isRecaptchaOK,setOK] = useState(false)
     const captchaRef = useRef(null)
     const nextStep = () => {
         setVisiblePop(true);

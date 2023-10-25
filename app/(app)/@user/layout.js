@@ -27,7 +27,6 @@ import {
 } from "antd-mobile-icons";
 import {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {redirect} from "next/navigation";
 import {AboutUs, avatarList} from "@/app/(app)/clientConfig";
 import {getCookie, responseHandle} from "@/app/component/function";
 import {getUserData} from "@/app/api/serverAction";

@@ -1,7 +1,7 @@
 'use client'
 
 import './login.css'
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
@@ -9,7 +9,6 @@ import TranslationAvatar from "@/app/component/translationAvatar";
 import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
-import Script from "next/script";
 
 export default function Home() {
     const [form] = Form.useForm();

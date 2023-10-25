@@ -4,7 +4,7 @@ import SendPost from "@/app/component/sendPost";
 import React, {useContext, useRef, useState} from 'react'
 import {Button, NavBar, Tabs, Toast} from 'antd-mobile'
 import Image from 'next/image'
-import {AddOutline, MessageFill} from 'antd-mobile-icons'
+import {AddOutline} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
 import {showLoginModal} from "@/app/component/function";
 

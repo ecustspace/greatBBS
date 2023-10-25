@@ -1,6 +1,5 @@
 import './translationAvatar.css'
 import {useEffect, useState} from "react";
-import {AutoCenter} from "antd-mobile";
 
 export default function TranslationAvatar({avatarList,size}) {
     const [activeIndex,setIndex] = useState(0)

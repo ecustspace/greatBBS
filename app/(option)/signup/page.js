@@ -1,7 +1,7 @@
 'use client'
 import '../../globals.css'
 import './signup.css'
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {sha256} from "js-sha256";
@@ -18,7 +18,6 @@ export default function Home() {
     const [time, setTime] = useState("获取验证码");
     const [form] = Form.useForm()
     const [email, setEmail] = useState("")
-    const [isRecaptchaOK,setOK] = useState(false)
     const captchaRef = useRef(null)
     const onSubmit = () => {    //验证码
         if (email.length === 0) {

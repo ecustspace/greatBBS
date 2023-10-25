@@ -17,6 +17,11 @@ export default function Home() {
     const { showPostPopup, showImgPopup } = useContext(detailsContext)
 
     const login = useContext(loginState)
+    useEffect(() => {
+        if (login.isLogin === false) {
+            window.location.replace('/login')
+        }
+    },[])
     function deletePost(post) {
         deleteOperation(document.cookie,post.SK,'Notify#')
         setList(
@@ -63,11 +68,6 @@ export default function Home() {
 
     return (
         <>
-            <script>
-                if (login.isLogin === false) {
-                window.location.replace('/login')
-            }
-            </script>
             <div className='FloatBubble' onClick={refresh} style={{bottom:'65px'}}>
                 <UndoOutline fontSize={32} color='#fff' />
             </div>

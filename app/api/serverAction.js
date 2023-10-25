@@ -6,7 +6,7 @@ import {docClient, getUserItem} from "@/app/api/server";
 import {
     BatchGetCommand,
     DeleteCommand,
-    GetCommand,
+    GetCommand, PutCommand,
     QueryCommand,
     TransactWriteCommand,
     UpdateCommand
@@ -484,23 +484,16 @@ export async function Report(cookie,PK,SK) {
         ProjectionExpression:'PostType'
     })).then((res) => {
         if (res.Item.PostType) {
-            docClient.send(new UpdateCommand({
+            docClient.send(new PutCommand({
                 TableName:'BBS',
-                Key: {
+                Item: {
                     PK:'Report#' + PK,
-                    SK: SK
+                    SK: SK,
+                    ttl: Date.now()/1000 + 60*60*24*7,
+                    PostType: 'Report'
                 },
-                UpdateExpression: 'PostType = :post_type,#ttl = :ttl',
-                ExpressionAttributeNames: {
-                    '#ttl' : 'ttl'
-                },
-                ExpressionAttributeValues: {
-                    ':post_type': 'Report',
-                    ':ttl' : Date.now()/1000 + 60*60*24*7
-                },
-                ReturnValues:'NONE'
-            }))
-            return 200
+            })).then(() => {return 200})
+                .catch(() => {return 500})
         }
     }).catch((err) => {
         console.log(err)

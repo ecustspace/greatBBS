@@ -19,12 +19,15 @@ export default function Home() {
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
             const values = form.getFieldsValue(true)
-            if (values.useremail === 'admin') {
+            if (values.useremail === 'admin#') {
                 document.cookie = `Admin=${values.password}; max-age=` + 60*60*24*7
                 window.location.replace('/dashboard')
                 return
             }
             values.recaptchaToken = token
+            Toast.show({
+                icon:"loading"
+            })
             toLogin(values).then(res => {
                 if (res.status === 200) {
                     window.location.replace('/')

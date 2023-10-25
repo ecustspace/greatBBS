@@ -322,7 +322,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>
                             <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>
                                 <LoopOutline style={{fontSize:20 ,marginLeft:6}} onClick={() => setMethod(sortMethod => !sortMethod)} />
-                                <SwitchLike size={20} postID={post.PostID} />
+                                <SwitchLike size={20} postID={post.PostID} PK={post.PK} SK={post.SK}/>
                                 <UploadOutline style={{fontSize:20}} onClick={(e) => {
                                     share(post)
                                     e.stopPropagation()

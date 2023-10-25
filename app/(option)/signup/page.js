@@ -30,6 +30,9 @@ export default function Home() {
             captchaRef.current.executeAsync().then(token => {
                 let values = form.getFieldsValue(true)
                 values.recaptchaToken = token
+                Toast.show({
+                    icon:"loading"
+                })
                 fetch(window.location.origin + '/api/register/forCaptcha', {
                     method: 'post',
                     body: JSON.stringify(values),
@@ -91,6 +94,9 @@ export default function Home() {
             const anid = (Math.round(Math.random() * (999999 - 100000)) + 100000).toString();
             values.anid = sha256(anid)
             values.avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
+            Toast.show({
+                icon:"loading"
+            })
             fetch(window.location.origin + '/api/register/verify', {
                 method: 'POST',
                 credentials: 'include',

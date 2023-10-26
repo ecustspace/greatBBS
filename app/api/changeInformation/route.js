@@ -10,7 +10,7 @@ import {dataLengthVerify} from "@/app/api/register/verify/route";
 export async function POST(request){
     const data = await request.json()
     if (data.contact_information.length > 50 || !avatarList.includes(data.avatar)
-        || (data.anid && dataLengthVerify(5,15,data.anid))) {
+        || (data.anid && !dataLengthVerify(5,15,data.anid))) {
         return NextResponse.json({tip:'数据格式错误',status:500})
     }
     const cookieStore = cookies()

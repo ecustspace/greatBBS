@@ -475,30 +475,36 @@ export async function Report(cookie,PK,SK) {
     if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
-    return await docClient.send(new GetCommand({
+    const postData = await docClient.send(new GetCommand({
         TableName:'BBS',
         Key:{
             PK:PK,
             SK:SK
         },
         ProjectionExpression:'PostType'
-    })).then((res) => {
-        if (res.Item.PostType) {
-            docClient.send(new PutCommand({
-                TableName:'BBS',
-                Item: {
-                    PK:'Report#' + PK,
-                    SK: SK,
-                    ttl: Date.now()/1000 + 60*60*24*7,
-                    PostType: 'Report'
-                },
-            })).then(() => {return 200})
-                .catch(() => {return 500})
-        }
-    }).catch((err) => {
+    })).then(res => {
+        return res.Item
+    }).catch(err => {
         console.log(err)
         return 500
     })
+    if (postData === undefined) {
+        return 500
+    }
+    if (postData.PostType) {
+        return await docClient.send(new PutCommand({
+            TableName:'BBS',
+            Item: {
+                PK:'Report#' + PK,
+                SK: SK,
+                ttl: Date.now()/1000 + 60*60*24*7,
+                PostType: 'Report'
+            },
+        })).then(() => {return 200})
+            .catch(() => {return 500})
+    } else {
+        return 500
+    }
 }
 
 export async function ContactTa(cookie,name) {

@@ -10,7 +10,6 @@ import {ImageContainer} from "@/app/component/imageContainer";
 export default function Home() {
     const [lastKey,setKey] = useState(null)
     const [list,setList] = useState([])
-    const [part,setPart] = useState('Post')
     const [hasMore,setHasMore] = useState(true)
     const [banModalVisible,setVisible] = useState(false)
     const now = new Date(new Date().setHours(0, 0, 0, 0))
@@ -63,6 +62,7 @@ export default function Home() {
     }
     async function loadMore() {
         await getTrends(document.cookie,lastKey? lastKey : null,date.getTime()).then(res => {
+            setList([...list,...res.items])
             if (res === 500) {
                 setHasMore(false)
             }
@@ -71,7 +71,6 @@ export default function Home() {
             } else {
                 setKey(res.lastKey)
             }
-            setList([...list,...res.items])
         })
     }
 
@@ -94,19 +93,20 @@ export default function Home() {
                     setDate(val)
                     setPickerVisible(false)
                     setList([])
+                    setKey(null)
                     setHasMore(true)
                 }}
                 max={now}
             >
             </DatePicker>
-            {list.map(post => <div key={post.id} onClick={() => {operateClick(post)}}>
+            {list.filter(item => item.PostType !== 'Report').map(post => <div key={post.id} onClick={() => {operateClick(post)}}>
                 <div>{post.PK.length <= 30 ? post.PK : '匿名用户'}</div>
                 <div>{timeConclude(post.SK)}</div>
                 <div>{post.Content}</div>
                 {post.ImageList !== undefined?
                     <ImageContainer
                         list={post.ImageList}
-                        from={post.PostType === ('Image' || 'AnPost' || 'Post') ? ('/@post/' + post.PostID) :
+                        from={(post.PostType === 'Image' || 'AnPost' || 'Post') ? ('/@post/' + post.PostID) :
                             ('/reply/' + post.PostType.split('o')[1] + '/' + post.ReplyID)} /> : ''}
                 <hr/>
             </div>)}

@@ -25,11 +25,13 @@ export async function getTrends(cookie,lastKey,from) {
     }
     return await docClient.send(new ScanCommand(scanInput))
         .then(res => {
+            console.log(res.Items.length)
             return {
                 items:res.Items,
                 lastKey:res.LastEvaluatedKey
             }
         }).catch((err) => {
+            console.log(err)
             return 500
         })
 }

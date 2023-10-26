@@ -1,3 +1,5 @@
+'use client'
+
 import './loading.css'
 import Image from 'next/image'
 

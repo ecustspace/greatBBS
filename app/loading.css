@@ -21,3 +21,14 @@
 .spinloading {
     margin-top: 50px;
 }
+
+.delayText {
+    margin-top: 10px;
+    opacity: 0; /* 初始状态为透明 */
+    animation: fade-in 0s 1500ms forwards; /* 动画名称、动画时长、延迟和结束后的状态 */
+}
+
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; } /* 动画结束后透明度为 1 */
+}

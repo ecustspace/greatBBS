@@ -3,8 +3,8 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Image, InfiniteScroll, Toast,} from "antd-mobile";
 import {imageUrl} from "@/app/(app)/clientConfig";
-import {detailsContext, likeListContext} from "@/app/(app)/layout";
-import {fetchData, getPostLikeList, getPostList} from "@/app/api/serverAction";
+import {detailsContext, likeListContext, messageCountContext} from "@/app/(app)/layout";
+import {fetchData, getMessageCount, getPostLikeList, getPostList} from "@/app/api/serverAction";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
@@ -22,6 +22,7 @@ export default function InsContainer({post}) {
     const {showImgPopup} = useContext(detailsContext)
     const {addLike} = useContext(likeListContext)
     const login = useContext(loginState)
+    const {setMessageCount} = useContext(messageCountContext)
 
     useEffect(() => {
         setWidth(containerRef.current.offsetWidth)
@@ -61,6 +62,14 @@ export default function InsContainer({post}) {
            })
            }
        )
+        if (login.isLogin === true) {
+            getMessageCount(document.cookie).then(res => {
+                setMessageCount(count => {
+                    count = count + (res === 'err' ? 0 : res)
+                    localStorage.setItem('messageCount',count)
+                    return count })
+            })
+        }
     }
 
     function height_width(height_width) {

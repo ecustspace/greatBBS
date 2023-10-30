@@ -1,5 +1,5 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {DynamoDBDocumentClient, GetCommand, PutCommand} from "@aws-sdk/lib-dynamodb";
+import {DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 
 const client = new DynamoDBClient({});
@@ -142,4 +142,25 @@ export async function isBan(username) {
         return false
     })
 }
+
+export async function setUserInquireTime(username,time) {
+    return await docClient.send(new UpdateCommand({
+        TableName: 'User',
+        Key: {
+            PK: 'user',
+            SK: username
+        },
+        UpdateExpression: 'SET InquireTime = :time',
+        ExpressionAttributeValues: {
+            ':time': time
+        }
+    })).then(() => {
+        return 200
+    }).catch(err => {
+        console.log(err)
+        return 500
+    })
+}
+
+
 

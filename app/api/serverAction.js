@@ -2,7 +2,7 @@
 
 import {sha256} from "js-sha256";
 import {getCookie} from "@/app/component/function";
-import {docClient, getUserItem} from "@/app/api/server";
+import {docClient, getUserItem, setUserInquireTime} from "@/app/api/server";
 import {
     BatchGetCommand,
     DeleteCommand,
@@ -13,6 +13,9 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import {avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
+import {console} from "next/dist/compiled/@edge-runtime/primitives";
+import {NextResponse} from "next/server";
+import {v4} from "uuid";
 
 export async function fetchData(type) {
     if (!['Image','Post','AnPost'].includes(type)) {
@@ -573,4 +576,99 @@ export async function getPostList(cookie,postType,lastKey) {
             lastKey: res.LastEvaluatedKey
         }
     }).catch((err) => {console.log(err);return 500})
+}
+
+export async function getMessageCount(cookie) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 'err'
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 'err'
+    }
+    const from = await docClient.send(new GetCommand({
+        TableName: 'User',
+        Key: {
+            PK: 'user',
+            SK: username
+        },
+        ProjectionExpression:'InquireTime'
+    })).then(res => {
+        return res.Item.InquireTime
+    }).catch((err) => {
+        console.log(err)
+        return 'err'
+    })
+    if (from === 'err') {
+        return null
+    }
+    const now = Date.now()
+    await setUserInquireTime(username,now)
+    return await docClient.send(new QueryCommand({
+        TableName:'BBS',
+        KeyConditionExpression: 'PK = :pk AND (SK BETWEEN :from AND :to)',
+        ExpressionAttributeValues: {
+            ':pk' : 'Notify#' + username,
+            ':from': from,
+            ':to':now
+        },
+        Select:'COUNT',
+        ScanIndexForward:false,
+    })).then(res => {
+        return res.Count
+    }).catch(err => {
+        console.log(err)
+        return 'err'
+    })
+}
+
+export async function upDateUserInquireTime(cookie,time) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 'err'
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 'err'
+    }
+    await setUserInquireTime(username,time)
+}
+
+export async function updateUserToken(cookie) {
+    const username = decodeURI(getCookie('UserName',cookie))
+    const user_item = await getUserItem(username,'UserToken')
+    if (user_item === 500 || !user_item){
+        console.log('false')
+        return 401
+    }
+
+    const now = Date.now()
+    if (user_item.UserToken !== getCookie('Token',cookie) || user_item.UserToken.split("#")[0] < now) {
+        return 401
+    }
+    const token = (now + 1000*60*60*24*7) + '#' + v4()
+    return await docClient.send(new  UpdateCommand({
+        TableName: 'User',
+        Key: {
+            PK:'user',
+            SK: username
+        },
+        UpdateExpression:'SET UserToken = :token',
+        ExpressionAttributeValues: {
+            ':token' : token
+        }
+    })).then(res => {
+        return {
+            token: token,
+            jwt: sha256(username + token.split('#')[0] + process.env.JWT_SECRET)
+        }
+    }).catch((err) => {
+        console.log(err)
+        return 500
+    })
 }

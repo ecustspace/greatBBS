@@ -1,7 +1,7 @@
 'use client'
 import '../globals.css'
 import React, {createContext, useContext, useEffect, useRef, useState,} from 'react'
-import {showLoginModal} from "@/app/component/function";
+import {getCookie, showLoginModal} from "@/app/component/function";
 import PostDetails from "@/app/component/postDetails";
 import AnPostDetails from "@/app/component/anPostDetails";
 import {loginState} from "@/app/layout";
@@ -10,11 +10,13 @@ import UserDetails from "@/app/component/userDetails";
 import {useSearchParams} from "next/navigation";
 import {TabBar, Toast} from "antd-mobile";
 import {CompassOutline, MailOutline, UserOutline} from "antd-mobile-icons";
-import {getPostData} from "@/app/api/serverAction";
+import {getMessageCount, getPostData, updateUserToken} from "@/app/api/serverAction";
 import {recaptcha_site_key_v3} from "@/app/(app)/clientConfig";
+import {sha256} from "js-sha256";
 
 export const likeListContext = createContext(null)
 export const detailsContext = createContext(null)
+export const messageCountContext = createContext(null)
 export default function RootLayout({ post,message,user }) {
     const pages = [<>{post}</>,<>{message}</>,<>{user}</>]
     const [likeList,setLikeList] = useState([])
@@ -24,6 +26,7 @@ export default function RootLayout({ post,message,user }) {
     const [focusImg,setFocusImg] = useState({})
     const [focusUser,setFocusUser] = useState({})
     const [activeIndex,setIndex] = useState(0)
+    const [messageCount,setMessageCount] = useState(0)
     const postPopup = useRef(null)
     const anPostPopup = useRef(null)
     const imgPopup = useRef(null)
@@ -109,7 +112,32 @@ export default function RootLayout({ post,message,user }) {
         hideAllPostPopup
     }
 
+    const messageContext = {
+        messageCount,
+        setMessageCount
+    }
+
     useEffect(() => {
+        if (login.isLogin === true) {
+            let count = localStorage.getItem('messageCount') ?
+                parseInt(localStorage.getItem('messageCount')) : 0
+            getMessageCount(document.cookie).then(res => {
+                count = count + (res === 'err' ? 0 : res)
+                localStorage.setItem('messageCount',count)
+                setMessageCount(count)
+            })
+            updateUserToken(document.cookie).then(res => {
+                if (res === 401){
+                    showLoginModal(login.toLogin)
+                    return
+                }
+                if (res === 500) {
+                    return;
+                }
+                document.cookie = `Token=${res.token}; Path=/; max-age=` + (30*24*60*60).toString()
+                document.cookie = `JWT=${res.jwt}; Path=/; max-age=` + (30*24*60*60).toString()
+            })
+        }
         const handle = (e) => {
             history.pushState(null, null, document.URL);
             hideAllPopup()
@@ -136,6 +164,11 @@ export default function RootLayout({ post,message,user }) {
                 } else if (res.PostType === 'Image') {
                     showImgPopup(res)
                 } else {showAnPostPopup(res)}
+            }).catch(() => {
+                Toast.show({
+                    icon: 'fail',
+                    content:'请先登录'
+                })
             })
         }
         return () => {window.removeEventListener('popstate',handle)}
@@ -144,7 +177,8 @@ export default function RootLayout({ post,message,user }) {
   return (
       <div>
       <script async src={'//recaptcha.net/recaptcha/api.js?render=' + recaptcha_site_key_v3}></script>
-      <likeListContext.Provider value={like}>
+          <messageCountContext.Provider value={messageContext}>
+          <likeListContext.Provider value={like}>
           <detailsContext.Provider value={detailsRef}>
               <UserDetails user={focusUser} ref={userPopup} />
               <PostDetails post={focusPost} ref={postPopup} />
@@ -155,11 +189,12 @@ export default function RootLayout({ post,message,user }) {
                   key => setIndex(key)
               }>
                   <TabBar.Item key={0} icon={<CompassOutline />} />
-                  <TabBar.Item key={1} icon={<MailOutline />} />
+                  <TabBar.Item key={1} icon={<MailOutline />} badge={messageCount > 0 ? (messageCount > 99 ? '99+' : messageCount) : ''}/>
                   <TabBar.Item key={2} icon={<UserOutline />} />
               </TabBar>
           </detailsContext.Provider>
-      </likeListContext.Provider>
+          </likeListContext.Provider>
+          </messageCountContext.Provider>
       </div>
   )
 }

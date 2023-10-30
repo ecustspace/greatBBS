@@ -396,7 +396,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 }} />
                                 <SmileOutline style={{fontSize:22}} />
                             </Space>
-                            <Button disabled={btnDisable} size='mini' color='primary' onClick={submitReply}>评论</Button>
+                            <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary' onClick={submitReply}>评论</Button>
                         </div>
                     </div>
                 </div>

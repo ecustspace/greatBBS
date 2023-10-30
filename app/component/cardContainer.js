@@ -3,8 +3,8 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {ActionSheet, Dialog, InfiniteScroll, Toast,} from "antd-mobile";
 import {PostCard} from "@/app/component/postCard";
-import {fetchData, getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
-import {detailsContext, likeListContext} from "@/app/(app)/layout";
+import {fetchData, getMessageCount, getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
+import {detailsContext, likeListContext ,messageCountContext} from "@/app/(app)/layout";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
@@ -18,6 +18,7 @@ export default function CardContainer({post,type}) {
     const {showPostPopup, showAnPostPopup,showUserPopup} = useContext(detailsContext)
     const {addLike} = useContext(likeListContext)
     const login = useContext(loginState)
+    const {setMessageCount} =useContext(messageCountContext)
     function operateClick(post) {
         actionSheet.current = ActionSheet.show({
             closeOnAction:true,
@@ -77,6 +78,14 @@ export default function CardContainer({post,type}) {
                 content:'刷新失败'
             })
             setPostList('err')})
+        if (login.isLogin === true) {
+            getMessageCount(document.cookie).then(res => {
+                setMessageCount(count => {
+                    count = count + (res === 'err' ? 0 : res)
+                    localStorage.setItem('messageCount',count)
+                    return count })
+            })
+        }
     }
 
     async function loadMore() {

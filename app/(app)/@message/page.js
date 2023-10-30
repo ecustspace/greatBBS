@@ -3,8 +3,8 @@
 import './message.css'
 import {useContext, useEffect, useState} from "react";
 import {InfiniteScroll, NavBar, Toast} from "antd-mobile";
-import {deleteOperation, getPostData, getUserOperations} from "@/app/api/serverAction";
-import {detailsContext} from "@/app/(app)/layout";
+import {deleteOperation, getPostData, getUserOperations, upDateUserInquireTime} from "@/app/api/serverAction";
+import {detailsContext, messageCountContext} from "@/app/(app)/layout";
 import MessageCard from "@/app/component/messageCard";
 import {UndoOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
@@ -15,12 +15,15 @@ export default function Home() {
     const [list, setList] = useState([])
     const [hasMore, setHasMore] = useState(true)
     const { showPostPopup, showImgPopup } = useContext(detailsContext)
-
+    const {setMessageCount} = useContext(messageCountContext)
     const login = useContext(loginState)
     useEffect(() => {
         if (login.isLogin === false) {
             window.location.replace('/login')
         }
+        localStorage.setItem('messageCount','0')
+        setMessageCount(0)
+        upDateUserInquireTime(document.cookie,Date.now())
     },[])
     function deletePost(post) {
         deleteOperation(document.cookie,post.SK,'Notify#')

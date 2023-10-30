@@ -43,7 +43,7 @@ const SendPost = forwardRef((props, ref) => {
     const sendPostRight = (
         <div style={{ fontSize: 24 }}>
             <Space style={{ '--gap': '16px' }}>
-                <Button color='primary' fill='solid' size='small' onClick={onSubmit} disabled={btnDisable}>
+                <Button color='primary' fill='solid' size='small' onClick={onSubmit} disabled={btnDisable || (Text.length === 0 && activePart !== 2)}>
                     发布
                 </Button>
             </Space>
@@ -84,8 +84,15 @@ const SendPost = forwardRef((props, ref) => {
             })
             xhr.withCredentials = true
             xhr.responseType = 'json';
+            xhr.addEventListener("error", function () {
+                Toast.show({
+                    icon:'fail',
+                    content:'error'
+                })
+            })
             xhr.onreadystatechange = () => {
                 setBtnDisable(false)
+                Toast.clear()
                 if (xhr.readyState === 4) {
                     responseHandle(xhr.response)
                     if (xhr.response.status === 200) {
@@ -100,6 +107,7 @@ const SendPost = forwardRef((props, ref) => {
                 }
             };
             xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.timeout = 10000
             xhr.ontimeout = function () {
                 Toast.show({
                     content: '请求超时'

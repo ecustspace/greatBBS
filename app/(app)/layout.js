@@ -127,11 +127,7 @@ export default function RootLayout({ post,message,user }) {
                 setMessageCount(count)
             })
             updateUserToken(document.cookie).then(res => {
-                if (res === 401){
-                    showLoginModal(login.toLogin)
-                    return
-                }
-                if (res === 500) {
+                if (res === 500 || res === 401) {
                     return;
                 }
                 document.cookie = `Token=${res.token}; Path=/; max-age=` + (30*24*60*60).toString()

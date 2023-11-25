@@ -1,5 +1,4 @@
 import {v4} from "uuid";
-import nodemailer from 'nodemailer'
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
@@ -33,7 +32,7 @@ export async function POST(request) {
     }
 
     const mailData = {
-        from: '1563741036@qq.com', // sender address
+        from: process.env.SMTP_USERNAME, // sender address
         to: user_email + process.env.EMAIL, // list of receivers
         subject: `【${appName}】验证码`, // Subject line
         text: "你正在修改密码，你的验证码是:" + captcha.toString(), // plain text body

@@ -3,7 +3,6 @@ import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
-import {sha256} from "js-sha256";
 import {avatarList} from "@/app/(app)/clientConfig";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 

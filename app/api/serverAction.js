@@ -14,7 +14,6 @@ import {
 import {appName, avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
-import {NextResponse} from "next/server";
 import {v4} from "uuid";
 
 export async function fetchData(type) {

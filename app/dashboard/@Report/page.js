@@ -10,12 +10,8 @@ import {ImageContainer} from "@/app/component/imageContainer";
 export default function Home() {
     const [lastKey,setKey] = useState(null)
     const [list,setList] = useState([])
-    const [part,setPart] = useState('Post')
     const [hasMore,setHasMore] = useState(true)
     const [banModalVisible,setVisible] = useState(false)
-    const now = new Date(new Date().setHours(0, 0, 0, 0))
-    const [date,setDate] = useState(now)
-    const [datePickerVisible, setPickerVisible] = useState(false)
     const [banUserName,setUserName] = useState('')
     const actionSheet = useRef()
 

@@ -2,7 +2,7 @@
 
 import {sha256} from "js-sha256";
 import {getCookie} from "@/app/component/function";
-import {docClient, getUserItem, setUserInquireTime} from "@/app/api/server";
+import {docClient, getUserItem, setUserInquireTime, transporter} from "@/app/api/server";
 import {
     BatchGetCommand,
     DeleteCommand,
@@ -11,7 +11,7 @@ import {
     TransactWriteCommand,
     UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-import {avatarList, Url} from "@/app/(app)/clientConfig";
+import {appName, avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {NextResponse} from "next/server";
@@ -671,4 +671,40 @@ export async function updateUserToken(cookie) {
         console.log(err)
         return 500
     })
+}
+
+export async function feedBack(cookie,content) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return {tip:'错误',status:500}
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return {tip:'错误',status:500}
+    }
+    const mailData = {
+        from: process.env.SMTP_USERNAME, // sender address
+        to: process.env.SMTP_USERNAME, // list of receivers
+        subject: `来自${username}的反馈`, // Subject line
+        text: content
+    };
+    try {
+        await new Promise((resolve, reject) => {
+            // send mail
+            transporter.sendMail(mailData, (err, info) => {
+                if (err) {
+                    console.error(err);
+                    reject(err);
+                } else {
+                    resolve(info);
+                }
+            });
+        });
+    } catch (err) {
+        console.log(err)
+        return {tip:'错误',status:500}
+    }
+    return {tip:'感谢您的反馈',status:200}
 }

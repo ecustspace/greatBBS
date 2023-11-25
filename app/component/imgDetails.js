@@ -256,7 +256,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                         operateClick(post)
                                     }} />
                             </div>
-                            <ImageSwiper list={post.ImageList? post.ImageList:[]} from={'/@post/' + post.PostID} style={{marginTop:'8px'}} />
+                            <ImageSwiper list={post.ImageList? post.ImageList:[]} from={'/post/' + post.PostID} style={{marginTop:'8px'}} />
                             <Ellipsis style={{marginTop:'6px',marginBottom:'4px',fontSize:'large',wordBreak:'break-word'}} content={post.Content}></Ellipsis>
                         </div>
                         <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>

@@ -61,7 +61,7 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
                                 }} />
                         </div>
                         <Ellipsis content={post.Content} style={{marginTop:'6px',marginBottom:'4px'}} />
-                    {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/@post/' + post.PostID} style={{marginTop:'10px'}} /> : ''}
+                    {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/post/' + post.PostID} style={{marginTop:'10px'}} /> : ''}
                     <div className='cardFooter'>
                         {operate ?
                                 <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}>

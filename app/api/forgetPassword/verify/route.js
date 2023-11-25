@@ -21,10 +21,8 @@ export async function POST(request) {
         !data.useremail) {
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
-    console.log(data)
     const cookieStore = cookies()
     const sign_up_token = cookieStore.get('SignUpToken')
-    console.log(sign_up_token)
     const getCaptchaCommand = new GetCommand(
         {
             TableName: 'User',

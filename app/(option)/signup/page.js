@@ -1,7 +1,7 @@
 'use client'
 import '../../globals.css'
 import './signup.css'
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {sha256} from "js-sha256";
@@ -9,6 +9,7 @@ import TranslationAvatar from "@/app/component/translationAvatar";
 import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
+import {useSearchParams} from "next/navigation";
 
 export default function Home() {
     const [psw, setPsw] = useState();
@@ -17,11 +18,19 @@ export default function Home() {
     const [disable, setDisable] = useState(false)
     const [time, setTime] = useState("获取验证码");
     const [form] = Form.useForm()
-    const [email, setEmail] = useState("")
     const captchaRef = useRef(null)
+    const searchParams = useSearchParams()
+
+    useEffect(() => {
+        const data = JSON.parse(decodeURIComponent(searchParams.get('data')))
+        if (data) {
+            document.cookie = `SignUpToken=${data.signUpToken}`
+            form.submit()
+        }
+    },[])
+
     const onSubmit = () => {    //验证码
-        if (email.length === 0) {
-            console.log(email)
+        if (form.getFieldsValue(['useremail'])) {
             alert("请正确输入邮箱后获取验证码！")
             return
         }
@@ -31,7 +40,8 @@ export default function Home() {
                 let values = form.getFieldsValue(true)
                 values.recaptchaToken = token
                 Toast.show({
-                    icon:"loading"
+                    icon:"loading",
+                    duration:0
                 })
                 fetch(window.location.origin + '/api/register/forCaptcha', {
                     method: 'post',
@@ -148,6 +158,7 @@ export default function Home() {
             <Form
                 form={form}
                 onFinish={onSubmit1}
+                initialValues={JSON.parse(decodeURIComponent(searchParams.get('data')))}
                 layout='horizontal'
                 mode='card' className='fm'
                 style={{ '--prefix-width': '4.5em' }}
@@ -200,10 +211,7 @@ export default function Home() {
                         <div>@mail.ecust.edu.cn</div>
                     }
                 >
-                    <Input
-                        value={email}
-                        onChange={setEmail}
-                        placeholder='请输入' />
+                    <Input placeholder='请输入' />
                 </Form.Item>
                 <Form.Item
                     label='密码'

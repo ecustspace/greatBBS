@@ -94,7 +94,7 @@ export default function InsContainer({post}) {
                     onClick={() => {
                         showImgPopup(item)
                     }}
-                    src={imageUrl + '/@post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
+                    src={imageUrl + '/post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
                     fit='cover'
                     alt=''
                     width={width/2}
@@ -106,7 +106,7 @@ export default function InsContainer({post}) {
                     onClick={() => {
                         showImgPopup(item)
                     }}
-                    src={imageUrl + '/@post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
+                    src={imageUrl + '/post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
                     fit='cover'
                     alt=''
                     width={width/2}

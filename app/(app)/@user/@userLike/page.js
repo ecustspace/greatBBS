@@ -82,7 +82,8 @@ export default function Home() {
                         showAnPostPopup(post)
                     }
                     }
-                } />)}
+                }
+                operate />)}
             <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
             <br/>
             <br/>

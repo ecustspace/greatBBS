@@ -251,7 +251,7 @@ const PostDetails = forwardRef(({post},ref) => {
                             <MoreOutline style={{ fontSize: 26 }} onClick={() => operateClick(post)} />
                         </div>
                         <div style={{marginTop:'14px',fontSize:'medium',wordBreak:'break-word'}}>{post.Content}</div>
-                        <ImageContainer list={post.ImageList? post.ImageList:[]} from={'/@post/' + post.PostID} style={{marginTop:10}} />
+                        <ImageContainer list={post.ImageList? post.ImageList:[]} from={'/post/' + post.PostID} style={{marginTop:10}} />
                     </div>
                     <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>
                         <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>

@@ -26,7 +26,7 @@ export default function Home() {
             captchaRef.current.reset()
             const values = form1.getFieldsValue(true)
             values.recaptchaToken = token
-            fetch(window.location.origin + '/api/register/forCaptcha', {
+            fetch(window.location.origin + '/api/forgetPassword/forCaptcha', {
                 method: 'post',
                 body: JSON.stringify(values),
                 headers: {
@@ -52,7 +52,7 @@ export default function Home() {
                 ...form2.getFieldsValue(true)
             }
             values.recaptchaToken = token
-            fetch(window.location.origin + '/api/register/forgetPassword', {
+            fetch(window.location.origin + '/api/forgetPassword/verify', {
                 method: 'POST',
                 credentials: 'include',
                 body: JSON.stringify(values),

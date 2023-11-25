@@ -307,7 +307,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                             <div style={{display:'flex'}}>
                                 <Avatar src={post.Avatar} style={{'--size': '54px',marginRight:18}}></Avatar>
                                 <div style={{flexGrow:1,position:"relative"}}>
-                                    <div style={{fontWeight:'bold',fontSize:20,top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
+                                    <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
                                     <div style={{
                                         fontSize:'medium',color:"gray",
                                         position:"absolute",
@@ -317,7 +317,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 <MoreOutline style={{ fontSize: 26 }} onClick={() => {operateClick(post)}} />
                             </div>
                             <div style={{marginTop:'14px',fontSize:'medium',wordBreak:'break-word'}}>{post.Content}</div>
-                            {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/@post/' + post.PostID} style={{marginTop:10}} /> : ''}
+                            {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/post/' + post.PostID} style={{marginTop:10}} /> : ''}
                         </div>
                         <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>
                             <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>

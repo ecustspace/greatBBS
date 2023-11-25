@@ -40,8 +40,10 @@ export async function POST(request) {
         return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
 
-    if (data.isAnonymity) {
-        if (sha256(data.isAnonymity) !== user_item.Anid){
+    if (!data.isAnonymity) {
+        return NextResponse.json({tip:'匿名密钥错误',status:500})
+    } else {
+        if (sha256(data.isAnonymity) !== user_item.Anid) {
             return NextResponse.json({tip:'匿名密钥错误',status:500})
         }
     }
@@ -69,9 +71,9 @@ export async function POST(request) {
         const putPostItem = new PutCommand({
             TableName: 'BBS',
             Item: {
-                PK: data.isAnonymity ? sha256(data.isAnonymity + username + post_id) : username,
+                PK: sha256(data.isAnonymity + username + post_id),
                 SK: now,
-                PostType: data.isAnonymity ? 'AnPost' : 'Post',
+                PostType: 'AnPost',
                 PostID: post_id,
                 ReplyCount: 0,
                 ReplyID: 0,
@@ -82,36 +84,13 @@ export async function POST(request) {
         })
         res = await docClient.send(putPostItem)
             .catch(error => {
-                console.log('错误')
+                console.log(error)
                 return 500})
     }
 
     if (res === 500 || !res) {
         return NextResponse.json({tip:'err',status:500})
     }
-
-    let image_list = []
-    if (!data.isAnonymity) {
-        for(let i = 0, len = data.images.length; i < len; i++) {
-            const type = uploadImage(data.images[i],'/@post',post_id + '-' + i.toString())
-            image_list.push(type)
-        }
-    }
-    image_list = await Promise.all(image_list)
-    if (image_list.length !== 0) {
-        await docClient.send(new UpdateCommand({
-            TableName: 'BBS',
-            Key: {
-                PK: username,
-                SK: now
-            },
-            UpdateExpression: "SET ImageList = :image_list",
-            ExpressionAttributeValues: {
-                ":image_list" : image_list
-            }
-        }))
-    }
-    revalidateTag(data.isAnonymity ? 'AnPost' : 'Post')
+    revalidateTag('AnPost')
     return NextResponse.json({tip:'发布成功',status:200})
 }
-

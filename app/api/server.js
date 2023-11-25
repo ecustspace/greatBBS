@@ -1,9 +1,20 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
+import nodemailer from "nodemailer";
 
 const client = new DynamoDBClient({});
 export const docClient = DynamoDBDocumentClient.from(client);
+
+export const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_USERPASS,
+    },
+});
 
 export async function getUserIDItem(userid){
     const getTokenCommand = new GetCommand({
@@ -161,6 +172,7 @@ export async function setUserInquireTime(username,time) {
         return 500
     })
 }
+
 
 
 

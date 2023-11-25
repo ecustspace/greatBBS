@@ -67,9 +67,13 @@ const SendPost = forwardRef((props, ref) => {
         recaptchaExecute().then(token => {
             data.recaptchaToken = token
             const xhr = new XMLHttpRequest();
-            if (activePart !== 2) {
-                xhr.open('POST', window.location.origin + '/api/post', true);
-            } else {
+            if (activePart === 0) {
+                xhr.open('POST', window.location.origin + '/api/postPost', true);
+            }
+            else if (activePart === 1) {
+                xhr.open('POST', window.location.origin + '/api/postAnPost', true);
+            }
+            else {
                 xhr.open('POST', window.location.origin + '/api/postImg', true);
             }
             xhr.upload.addEventListener('progress',function (e) {

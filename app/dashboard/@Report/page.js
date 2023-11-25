@@ -90,7 +90,7 @@ export default function Home() {
                 {post.ImageList !== undefined?
                     <ImageContainer
                         list={post.ImageList}
-                        from={post.PostType === 'Image' || 'AnPost' || 'Post' ? ('/@post/' + post.PostID) :
+                        from={post.PostType === 'Image' || 'AnPost' || 'Post' ? ('/post/' + post.PostID) :
                             ('/reply/' + reply.PostType.split('o')[1] + '/' + reply.ReplyID)} /> : ''}
                 <hr/>
             </div>)}

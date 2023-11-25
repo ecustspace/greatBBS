@@ -13,9 +13,10 @@ import {
     Popup,
     Space,
     Swiper,
-    TextArea
+    TextArea, Toast
 } from "antd-mobile";
 import {
+    ArrowDownCircleOutline,
     CloseShieldOutline,
     EyeInvisibleOutline,
     EyeOutline,
@@ -25,11 +26,13 @@ import {
     TeamOutline,
     TextOutline
 } from "antd-mobile-icons";
-import {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {AboutUs, avatarList} from "@/app/(app)/clientConfig";
+import {AboutUs, avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {getCookie, responseHandle} from "@/app/component/function";
-import {getUserData} from "@/app/api/serverAction";
+import {feedBack, getUserData} from "@/app/api/serverAction";
+import ReCAPTCHA from "react-google-recaptcha";
+import {sha256} from "js-sha256";
 
 export default function RootLayout({userReply,userLike,userPost}) {
     const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>]
@@ -37,6 +40,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         avatar:'dog.jpg',
         name:'user',
         contactInformation:'',
+        notifyEmail: '',
         count:[0,0,0]
     })
     const {isLogin} = useContext(loginState)
@@ -44,11 +48,12 @@ export default function RootLayout({userReply,userLike,userPost}) {
     const [form] = Form.useForm();
     const [isPopupVisible,setPopupVisible] = useState(false)
     const [activeIndex,setIndex] = useState(0)
-    const [visible, setVisible] = useState(false)
+    const [notifyEmail,setNotifyEmail] = useState('')
     const [visibleFeedBack, setVisibleFeedBack] = useState(false)
     const [visibleData, setVisibleData] = useState(false)
     const [avatar,setAvatar] = useState(userData.avatar)
     const ref = useRef(null);
+    const captchaRef = useRef(null)
 
     useEffect(() => {
         const handle = (e) => {
@@ -60,6 +65,8 @@ export default function RootLayout({userReply,userLike,userPost}) {
         data.avatar = localStorage.getItem('Avatar')
         data.contactInformation = localStorage.getItem('ContactInformation')
         data.name = decodeURI(getCookie('UserName'))
+        data.notifyEmail = localStorage.getItem('NotifyEmail')
+        data.anid = localStorage.getItem('Anid')
         setAvatar(localStorage.getItem('Avatar'))
         if (isLogin === false) {
             window.location.replace('/login')
@@ -78,8 +85,12 @@ export default function RootLayout({userReply,userLike,userPost}) {
         }
     },[isLogin])
     function submitInformation() {
-        const values = form.getFieldsValue(true)
+        Toast.show({
+            icon:'loading'
+        })
+        let values = form.getFieldsValue(true)
         values.avatar = avatar
+        values.shaAnid = sha256(values.anid)
         fetch(window.location.origin + '/api/changeInformation',{
             method:'POST',
             credentials:'include',
@@ -90,22 +101,56 @@ export default function RootLayout({userReply,userLike,userPost}) {
         })
             .then((res)=>res.json())
             .then(data => {
-                if (data.tip === "修改成功" || '距离上次修改匿名密钥不得小于一周'){
-                    localStorage.setItem('Avatar',values.avatar)
-                    setAvatar(values.avatar)
-                    localStorage.setItem('ContactInformation',values.contact_information)
-                    setData({
-                        ...userData,
-                        contactInformation:values.contact_information,
-                        avatar: values.avatar
-                    })
-                }
-                if (values.anid && data.tip === "修改成功") {
+                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周')) {
                     localStorage.setItem('Anid',values.anid)
+                }
+                if (!data.tip.includes('邮箱未通过验证，请到邮箱打开链接')) {
+                    localStorage.setItem('NotifyEmail',values.email)
+                }
+                localStorage.setItem('Avatar',values.avatar)
+                setAvatar(values.avatar)
+                localStorage.setItem('ContactInformation',values.contact_information)
+                setData({
+                    ...userData,
+                    contactInformation:values.contact_information,
+                    avatar: values.avatar,
+                    notifyEmail: values.email
+                })
+                if (data.tip === '修改成功') {
+                    setVisibleData(false)
                 }
                 responseHandle(data)
             })
     }
+
+    function changeNotifyEmail() {
+        Toast.show({
+            icon:'loading'
+        })
+        captchaRef.current.executeAsync().then(token => {
+            let values = form.getFieldsValue(['email'])
+            values.recaptchaToken = token
+            fetch(window.location.origin + '/api/changeNotifyEmail/change',{
+                method:'POST',
+                credentials:'include',
+                body: JSON.stringify(values),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json()).then(
+                data => {
+                    responseHandle(data)
+                }
+            )
+        })
+
+    }
+
+    function isEmail(str) {
+        const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+        return  reg.test(str);
+    }
+
     const items = avatarList.map((ava, index) => (
         <Swiper.Item key={index}>
             <div className='ava_item'>
@@ -116,6 +161,14 @@ export default function RootLayout({userReply,userLike,userPost}) {
 
     return (
         <div>
+            <script>
+                window.recaptchaOptions = useRecaptchaNet: true
+            </script>
+            <ReCAPTCHA
+                sitekey={recaptcha_site_key_v2}
+                ref={captchaRef}
+                size="invisible"
+            />
             <div className='userData'>
                 <div className='ava'>
                     <Image src={userData.avatar} alt='这是一个头像' width={75} height={75} style={{ borderRadius: 60, display: 'inline-block' }} />
@@ -166,6 +219,16 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     }}>
                         我要反馈
                     </List.Item>
+                    <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
+                        setVisibleFeedBack(true)
+                    }}>
+                        下载app
+                    </List.Item>
+                    <List.Item prefix={<Image src='chatgpt.svg' height={24}/>} onClick={() => {
+                        window.open('https://chatjbt.top', '_blank');
+                    }}>
+                        chatGPT
+                    </List.Item>
                     <List.Item prefix={<CloseShieldOutline fontSize={24}/>} onClick={() => {
                         Dialog.confirm({
                             content:'确定要登出吗',
@@ -202,12 +265,21 @@ export default function RootLayout({userReply,userLike,userPost}) {
             >
                 <br/>
                 <Form
+                    onFinish={content => {
+                        Toast.show({icon:'loading'})
+                        feedBack(document.cookie,content.content).then(res => {
+                            if (res.status === 200) {
+                                setVisibleFeedBack(false)
+                            }
+                            responseHandle(res)
+                        }
+                    )}}
                     style={{'--border-top':'0'}}
                     footer={<Button block color={"primary"} shape={"rounded"} size='large' type='submit' style={{ marginTop: '10px' }}>
                         <div style={{ fontWeight: 'bolder', fontSize: 18 }}>反 馈</div>
                     </Button>}>
                     <h2 style={{marginBottom:'20px'}}>反馈问题</h2>
-                    <Form.Item>
+                    <Form.Item name='content'>
                         <TextArea
                             placeholder='请输入反馈内容'
                             showCount
@@ -268,11 +340,12 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     form={form}
                     initialValues={{
                         contact_information : userData.contactInformation !== 'undefined' ? userData.contactInformation : '',
-                        anid : ''
+                        anid : userData.anid,
+                        email:userData.notifyEmail
                     }}
                     layout='horizontal'
                     mode='card' className='fm'
-                    style={{ '--prefix-width': '4.5em' }}
+                    style={{ '--prefix-width': '6em' }}
                     requiredMarkStyle='none'
                     footer={
                         <>
@@ -311,28 +384,32 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     <Form.Item
                         label='匿名密钥'
                         rules={[{
-                            max: 15,
+                            max: 100,
                             min: 5,
                         }]}
                         name='anid'
-                        extra={
-                            <div className="eye">
-                                {!visible ? (
-                                    <EyeInvisibleOutline onClick={() => {
-                                        form.setFieldValue('anid',localStorage.getItem('Anid') ? localStorage.getItem('Anid') : '')
-                                        setVisible(true)
-                                    }} />
-                                ) : (
-                                    <EyeOutline onClick={() => setVisible(false)} />
-                                )}
-                            </div>
-                        }
                     >
-                        <Input
-                            placeholder='为空则为不修改'
-                            clearable
-                            type={visible ? 'text' : 'password'}
-                        />
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name='email'
+                        label='通知邮箱'
+                        extra={<Button
+                            disabled={!isEmail(notifyEmail) || !form.isFieldTouched(['email'])}
+                            size='small'
+                            block
+                            color='primary'
+                            fill='none'
+                            onClick={() => {
+                                changeNotifyEmail()
+                            }}>验证</Button>}
+                        help='用于接受通知的邮箱，当有点赞，评论的消息的时候会发送到这个邮箱（为空则默认不接受邮件通知）'
+                        rules={[
+                            { type: 'email' },
+                        ]}
+                    >
+                            <Input onChange={setNotifyEmail}
+                                   placeholder='为空则默认不订阅通知' />
                     </Form.Item>
                 </Form>
             </CenterPopup>

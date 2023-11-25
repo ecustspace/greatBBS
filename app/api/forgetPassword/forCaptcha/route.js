@@ -1,8 +1,9 @@
 import {v4} from "uuid";
+import nodemailer from 'nodemailer'
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {appName, Url} from "@/app/(app)/clientConfig";
+import {appName} from "@/app/(app)/clientConfig";
 import {transporter} from "@/app/api/server";
 
 export async function POST(request) {
@@ -30,21 +31,13 @@ export async function POST(request) {
         console.log(err)
         return NextResponse.json({tip:'验证码发送失败，请检查邮箱',status:500})
     }
-    const sign_up_token = v4()
 
-    let data_ = data
-    delete data_.recaptchaToken
-    data_.verification = captcha.toString()
-    data_.signUpToken = sign_up_token
-
-    const link = Url + '/signup/?data=' + encodeURIComponent(JSON.stringify(data_))
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
+        from: '1563741036@qq.com', // sender address
         to: user_email + process.env.EMAIL, // list of receivers
-        subject: `【${appName}】注册验证码`, // Subject line
-        text: "您的验证码是:" + captcha.toString() + '\n或者直接访问该链接:' + link, // plain text body
-        html: "<b>您的验证码是:" + captcha.toString() + "</b><br>" +
-            "<a href='" + link + "'>或者点此完成注册</a>", // html body
+        subject: `【${appName}】验证码`, // Subject line
+        text: "你正在修改密码，你的验证码是:" + captcha.toString(), // plain text body
+        html: "<div>你正在修改密码</div><b>您的验证码是:" + captcha.toString() + "</b>", // html body
     };
     try {
         await new Promise((resolve, reject) => {
@@ -63,6 +56,8 @@ export async function POST(request) {
         return NextResponse.json({tip:'验证码发送失败，请检查邮箱',status:500})
     }
 
+    const sign_up_token = v4()
+
     const putCaptchaCommand = new PutCommand(
         {
             TableName: 'User',
@@ -75,8 +70,8 @@ export async function POST(request) {
         }
     )
     return await docClient.send(putCaptchaCommand).then((res) => {
-        console.log('成功')
-        return NextResponse.json({sign_up_token:sign_up_token,tip:'请查收验证码',status:200})
+            console.log('成功')
+            return NextResponse.json({sign_up_token:sign_up_token,tip:'请查收验证码',status:200})
         }
     ).catch(error => {
         console.log('失败')

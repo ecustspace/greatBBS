@@ -9,14 +9,15 @@ import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request){
     const data = await request.json()
+    console.log(data)
     if (data.contact_information.length > 50 || !avatarList.includes(data.avatar)
-        || (data.anid && !dataLengthVerify(5,15,data.anid))) {
+        || (data.anid && !dataLengthVerify(5,100,data.anid))) {
         return NextResponse.json({tip:'数据格式错误',status:500})
     }
     const cookieStore = cookies()
     const username = decodeURI(cookieStore.get('UserName').value)
     const token = cookieStore.get('Token').value
-    const user_item = await getUserItem(username,'SK,UserToken,LastChangeAnid,Anid')
+    const user_item = await getUserItem(username,'SK,UserToken,LastChangeAnid,Anid,Avatar,ContactInformation,NotifyEmail')
 
     if (user_item === 500 || !user_item){
         console.log('false')
@@ -29,39 +30,47 @@ export async function POST(request){
     }
 
     const couldChangeAnid = (now - user_item.LastChangeAnid) >= 3600 * 1000 * 24 * 7
+    let update = {UpdateExpression:'SET ',ExpressionAttributeValues:{}}
+    let tip = ''
+    if (user_item.Avatar !== data.avatar) {
+        update.UpdateExpression += "Avatar = :avatar,"
+        update.ExpressionAttributeValues[":avatar"] = data.avatar
+    }
+    if (user_item.ContactInformation !== data.contact_information) {
+        update.UpdateExpression += "ContactInformation = :contact_information,"
+        update.ExpressionAttributeValues[":contact_information"] = data.contact_information
+    }
+    if (user_item.Anid !== data.shaAnid) {
+        if (!couldChangeAnid) {
+            tip += ('• 修改匿名密钥距离上次必须大于一周，还有' +
+                ((user_item.LastChangeAnid + 3600 * 1000 * 24 * 7 - now)/(3600 * 1000 * 24)).toFixed(3)
+                + '天可修改\n')
+        } else {
+            update.UpdateExpression += "Anid = :anid,"
+            update.ExpressionAttributeValues[":anid"] = data.shaAnid
+            update.UpdateExpression += "LastChangeAnid = :last_change,"
+            update.ExpressionAttributeValues[":last_change"] = now
+        }
+    }
 
+    if (user_item.NotifyEmail !== data.email && data.email !== '') {
+        tip += '• 邮箱未通过验证，请到邮箱打开链接'
+    }
+    if (update.UpdateExpression === 'SET ') {
+        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:200})
+    }
     const updateUserCommand = new UpdateCommand({
         TableName: 'User',
         Key: {
             PK: 'user',
             SK: username
         },
-        UpdateExpression:
-            "SET " +
-            "ContactInformation = :contact_information," +
-            "Anid = :anid," +
-            "Avatar = :avatar," +
-            "LastChangeAnid = :last_change",
-        ExpressionAttributeValues: couldChangeAnid === true && data.anid !== '' ? {
-            ":contact_information" : data.contact_information,
-            ":anid" :  sha256(data.anid),
-            ":avatar" : data.avatar,
-            ":last_change" :  now
-        } :{
-            ":contact_information" : data.contact_information,
-            ":anid" : user_item.Anid,
-            ":avatar" : data.avatar,
-            ":last_change" :  user_item.LastChangeAnid
-        }
+        UpdateExpression: update.UpdateExpression.slice(0,-1),
+        ExpressionAttributeValues: update.ExpressionAttributeValues
     })
 
     return await docClient.send(updateUserCommand).then(res => {
-        if (couldChangeAnid !== true && data.anid !== '') {
-            console.log('success')
-            return NextResponse.json({tip:'距离上次修改匿名密钥不得小于一周',status:500})
-        }
-        console.log('success')
-        return NextResponse.json({tip:'修改成功',status:200})
+        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:200})
     }).catch((err)=>{
         console.log(err)
         console.log(data.anid)

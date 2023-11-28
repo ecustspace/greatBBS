@@ -81,6 +81,7 @@ export default function Home() {
                         color={"default"}
                         shape={"rounded"}
                         size='large'
+                        type="primary"
                         onClick={()=>{window.location.replace('/signup')}}
                         >
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>注 册</div>

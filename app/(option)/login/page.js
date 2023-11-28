@@ -60,7 +60,6 @@ export default function Home() {
                 <TranslationAvatar
                     avatarList={avatarList}
                     size={'96px'}/>
-
             </AutoCenter>
             <div>
                 <h1>登录账号</h1>
@@ -81,7 +80,6 @@ export default function Home() {
                         color={"default"}
                         shape={"rounded"}
                         size='large'
-                        type="primary"
                         onClick={()=>{window.location.replace('/signup')}}
                         >
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>注 册</div>

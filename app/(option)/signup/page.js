@@ -1,30 +1,38 @@
 'use client'
+
 import './signup.css'
 import React, {useEffect, useRef, useState} from 'react'
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {sha256} from "js-sha256";
-import TranslationAvatar from "@/app/component/translationAvatar";
 import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSearchParams} from "next/navigation";
 
 export default function Home() {
-    const [psw, setPsw] = useState();
-    const [psw2, setPsw2] = useState();
+    const [psw, setPsw] = useState('');
+    const [psw2, setPsw2] = useState('');
     const [visible, setVisible] = useState(false)
     const [disable, setDisable] = useState(false)
     const [time, setTime] = useState("获取验证码");
     const [form] = Form.useForm()
     const captchaRef = useRef(null)
     const searchParams = useSearchParams()
+    const [activeIndex,setIndex] = useState(0)
+    function nextImg() {
+        setIndex(activeIndex => (activeIndex + 1) % avatarList.length)
+    }
 
     useEffect(() => {
         const data = JSON.parse(decodeURIComponent(searchParams.get('data')))
         if (data) {
             document.cookie = `SignUpToken=${data.signUpToken}`
             form.submit()
+        }
+        let timer = setInterval(nextImg, 3000)
+        return () => {
+            clearInterval(timer)
         }
     },[])
 
@@ -145,15 +153,18 @@ export default function Home() {
                 size="invisible"
             />
             <NavBar onBack={back}></NavBar>
-            <AutoCenter style={{ marginTop: '10px' }}>
-                <TranslationAvatar
-                    avatarList={avatarList}
-                    size={'96px'} />
-            </AutoCenter>
-
-            <div>
+            <AutoCenter>
+                <div style={{width:'96px',height:'96px',position:"relative"}}>
+                    {avatarList.map(
+                        (avatar,index) =>
+                            <img key={avatar.id}
+                                 src={avatar}
+                                 alt={index}
+                                 style={{borderRadius: 16,position:"absolute",left:0,top:0,width:'96px',height:'96px'}}
+                                 className={index === activeIndex ? 'fade-in' : 'fade-out'} />)}
+                </div>
                 <h1>注册账号</h1>
-            </div>
+            </AutoCenter>
             <Form
                 form={form}
                 onFinish={onSubmit1}

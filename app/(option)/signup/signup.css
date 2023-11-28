@@ -41,3 +41,13 @@ h1 {
     width: 30px;
     height: 30px;
 }
+
+.fade-in {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}

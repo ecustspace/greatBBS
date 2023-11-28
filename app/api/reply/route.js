@@ -5,6 +5,7 @@ import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {sha256} from "js-sha256";
 import {revalidateTag} from "next/cache";
+import {Url} from "@/app/(app)/clientConfig";
 
 export async function POST(request) {
     const data = await request.json()
@@ -222,6 +223,16 @@ export async function POST(request) {
             .catch((err) => {console.log(err); return 500})
     }
     if (res === 200 && (postData[0].PostType === 'Post' || 'Image')) {
+        if (data.post_name !== username) {
+            const data_ = encodeURIComponent(JSON.stringify({
+                username: data.post_name,
+                type: '评论',
+                from: username,
+                content: data.content,
+                inWhere: data.post_name + '#' + data.post_time
+            }))
+            fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
+        }
         let image_list = []
         for(let i = 0, len = data.images.length; i < len; i++) {
             const type = uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())

@@ -23,8 +23,7 @@ export function timeConclude(time) {
         const day = date.getDate();
         const hours = date.getHours();
         const minutes = date.getMinutes();
-        const seconds = date.getSeconds();
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        return `${year}-${month}-${day} ${hours < 10 ? ('0' + hours) : hours}:${minutes < 10 ? ('0' + minutes) : minutes}`;
 
     }
 }

@@ -1,5 +1,5 @@
 export const imageUrl = 'https://d2ekmn0x4fiphu.cloudfront.net'
-export const Url = 'https://ecustspace.xyz'
+export const Url = 'http://localhost:3000'
 
 export const appName = 'Ecust Space'
 

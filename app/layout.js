@@ -46,7 +46,6 @@ export default function RootLayout({ children }) {
         <head>
             <link rel='manifest' href='/manifest.json'></link>
             <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no' />
-            <meta name="apple-mobile-web-app-capable" content="yes" />
         </head>
         <loginState.Provider value={login}>
             <div id='loginRoot'></div>

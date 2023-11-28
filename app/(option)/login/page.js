@@ -73,7 +73,8 @@ export default function Home() {
                 style={{ '--prefix-width': '4.5em' }}
                 requiredMarkStyle='none'
                 footer={<>
-                <Button block color={"primary"} shape={"rounded"} size='large' type='submit'>
+                <Button block color={"primary"} shape={"rounded"} size='large' type="primary"
+                        htmlType='submit'>
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>登 录</div>
                 </Button><br />
                 <Button block

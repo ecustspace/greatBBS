@@ -169,7 +169,8 @@ export default function Home() {
                             color={"primary"}
                             shape={"rounded"}
                             size='large'
-                            type='submit'>
+                            type="primary"
+                            htmlType='submit'>
                             <div style={{ fontWeight: 'bolder', fontSize: 18 }}>注 册</div>
                         </Button>
                 }>

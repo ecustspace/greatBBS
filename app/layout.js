@@ -47,8 +47,12 @@ export default function RootLayout({ children }) {
             <link rel='manifest' href='/manifest.json'></link>
             <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no' />
             <meta name="apple-mobile-web-app-capable" content="yes" />
-            <link rel="apple-touch-startup-image" href="/Default@2x~iphone.png" media="(orientation: portrait)"/>
-            <link rel="apple-touch-startup-image" href="/Default-Landscape@2x~ipad.png" media="(orientation: landscape)"/>
+            <link href="/2048.png" sizes="2048x2732" rel="apple-touch-startup-image" />
+            <link href="/1536.png" sizes="1536x2048" rel="apple-touch-startup-image" />
+            <link href="/1125.png" sizes="1125x2436" rel="apple-touch-startup-image" />
+            <link href="/1242.png" sizes="1242x2208" rel="apple-touch-startup-image" />
+            <link href="/750.png" sizes="750x1334" rel="apple-touch-startup-image" />
+            <link href="/640.png" sizes="640x1136" rel="apple-touch-startup-image" />
         </head>
         <loginState.Provider value={login}>
             <div id='loginRoot'></div>

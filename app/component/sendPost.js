@@ -18,7 +18,7 @@ import {
     Toast
 } from 'antd-mobile'
 import {mockUpload, recaptchaExecute, responseHandle} from "@/app/component/function";
-import {EyeOutline, QuestionCircleOutline, UserOutline} from "antd-mobile-icons";
+import {QuestionCircleOutline, UserOutline} from "antd-mobile-icons";
 import {AboutAnonymity} from "@/app/(app)/clientConfig";
 
 // eslint-disable-next-line react/display-name
@@ -126,7 +126,8 @@ const SendPost = forwardRef((props, ref) => {
             <CenterPopup
                 visible={dialogVisible}
                 style={{
-                    "--z-index":1001}}
+                    "--z-index":1001,
+                    '--border-radius':'16px'}}
             >
                 <AutoCenter><div style={{fontSize:'large',padding:'9px'}}>请输入匿名密钥</div></AutoCenter>
                 <Form
@@ -146,14 +147,14 @@ const SendPost = forwardRef((props, ref) => {
                                 <div style={{ fontWeight: 'bolder', fontSize: 18 }}>确 认</div>
                             </Button>
                             <Button onClick={
-                                () => {setDialogVisible(false)}} block color={"primary"} shape={"rounded"} size='small' fill='outline' style={{ marginTop: '10px' }}>
+                                () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='small' fill='outline' style={{ marginTop: '10px' }}>
                                 <div style={{ fontWeight: 'bolder', fontSize: 18 }}>取 消</div>
                             </Button>
                         </>}
                 >
                     <Form.Item
                         label='匿名密钥'
-                        help={<>请到上次注册/修改密钥的设备(浏览器)→个人中心<UserOutline />→修改资料匿名密钥栏，点击 <EyeOutline /> 查看</>}
+                        help={<>请到上次注册/修改密钥的设备(浏览器)→个人中心<UserOutline />→修改资料【匿名密钥】查看</>}
                     >
                         <Input placeholder='匿名密钥' onChange={setAnid}/>
                     </Form.Item>

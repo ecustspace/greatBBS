@@ -302,7 +302,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     '--z-index': 1,
                     '--max-width':'100vw',
                     '--min-width':'90vw',
-                    '--border-radius':'8px'}}
+                    '--border-radius':'16px'}}
             >
                 <br/>
                 <div className='avaDiv'>

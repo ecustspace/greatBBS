@@ -19,7 +19,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
             afterClose={root.unmount}
             style={{'--max-width':'100vw',
                 '--min-width':'90vw',
-                '--border-radius':'8px'}}>
+                '--border-radius':'16px'}}>
             <ReCAPTCHA
                 sitekey={recaptcha_site_key_v2}
                 ref={captchaRef}

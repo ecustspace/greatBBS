@@ -81,7 +81,7 @@ export default function Home() {
                         shape={"rounded"}
                         size='large'
                         onClick={()=>{window.location.replace('/signup')}}
-                        type='submit'>
+                        >
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>注 册</div>
                 </Button>
                     <br/>

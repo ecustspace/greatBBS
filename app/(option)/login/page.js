@@ -26,7 +26,8 @@ export default function Home() {
             }
             values.recaptchaToken = token
             Toast.show({
-                icon:"loading"
+                icon:"loading",
+                duration:0
             })
             toLogin(values).then(res => {
                 if (res.status === 200) {
@@ -72,8 +73,7 @@ export default function Home() {
                 style={{ '--prefix-width': '4.5em' }}
                 requiredMarkStyle='none'
                 footer={<>
-                <Button block color={"primary"} shape={"rounded"} size='large' type="primary"
-                        htmlType='submit'>
+                <Button block color={"primary"} shape={"rounded"} size='large' type="submit">
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>登 录</div>
                 </Button><br />
                 <Button block

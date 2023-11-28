@@ -218,7 +218,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         我要反馈
                     </List.Item>
                     <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
-                        setVisibleFeedBack(true)
+                        window.open('https://ecustspace.github.io', '_blank');
                     }}>
                         下载app
                     </List.Item>

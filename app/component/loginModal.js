@@ -58,8 +58,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             color={"primary"}
                             shape={"rounded"}
                             size='small'
-                            type="primary"
-                            htmlType='submit'
+                            type="submit"
                             >
                             <div style={{ fontWeight: 'bolder', fontSize: 18 }}>登 录</div>
                         </Button>

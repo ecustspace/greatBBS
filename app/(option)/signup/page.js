@@ -37,7 +37,7 @@ export default function Home() {
     },[])
 
     const onSubmit = () => {    //验证码
-        if (form.getFieldsValue(['useremail'])) {
+        if (form.getFieldsValue(['useremail']) === '') {
             alert("请正确输入邮箱后获取验证码！")
             return
         }
@@ -112,7 +112,8 @@ export default function Home() {
             values.anid = sha256(anid)
             values.avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
             Toast.show({
-                icon:"loading"
+                icon:"loading",
+                duration:0
             })
             fetch(window.location.origin + '/api/register/verify', {
                 method: 'POST',
@@ -179,8 +180,7 @@ export default function Home() {
                             color={"primary"}
                             shape={"rounded"}
                             size='large'
-                            type="primary"
-                            htmlType='submit'>
+                            type="submit">
                             <div style={{ fontWeight: 'bolder', fontSize: 18 }}>注 册</div>
                         </Button>
                 }>

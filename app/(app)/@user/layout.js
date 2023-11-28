@@ -82,11 +82,11 @@ export default function RootLayout({userReply,userLike,userPost}) {
             removeEventListener('popstate',handle)
         }
     },[isLogin])
-    function submitInformation() {
+    function submitInformation(values) {
         Toast.show({
-            icon:'loading'
+            icon:'loading',
+            duration:0
         })
-        let values = form.getFieldsValue(true)
         values.avatar = avatar
         values.shaAnid = sha256(values.anid)
         fetch(window.location.origin + '/api/changeInformation',{
@@ -354,7 +354,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                                 size='large'
                                 type='submit'
                                 style={{ marginTop: '10px' }}
-                                onClick={submitInformation}
+                                onFinish={submitInformation}
                             >
                                 <div style={{ fontWeight: 'bolder', fontSize: 18 }}>保 存</div>
                             </Button>
@@ -381,13 +381,9 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     </Form.Item>
                     <Form.Item
                         label='匿名密钥'
-                        rules={[{
-                            max: 100,
-                            min: 5,
-                        }]}
                         name='anid'
                     >
-                        <Input />
+                        <Input placeholder='为空则默认不修改'/>
                     </Form.Item>
                     <Form.Item
                         name='email'

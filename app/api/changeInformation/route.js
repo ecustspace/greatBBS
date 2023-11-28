@@ -10,7 +10,7 @@ export async function POST(request){
     const data = await request.json()
     console.log(data)
     if (data.contact_information.length > 50 || !avatarList.includes(data.avatar)
-        || (data.anid && !dataLengthVerify(5,100,data.anid))) {
+        || (typeof data.anid !== "string")) {
         return NextResponse.json({tip:'数据格式错误',status:500})
     }
     const cookieStore = cookies()
@@ -44,6 +44,9 @@ export async function POST(request){
             tip += ('• 修改匿名密钥距离上次必须大于一周，还有' +
                 ((user_item.LastChangeAnid + 3600 * 1000 * 24 * 7 - now)/(3600 * 1000 * 24)).toFixed(3)
                 + '天可修改\n')
+        }
+        else if (data.shaAnid.length === 0) {
+
         } else {
             update.UpdateExpression += "Anid = :anid,"
             update.ExpressionAttributeValues[":anid"] = data.shaAnid

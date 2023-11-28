@@ -1,5 +1,4 @@
 'use client'
-import '../../globals.css'
 import './signup.css'
 import React, {useEffect, useRef, useState} from 'react'
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'

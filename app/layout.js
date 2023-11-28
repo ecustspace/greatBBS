@@ -47,12 +47,56 @@ export default function RootLayout({ children }) {
             <link rel='manifest' href='/manifest.json'></link>
             <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no' />
             <meta name="apple-mobile-web-app-capable" content="yes" />
-            <link href="/2048.png" sizes="2048x2732" rel="apple-touch-startup-image" />
-            <link href="/1536.png" sizes="1536x2048" rel="apple-touch-startup-image" />
-            <link href="/1125.png" sizes="1125x2436" rel="apple-touch-startup-image" />
-            <link href="/1242.png" sizes="1242x2208" rel="apple-touch-startup-image" />
-            <link href="/750.png" sizes="750x1334" rel="apple-touch-startup-image" />
-            <link href="/640.png" sizes="640x1136" rel="apple-touch-startup-image" />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/828.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+                href="/1242.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+                href="/1125.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+                href="/1242.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/750.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/2048.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/2048.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/640.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/2048.png"
+            />
+            <link
+                rel="apple-touch-startup-image"
+                media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+                href="/1536.png"
+            />
         </head>
         <loginState.Provider value={login}>
             <div id='loginRoot'></div>

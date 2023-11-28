@@ -19,6 +19,7 @@ export default function RootLayout({ children }) {
             (data) => {
                 localStorage.setItem('Avatar',data.avatar)
                 localStorage.setItem('ContactInformation',data.contact_information)
+                localStorage.setItem('NotifyEmail',data.notify_email)
                 if (data.tip === '登陆成功'){
                     setLogin(true)
                 }

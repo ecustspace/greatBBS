@@ -4,7 +4,6 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {avatarList} from "@/app/(app)/clientConfig";
-import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request){
     const data = await request.json()

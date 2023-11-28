@@ -18,8 +18,6 @@ import {
 import {
     ArrowDownCircleOutline,
     CloseShieldOutline,
-    EyeInvisibleOutline,
-    EyeOutline,
     LeftOutline,
     RightOutline,
     TagOutline,

@@ -64,6 +64,7 @@ export default function Home() {
                         document.cookie = `SignUpToken=${data.sign_up_token}`
                         window.localStorage.setItem("time", Date.parse(new Date()))
                         if (data.status === 200) {
+                            Toast.clear()
                             Dialog.show({
                                 content: '验证码发送成功，请查收',
                                 closeOnAction: true,
@@ -245,7 +246,7 @@ export default function Home() {
                         <div>{emailAddress}</div>
                     }
                 >
-                    <Input placeholder='请输入' />
+                    <Input placeholder='输入学号即可' />
                 </Form.Item>
                 <Form.Item
                     label='密码'

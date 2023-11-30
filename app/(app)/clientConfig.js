@@ -3,6 +3,10 @@ export const Url = 'https://ecustspace.xyz'
 
 export const appName = 'Ecust Space'
 
+export const emailAddress = '@mail.ecust.edu.cn'
+
+export const emailWebsite = 'https://stu.mail.ecust.edu.cn/'
+
 export const recaptcha_site_key_v3 = '6Lf7p7YoAAAAADIPFm9mPFwRCD7-Po147XP5bQKO'
 export const recaptcha_site_key_v2 = '6LdFP0AlAAAAAHCFWFdhftLrUsVIvK-ezlwVAlcS'
 

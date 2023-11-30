@@ -6,7 +6,7 @@ import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
 import TranslationAvatar from "@/app/component/translationAvatar";
-import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {avatarList, emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -94,7 +94,7 @@ export default function Home() {
                     name='useremail'
                     label='邮箱'
                     extra={
-                        <div>@mail.ecust.edu.cn</div>
+                        <div>${emailAddress}</div>
                     }
                 >
                     <Input placeholder='你的学号' />

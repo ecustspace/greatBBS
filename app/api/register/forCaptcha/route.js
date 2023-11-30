@@ -2,7 +2,7 @@ import {v4} from "uuid";
 import {PutCommand} from "@aws-sdk/lib-dynamodb";
 import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {appName, Url} from "@/app/(app)/clientConfig";
+import {appName, emailAddress, Url} from "@/app/(app)/clientConfig";
 import {transporter} from "@/app/api/server";
 
 export async function POST(request) {
@@ -40,7 +40,7 @@ export async function POST(request) {
     const link = Url + '/signup/?data=' + encodeURIComponent(JSON.stringify(data_))
     const mailData = {
         from: process.env.SMTP_USERNAME, // sender address
-        to: user_email + process.env.EMAIL, // list of receivers
+        to: user_email + emailAddress, // list of receivers
         subject: `【${appName}】注册验证码`, // Subject line
         text: "您的验证码是:" + captcha.toString() + '\n或者直接访问该链接:' + link, // plain text body
         html: "<b>您的验证码是:" + captcha.toString() + "</b><br>" +

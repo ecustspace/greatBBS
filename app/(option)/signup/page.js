@@ -2,10 +2,10 @@
 
 import './signup.css'
 import React, {useEffect, useRef, useState} from 'react'
-import {AutoCenter, Button, Form, Input, NavBar, Toast} from 'antd-mobile'
+import {AutoCenter, Button, Dialog, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {sha256} from "js-sha256";
-import {avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {avatarList, emailAddress, emailWebsite, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSearchParams} from "next/navigation";
@@ -132,6 +132,26 @@ export default function Home() {
                         localStorage.setItem('Avatar', data.avatar)
                         localStorage.setItem('Anid', anid)
                         window.location.replace('/')
+                        Dialog.show({
+                            content: '验证码发送成功，请查收',
+                            closeOnAction: true,
+                            actions: [
+                                [
+                                    {
+                                        key: 'cancel',
+                                        text: '取消',
+                                    },
+                                    {
+                                        key: 'go',
+                                        text: '前往邮箱',
+                                        bold: true,
+                                        onClick: () => {
+                                            window.open(emailWebsite, '_blank')
+                                        }
+                                    },
+                                ],
+                            ],
+                        })
                     }
                 }
             )
@@ -215,11 +235,11 @@ export default function Home() {
                     label='邮箱'
                     help={<>
                         <div>只接受学校邮箱，输入学号即可</div>
-                        <a href='https://stu.mail.ecust.edu.cn/' target="_blank">学校邮箱网址：https://stu.mail.ecust.edu.cn/</a>
+                        <a href={emailWebsite} target="_blank">学校邮箱网址：${emailWebsite}</a>
                         <div>邮箱初始密码：身份证后八位加上Ecust#</div>
                     </>}
                     extra={
-                        <div>@mail.ecust.edu.cn</div>
+                        <div>${emailAddress}</div>
                     }
                 >
                     <Input placeholder='请输入' />

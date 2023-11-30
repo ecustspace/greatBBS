@@ -6,7 +6,7 @@ import {useRef, useState} from 'react'
 import {Button, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
-import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import ReCAPTCHA from "react-google-recaptcha";
 
 
@@ -109,7 +109,7 @@ export default function Home() {
                     label="邮箱"
                     name='useremail'
                     rules={[{ required: true, message: ' ' }]}
-                    extra={<div>@ecust.mail.edu.cn</div>}
+                    extra={<div>${emailAddress}</div>}
                 >
                     <Input placeholder='请输入邮箱' />
                 </Form.Item>

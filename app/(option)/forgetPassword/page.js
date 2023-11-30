@@ -3,10 +3,10 @@
 'use client'
 import './forgetPassword.css'
 import {useRef, useState} from 'react'
-import {Button, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
+import {Button, Dialog, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
-import {emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {emailAddress, emailWebsite, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import ReCAPTCHA from "react-google-recaptcha";
 
 
@@ -26,6 +26,10 @@ export default function Home() {
             captchaRef.current.reset()
             const values = form1.getFieldsValue(true)
             values.recaptchaToken = token
+            Toast.show({
+                icon:"loading",
+                duration:0
+            })
             fetch(window.location.origin + '/api/forgetPassword/forCaptcha', {
                 method: 'post',
                 body: JSON.stringify(values),
@@ -38,7 +42,31 @@ export default function Home() {
             }).then(
                 (data) => {
                     document.cookie = `SignUpToken=${data.sign_up_token}`
-                    responseHandle(data)
+                    if (data.status === 200) {
+                        Toast.clear()
+                        Dialog.show({
+                            content: '验证码发送成功，请查收',
+                            closeOnAction: true,
+                            actions: [
+                                [
+                                    {
+                                        key: 'cancel',
+                                        text: '取消',
+                                    },
+                                    {
+                                        key: 'go',
+                                        text: '前往邮箱',
+                                        bold: true,
+                                        onClick: () => {
+                                            window.open(emailWebsite, '_blank')
+                                        }
+                                    },
+                                ],
+                            ],
+                        })
+                    } else {
+                        responseHandle(data)
+                    }
                 }
             ).catch(() => {Toast.show('error')})
         }).catch(() => {

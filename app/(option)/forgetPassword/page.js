@@ -109,7 +109,7 @@ export default function Home() {
                     label="邮箱"
                     name='useremail'
                     rules={[{ required: true, message: ' ' }]}
-                    extra={<div>${emailAddress}</div>}
+                    extra={<div>{emailAddress}</div>}
                 >
                     <Input placeholder='请输入邮箱' />
                 </Form.Item>

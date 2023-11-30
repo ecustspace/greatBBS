@@ -94,7 +94,7 @@ export default function Home() {
                     name='useremail'
                     label='邮箱'
                     extra={
-                        <div>${emailAddress}</div>
+                        <div>{emailAddress}</div>
                     }
                 >
                     <Input placeholder='你的学号' />

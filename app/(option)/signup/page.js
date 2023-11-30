@@ -62,8 +62,31 @@ export default function Home() {
                 }).then(
                     (data) => {
                         document.cookie = `SignUpToken=${data.sign_up_token}`
-                        responseHandle(data)
                         window.localStorage.setItem("time", Date.parse(new Date()))
+                        if (data.status === 200) {
+                            Dialog.show({
+                                content: '验证码发送成功，请查收',
+                                closeOnAction: true,
+                                actions: [
+                                    [
+                                        {
+                                            key: 'cancel',
+                                            text: '取消',
+                                        },
+                                        {
+                                            key: 'go',
+                                            text: '前往邮箱',
+                                            bold: true,
+                                            onClick: () => {
+                                                window.open(emailWebsite, '_blank')
+                                            }
+                                        },
+                                    ],
+                                ],
+                            })
+                        } else {
+                            responseHandle(data)
+                        }
                         setDisable(true)
                         last = window.localStorage.getItem("time")
                         let now = Date.parse(new Date())
@@ -132,26 +155,6 @@ export default function Home() {
                         localStorage.setItem('Avatar', data.avatar)
                         localStorage.setItem('Anid', anid)
                         window.location.replace('/')
-                        Dialog.show({
-                            content: '验证码发送成功，请查收',
-                            closeOnAction: true,
-                            actions: [
-                                [
-                                    {
-                                        key: 'cancel',
-                                        text: '取消',
-                                    },
-                                    {
-                                        key: 'go',
-                                        text: '前往邮箱',
-                                        bold: true,
-                                        onClick: () => {
-                                            window.open(emailWebsite, '_blank')
-                                        }
-                                    },
-                                ],
-                            ],
-                        })
                     }
                 }
             )
@@ -235,11 +238,11 @@ export default function Home() {
                     label='邮箱'
                     help={<>
                         <div>只接受学校邮箱，输入学号即可</div>
-                        <a href={emailWebsite} target="_blank">学校邮箱网址：${emailWebsite}</a>
+                        <a href={emailWebsite} target="_blank">学校邮箱网址：{emailWebsite}</a>
                         <div>邮箱初始密码：身份证后八位加上Ecust#</div>
                     </>}
                     extra={
-                        <div>${emailAddress}</div>
+                        <div>{emailAddress}</div>
                     }
                 >
                     <Input placeholder='请输入' />

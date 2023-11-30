@@ -73,7 +73,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                     name='useremail'>
                     <div style={{display:"flex"}}>
                         <Input placeholder='你的学号' clearable></Input>
-                        <span>${emailAddress}</span>
+                        <span>{emailAddress}</span>
                     </div>
                 </Form.Item>
                 <Form.Item

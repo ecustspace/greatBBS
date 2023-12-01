@@ -37,9 +37,6 @@ export default function RootLayout({userReply,userLike,userPost}) {
     const [userData,setData] = useState({
         avatar:'dog.jpg',
         name:'user',
-        contactInformation:'',
-        notifyEmail: '',
-        anid: '',
         count:[0,0,0]
     })
     const {isLogin} = useContext(loginState)
@@ -62,17 +59,15 @@ export default function RootLayout({userReply,userLike,userPost}) {
         window.addEventListener('popstate',handle)
         const data = userData
         data.avatar = localStorage.getItem('Avatar')
-        data.contactInformation = localStorage.getItem('ContactInformation')
         data.name = decodeURI(getCookie('UserName'))
-        data.notifyEmail = localStorage.getItem('NotifyEmail')
-        data.anid = localStorage.getItem('Anid')
         setAvatar(localStorage.getItem('Avatar'))
         if (isLogin === false) {
             window.location.replace('/login')
         } else {
+            form.setFieldValue('contact_information',localStorage.getItem('ContactInformation'))
+            form.setFieldValue('anid',localStorage.getItem('Anid'))
+            form.setFieldValue('email',localStorage.getItem('NotifyEmail'))
             getUserData(document.cookie).then(res => {
-                data.count = res
-
                 setData({
                     ...data,
                     count: res
@@ -379,11 +374,6 @@ export default function RootLayout({userReply,userLike,userPost}) {
                 </div>
                 <Form
                     form={form}
-                    initialValues={{
-                        contact_information : userData.contactInformation !== 'undefined' ? userData.contactInformation : '',
-                        anid : userData.anid,
-                        email:userData.notifyEmail
-                    }}
                     layout='horizontal'
                     mode='card' className='fm'
                     style={{ '--prefix-width': '6em' }}

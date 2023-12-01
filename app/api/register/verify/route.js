@@ -1,10 +1,11 @@
 import {DeleteCommand, GetCommand, TransactWriteCommand,} from "@aws-sdk/lib-dynamodb";
 import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {cookies} from "next/headers";
+import {cookies, headers} from "next/headers";
 import {v4} from "uuid";
 import {avatarList} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
+import parser from "ua-parser-js";
 
 export function dataLengthVerify(min,max,data) {
     return !(data.length > max || data.length < min);
@@ -58,6 +59,22 @@ export async function POST(request) {
             },
             ConditionExpression: "attribute_not_exists(SK)"
         }
+        const ua = parser(headers().get('user-agent'))
+        let device = ''
+        if (ua.device.model != null) {
+            device += ua.device.model
+        } else {
+            if (ua.device.name != null) {
+                device += ua.device.vendor
+            } else {
+                if (ua.os.name != null) {
+                    device += ua.os.name
+                }
+            }
+        }
+        if (ua.browser.name != null) {
+            device += `(${ua.browser.name})`
+        }
         const putUserName = {
             TableName: 'User',
             Item: {
@@ -67,7 +84,10 @@ export async function POST(request) {
                 Avatar: data.avatar,
                 InquireTime: now,
                 Anid: data.anid,
-                LastChangeAnid: 0
+                LastChangeAnid: {
+                    device: device,
+                    time: 0
+                }
             },
             ConditionExpression: "attribute_not_exists(SK)"
         }

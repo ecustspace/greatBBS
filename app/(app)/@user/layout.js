@@ -65,6 +65,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
             window.location.replace('/login')
         } else {
             form.setFieldValue('contact_information',localStorage.getItem('ContactInformation'))
+            alert(localStorage.getItem('Anid'))
             form.setFieldValue('anid',localStorage.getItem('Anid'))
             form.setFieldValue('email',localStorage.getItem('NotifyEmail'))
             getUserData(document.cookie).then(res => {

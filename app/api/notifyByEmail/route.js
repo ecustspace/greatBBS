@@ -1,8 +1,7 @@
 import {NextResponse} from "next/server";
-import {docClient, getUserItem, transporter} from "@/app/api/server";
+import {getUserItem, transporter} from "@/app/api/server";
 import {appName, Url} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
-import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 
 export async function GET(request) {
     const token = request.nextUrl.searchParams.get('token')

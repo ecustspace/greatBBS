@@ -40,7 +40,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         count:[0,0,0]
     })
     const {isLogin} = useContext(loginState)
-    const [Text, setText] = useState();
+    const [Text, setText] = useState('');
     const [form] = Form.useForm();
     const [isPopupVisible,setPopupVisible] = useState(false)
     const [activeIndex,setIndex] = useState(0)
@@ -311,7 +311,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         }
                     )}}
                     style={{'--border-top':'0'}}
-                    footer={<Button block color={"primary"} shape={"rounded"} size='large' type='submit' style={{ marginTop: '10px' }}>
+                    footer={<Button disabled={Text.length === 0} block color={"primary"} shape={"rounded"} size='large' type='submit' style={{ marginTop: '10px' }}>
                         <div style={{ fontWeight: 'bolder', fontSize: 18 }}>反 馈</div>
                     </Button>}>
                     <h2 style={{marginBottom:'20px'}}>反馈问题</h2>

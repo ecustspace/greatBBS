@@ -667,6 +667,9 @@ export async function updateUserToken(cookie) {
 }
 
 export async function feedBack(cookie,content) {
+    if (content.length > 500) {
+        return {tip:'error',status:500}
+    }
     const jwt = getCookie('JWT',cookie)
     const username = decodeURI(getCookie('UserName',cookie))
     const token = getCookie('Token',cookie)

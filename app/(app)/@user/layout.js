@@ -162,7 +162,8 @@ export default function RootLayout({userReply,userLike,userPost}) {
 
     function changeNotifyEmail() {
         Toast.show({
-            icon:'loading'
+            icon:'loading',
+            duration:0
         })
         captchaRef.current.executeAsync().then(token => {
             let values = form.getFieldsValue(['email'])

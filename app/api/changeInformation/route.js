@@ -90,7 +90,7 @@ export async function POST(request){
     })
 
     return await docClient.send(updateUserCommand).then(res => {
-        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:200})
+        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:(tip.length === 0 ? 200 : 400)})
     }).catch((err)=>{
         console.log(err)
         return NextResponse.json({tip:'修改失败',status:500})})

@@ -73,8 +73,13 @@ export async function POST(request){
         }
     }
 
-    if (user_item.NotifyEmail !== data.email && data.email != '') {
-        tip += '• 邮箱未通过验证，请到邮箱打开链接'
+    if (user_item.NotifyEmail !== data.email) {
+        if (data.email === ('' || null || undefined)) {
+            update.UpdateExpression += "NotifyEmail = :email,"
+            update.ExpressionAttributeValues[":email"] = ''
+        } else {
+            tip += '• 邮箱未通过验证，请到邮箱打开链接'
+        }
     }
     if (update.UpdateExpression === 'SET ') {
         return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:(tip.length === 0 ? 200 : 400)})

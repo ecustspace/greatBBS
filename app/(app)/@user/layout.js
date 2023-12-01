@@ -64,9 +64,9 @@ export default function RootLayout({userReply,userLike,userPost}) {
         if (isLogin === false) {
             window.location.replace('/login')
         } else {
-            form.setFieldValue('contact_information',localStorage.getItem('ContactInformation'))
-            form.setFieldValue('anid',localStorage.getItem('Anid') !=null ?localStorage.getItem('Anid'):'')
-            form.setFieldValue('email',localStorage.getItem('NotifyEmail'))
+            form.setFieldValue('contact_information',localStorage.getItem('ContactInformation') !== null? localStorage.getItem('ContactInformation') : '')
+            form.setFieldValue('anid',localStorage.getItem('Anid') !== null ?localStorage.getItem('Anid'):'')
+            form.setFieldValue('email',localStorage.getItem('NotifyEmail') !== null ? localStorage.getItem('NotifyEmail') : '')
             getUserData(document.cookie).then(res => {
                 setData({
                     ...data,

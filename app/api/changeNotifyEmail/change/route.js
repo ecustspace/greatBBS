@@ -1,6 +1,6 @@
 import {getUserItem, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {cookies, headers} from "next/headers";
+import {cookies} from "next/headers";
 import nodemailer from "nodemailer";
 import {appName, Url} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
@@ -63,7 +63,7 @@ export async function POST(request) {
             // send mail
             transporter.sendMail(mailData, (err, info) => {
                 if (err) {
-                    console.error(err);
+                    console.log(err);
                     reject(err);
                 } else {
                     resolve(info);

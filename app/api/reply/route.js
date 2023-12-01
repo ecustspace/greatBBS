@@ -1,7 +1,6 @@
 import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {sha256} from "js-sha256";
 import {revalidateTag} from "next/cache";
@@ -18,7 +17,6 @@ export async function POST(request) {
     const username = decodeURI(cookieStore.get('UserName').value)
 
     const user_item = await getUserItem(username,'UserToken,Avatar,Anid')
-    console.log(username)
     if (user_item === 500 || !user_item){
         return NextResponse.json({tip:'用户不存在',status:401})
     }

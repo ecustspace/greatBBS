@@ -11,9 +11,8 @@ import {
     TransactWriteCommand,
     UpdateCommand
 } from "@aws-sdk/lib-dynamodb";
-import {appName, avatarList, Url} from "@/app/(app)/clientConfig";
+import {avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {v4} from "uuid";
 
 export async function fetchData(type) {
@@ -156,7 +155,6 @@ export async function getUserLikePost(cookie,lastKey){
             SK: parseInt(item.InWhere.split('#')[1])
         }
     })
-    console.log(batchCommand)
     return await docClient.send(new BatchGetCommand({
         RequestItems: {
             'BBS' : {
@@ -164,7 +162,6 @@ export async function getUserLikePost(cookie,lastKey){
             }
         }
     })).then(res => {
-        console.log(res.Responses)
         like.items = res.Responses['BBS']
         return like
     }).catch(err => {
@@ -192,7 +189,6 @@ export async function getPostData(cookie,where) {
             SK: parseInt(where.split('#')[1])
         }
     })).then(res => {
-        console.log(res)
         return res.Item
     }).catch((err) => {console.log(err) ;return 500})
 }
@@ -362,7 +358,6 @@ export async function getPostLikeList(cookie,from,to,reply){
         ProjectionExpression:'SK',
         ScanIndexForward:false,
     })).then(res => {
-        console.log(res)
         return res.Items
     }).catch(err => {console.log(err)})
 }
@@ -642,7 +637,6 @@ export async function updateUserToken(cookie) {
     const username = decodeURI(getCookie('UserName',cookie))
     const user_item = await getUserItem(username,'UserToken')
     if (user_item === 500 || !user_item){
-        console.log('false')
         return 401
     }
 

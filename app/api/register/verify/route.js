@@ -3,7 +3,6 @@ import {docClient, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {v4} from "uuid";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {avatarList} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
 
@@ -36,17 +35,14 @@ export async function POST(request) {
         }
     )
     const item = await docClient.send(getCaptchaCommand).then((res) => {
-        console.log(res)
         return res.Item
     })
 
     if (!item) {
-        console.log('请先获取验证码')
         return NextResponse.json({tip:'请先获取验证码',status:500})
     }
 
     if (data.verification !== item.Captcha.toString()) {
-        console.log('验证码错误')
         return NextResponse.json({tip:'验证码错误',status:500})
     }
     else {

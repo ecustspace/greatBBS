@@ -1,6 +1,5 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import nodemailer from "nodemailer";
 
 const client = new DynamoDBClient({});
@@ -53,7 +52,6 @@ export async function getUserItem(name,expect){
 
     return await docClient.send(getTokenCommand).then(
         (res) => {
-            console.log(res.Item)
             return res.Item
         }
     ).catch((error) => {
@@ -98,7 +96,6 @@ export async function recaptchaVerify_v2(token) {
     });
 
     const data = await response.json();
-    console.log(data)
     return data.success;
 }
 

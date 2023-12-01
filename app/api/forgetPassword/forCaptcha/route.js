@@ -69,11 +69,9 @@ export async function POST(request) {
         }
     )
     return await docClient.send(putCaptchaCommand).then((res) => {
-            console.log('成功')
             return NextResponse.json({sign_up_token:sign_up_token,tip:'请查收验证码',status:200})
         }
     ).catch(error => {
-        console.log('失败')
         return NextResponse.json({tip:'error',status:500})
     });
 }

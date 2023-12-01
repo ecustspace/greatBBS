@@ -52,7 +52,6 @@ export default function Home() {
         })
         getPostData(document.cookie,where).then(res => {
             Toast.clear()
-            console.log(res)
             if (!res) {
                 Toast.show({
                     icon: 'fail',
@@ -61,7 +60,6 @@ export default function Home() {
                 return
             }
             if (res.PostType === 'Post') {
-                console.log(res)
                 showPostPopup(res)
             } else {
                 showImgPopup(res)

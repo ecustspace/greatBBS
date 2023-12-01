@@ -14,7 +14,6 @@ export async function POST(request) {
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
-    console.log(data)
     if (!dataLengthVerify(5,20,data.useremail) ||
         !dataLengthVerify(5,20,data.password) ||
         !dataLengthVerify(6,6,data.verification) ||
@@ -38,16 +37,13 @@ export async function POST(request) {
     })
 
     if (!item) {
-        console.log('请先获取验证码')
         return NextResponse.json({tip:'请先获取验证码',status:500})
     }
 
     if (data.verification !== item.Captcha.toString()) {
-        console.log('验证码错误')
         return NextResponse.json({tip:'验证码错误',status:500})
     }
     else {
-        console.log('验证码正确')
         const now = Date.now()
         const token = (now + 1000*3600*24*7).toString() + '#' + v4()
         const updatePassword = {

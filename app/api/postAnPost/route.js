@@ -3,7 +3,6 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
 import {sha256} from "js-sha256";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {

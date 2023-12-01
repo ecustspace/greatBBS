@@ -2,7 +2,6 @@ import {docClient, getUserItem} from "@/app/api/server";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies, headers} from "next/headers";
 import {NextResponse} from "next/server";
-import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {avatarList} from "@/app/(app)/clientConfig";
 import parser from 'ua-parser-js'
 
@@ -18,7 +17,6 @@ export async function POST(request){
     const user_item = await getUserItem(username,'SK,UserToken,LastChangeAnid,Anid,Avatar,ContactInformation,NotifyEmail')
 
     if (user_item === 500 || !user_item){
-        console.log('false')
         return NextResponse.json({tip:'用户不存在',status:401})
     }
 
@@ -42,7 +40,6 @@ export async function POST(request){
         if (data.shaAnid == '') {
 
         } else {
-            console.log(data.shaAnid)
             if (!couldChangeAnid) {
                 tip += ('• 修改匿名密钥距离上次必须大于一周，还有' +
                     ((user_item.LastChangeAnid.time + 3600 * 1000 * 24 * 7 - now)/(3600 * 1000 * 24)).toFixed(3)
@@ -96,6 +93,5 @@ export async function POST(request){
         return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:200})
     }).catch((err)=>{
         console.log(err)
-        console.log(data.anid)
         return NextResponse.json({tip:'修改失败',status:500})})
 }

@@ -248,7 +248,6 @@ const SendPost = forwardRef((props, ref) => {
                                 style={{ "--cell-size": "100px" }}
                                 value={fileList}
                                 onChange={(fileList) => {
-                                    console.log(fileList)
                                     setFileList(fileList)}}
                                 upload={mockUpload}
                                 preview={false}

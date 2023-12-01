@@ -1,7 +1,7 @@
 'use client'
 import '../globals.css'
 import React, {createContext, useContext, useEffect, useRef, useState,} from 'react'
-import {getCookie, showLoginModal} from "@/app/component/function";
+import {showLoginModal} from "@/app/component/function";
 import PostDetails from "@/app/component/postDetails";
 import AnPostDetails from "@/app/component/anPostDetails";
 import {loginState} from "@/app/layout";
@@ -145,7 +145,6 @@ export default function RootLayout({ post,message,user }) {
             })
             getPostData(document.cookie,decodeURI(postData)).then(res => {
                 Toast.clear()
-                console.log(res)
                 if (!res) {
                     Toast.show({
                         icon: 'fail',
@@ -154,7 +153,6 @@ export default function RootLayout({ post,message,user }) {
                     return
                 }
                 if (res.PostType === 'Post') {
-                    console.log(res)
                     showPostPopup(res)
                 } else if (res.PostType === 'Image') {
                     showImgPopup(res)

@@ -39,9 +39,7 @@ export default function Home() {
         })
         getPostData(document.cookie, where).then(res => {
             Toast.clear()
-            console.log(res)
             if (res.PostType === 'Post') {
-                console.log(res)
                 showPostPopup(res)
             } else {
                 showImgPopup(res)

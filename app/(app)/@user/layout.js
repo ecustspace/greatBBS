@@ -39,6 +39,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         name:'user',
         contactInformation:'',
         notifyEmail: '',
+        anid: '',
         count:[0,0,0]
     })
     const {isLogin} = useContext(loginState)

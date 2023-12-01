@@ -77,7 +77,7 @@ export async function POST(request){
         tip += '• 邮箱未通过验证，请到邮箱打开链接'
     }
     if (update.UpdateExpression === 'SET ') {
-        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:200})
+        return NextResponse.json({tip: (tip.length === 0 ? '修改成功' : tip) ,status:(tip.length === 0 ? 200 : 400)})
     }
     const updateUserCommand = new UpdateCommand({
         TableName: 'User',

@@ -127,7 +127,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         })
         values.avatar = avatar
         values.shaAnid = values.anid !== ('' && null && undefined) ? sha256(values.anid) : ''
-        values.email = values.email != undefined ? values.email : ''
+        values.email = values.email !== ('' && null && undefined) ? values.email : ''
         fetch(window.location.origin + '/api/changeInformation',{
             method:'POST',
             credentials:'include',
@@ -387,7 +387,6 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     mode='card' className='fm'
                     style={{ '--prefix-width': '6em' }}
                     requiredMarkStyle='none'
-                    onFinish={submitInformation}
                     footer={
                         <>
                             <Button
@@ -395,7 +394,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                                 color={"primary"}
                                 shape={"rounded"}
                                 size='large'
-                                type='submit'
+                                onClick={() => submitInformation(form.getFieldsValue(true))}
                                 style={{ marginTop: '10px' }}
                             >
                                 <div style={{ fontWeight: 'bolder', fontSize: 18 }}>保 存</div>

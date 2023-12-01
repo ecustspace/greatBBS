@@ -74,7 +74,7 @@ export async function POST(request){
     }
 
     if (user_item.NotifyEmail !== data.email) {
-        if (data.email === ('' || null || undefined)) {
+        if (data.email.length === 0) {
             update.UpdateExpression += "NotifyEmail = :email,"
             update.ExpressionAttributeValues[":email"] = ''
         } else {

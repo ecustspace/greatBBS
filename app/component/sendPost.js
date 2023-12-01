@@ -154,7 +154,12 @@ const SendPost = forwardRef((props, ref) => {
                 >
                     <Form.Item
                         label='匿名密钥'
-                        help={<>请到上次注册/修改密钥的设备(浏览器)→个人中心<UserOutline />→修改资料【匿名密钥】查看</>}
+                        help={
+                        <>
+                            <div>请到上次注册/修改密钥的设备(浏览器)→打开我们的web app → 个人中心<UserOutline /> → 修改资料【匿名密钥】查看</div>
+                            <div>上一次修改：{localStorage.getItem('LastChangeAnid') != null ? JSON.parse(localStorage.getItem('LastChangeAnid')).device : null}</div>
+                        </>
+                    }
                     >
                         <Input placeholder='匿名密钥' onChange={setAnid}/>
                     </Form.Item>

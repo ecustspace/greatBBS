@@ -1,15 +1,15 @@
 import {docClient, getUserItem} from "@/app/api/server";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
-import {cookies} from "next/headers";
+import {cookies, headers} from "next/headers";
 import {NextResponse} from "next/server";
 import {console} from "next/dist/compiled/@edge-runtime/primitives";
 import {avatarList} from "@/app/(app)/clientConfig";
+import parser from 'ua-parser-js'
 
 export async function POST(request){
     const data = await request.json()
-    console.log(data)
     if (data.contact_information.length > 50 || !avatarList.includes(data.avatar)
-        || (typeof data.anid !== "string")) {
+        || (typeof data.shaAnid !== "string")) {
         return NextResponse.json({tip:'数据格式错误',status:500})
     }
     const cookieStore = cookies()
@@ -27,7 +27,7 @@ export async function POST(request){
         return NextResponse.json({tip:'登录信息过期,请重新登录',status:401})
     }
 
-    const couldChangeAnid = (now - user_item.LastChangeAnid) >= 3600 * 1000 * 24 * 7
+    const couldChangeAnid = user_item.LastChangeAnid == null ? true : ((now - user_item.LastChangeAnid.time) >= 3600 * 1000 * 24 * 7)
     let update = {UpdateExpression:'SET ',ExpressionAttributeValues:{}}
     let tip = ''
     if (user_item.Avatar !== data.avatar) {
@@ -39,22 +39,44 @@ export async function POST(request){
         update.ExpressionAttributeValues[":contact_information"] = data.contact_information
     }
     if (user_item.Anid !== data.shaAnid) {
-        if (!couldChangeAnid) {
-            tip += ('• 修改匿名密钥距离上次必须大于一周，还有' +
-                ((user_item.LastChangeAnid + 3600 * 1000 * 24 * 7 - now)/(3600 * 1000 * 24)).toFixed(3)
-                + '天可修改\n')
-        }
-        else if (data.shaAnid.length === 0) {
+        if (data.shaAnid == '') {
 
         } else {
-            update.UpdateExpression += "Anid = :anid,"
-            update.ExpressionAttributeValues[":anid"] = data.shaAnid
-            update.UpdateExpression += "LastChangeAnid = :last_change,"
-            update.ExpressionAttributeValues[":last_change"] = now
+            console.log(data.shaAnid)
+            if (!couldChangeAnid) {
+                tip += ('• 修改匿名密钥距离上次必须大于一周，还有' +
+                    ((user_item.LastChangeAnid.time + 3600 * 1000 * 24 * 7 - now)/(3600 * 1000 * 24)).toFixed(3)
+                    + '天可修改\n')
+            }
+            else {
+                const ua = parser(headers().get('user-agent'))
+                let device = ''
+                if (ua.device.model != null) {
+                    device += ua.device.model
+                } else {
+                    if (ua.device.name != null) {
+                        device += ua.device.vendor
+                    } else {
+                        if (ua.os.name != null) {
+                            device += ua.os.name
+                        }
+                    }
+                }
+                if (ua.browser.name != null) {
+                    device += `(${ua.browser.name})`
+                }
+                update.UpdateExpression += "Anid = :anid,"
+                update.ExpressionAttributeValues[":anid"] = data.shaAnid
+                update.UpdateExpression += "LastChangeAnid = :last_change,"
+                update.ExpressionAttributeValues[":last_change"] = {
+                    time: now,
+                    device: device
+                }
+            }
         }
     }
 
-    if (user_item.NotifyEmail !== data.email && data.email !== '') {
+    if (user_item.NotifyEmail !== data.email && data.email != '') {
         tip += '• 邮箱未通过验证，请到邮箱打开链接'
     }
     if (update.UpdateExpression === 'SET ') {

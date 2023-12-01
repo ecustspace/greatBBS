@@ -20,6 +20,7 @@ export default function RootLayout({ children }) {
                 localStorage.setItem('Avatar',data.avatar)
                 localStorage.setItem('ContactInformation',data.contact_information)
                 localStorage.setItem('NotifyEmail',data.notify_email)
+                localStorage.setItem('LastChangeAnid',JSON.stringify(data.last_change_anid))
                 if (data.tip === '登陆成功'){
                     setLogin(true)
                 }

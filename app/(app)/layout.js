@@ -12,7 +12,6 @@ import {TabBar, Toast} from "antd-mobile";
 import {CompassOutline, MailOutline, UserOutline} from "antd-mobile-icons";
 import {getMessageCount, getPostData, updateUserToken} from "@/app/api/serverAction";
 import {recaptcha_site_key_v3} from "@/app/(app)/clientConfig";
-import {sha256} from "js-sha256";
 
 export const likeListContext = createContext(null)
 export const detailsContext = createContext(null)

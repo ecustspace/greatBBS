@@ -26,6 +26,7 @@
     "react-google-recaptcha-v3": "^1.10.1",
     "react-viewer": "^3.2.2",
     "tua-body-scroll-lock": "^1.4.0",
+    "ua-parser-js": "^1.0.37",
     "uuid": "^9.0.0"
   }
 }

@@ -1,6 +1,6 @@
 import {getUserItem, recaptchaVerify_v2} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {cookies} from "next/headers";
+import {cookies, headers} from "next/headers";
 import nodemailer from "nodemailer";
 import {appName, Url} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";

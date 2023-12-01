@@ -1,5 +1,6 @@
 import CardContainer from "@/app/component/cardContainer";
 import {Url} from "@/app/(app)/clientConfig";
+import {headers} from "next/headers";
 
 export default async function Home() {
     const data = await fetch(Url + `/api/getPostData?postType=Post`,{next:{tags:['Post']}})

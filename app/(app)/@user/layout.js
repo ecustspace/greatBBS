@@ -3,7 +3,7 @@
 import './user.css'
 import {
     Button,
-    CenterPopup,
+    CenterPopup, Checkbox,
     Dialog,
     Form,
     Image,
@@ -26,7 +26,7 @@ import {
 } from "antd-mobile-icons";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {AboutUs, avatarList, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {AboutUs, avatarList, emailWebsite, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {getCookie, responseHandle} from "@/app/component/function";
 import {feedBack, getUserData} from "@/app/api/serverAction";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -78,6 +78,44 @@ export default function RootLayout({userReply,userLike,userPost}) {
                 })
             })
         }
+        if (!localStorage.getItem('NotifyEmail') && !localStorage.getItem('NotifyEmail_NoMoreTip')) {
+            Dialog.show({
+                content:
+                    <>
+                        <div>你还没有设置通知邮箱,可能会错过一些通知哦</div>
+                        <br/>
+                        <Checkbox
+                            onChange={value => {
+                                value === true ?
+                                localStorage.setItem('NotifyEmail_NoMoreTip',value) : localStorage.removeItem('NotifyEmail_NoMoreTip')}}
+                            style={{
+                                '--icon-size': '18px',
+                                '--font-size': '14px',
+                                '--gap': '6px',
+                            }}
+                        >
+                            不再提醒
+                        </Checkbox>
+                    </>,
+                closeOnAction: true,
+                actions: [
+                    [
+                        {
+                            key: 'cancel',
+                            text: '取消',
+                        },
+                        {
+                            key: 'go',
+                            text: '前往设置',
+                            bold: true,
+                            onClick: () => {
+                                setVisibleData(true)
+                            }
+                        },
+                    ],
+                ],
+            })
+        }
         return () => {
             removeEventListener('popstate',handle)
         }
@@ -88,7 +126,8 @@ export default function RootLayout({userReply,userLike,userPost}) {
             duration:0
         })
         values.avatar = avatar
-        values.shaAnid = sha256(values.anid)
+        values.shaAnid = values.anid !== ('' && null && undefined) ? sha256(values.anid) : ''
+        values.email = values.email != undefined ? values.email : ''
         fetch(window.location.origin + '/api/changeInformation',{
             method:'POST',
             credentials:'include',
@@ -99,7 +138,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         })
             .then((res)=>res.json())
             .then(data => {
-                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周')) {
+                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周') || values.anid != undefined) {
                     localStorage.setItem('Anid',values.anid)
                 }
                 if (!data.tip.includes('邮箱未通过验证，请到邮箱打开链接')) {
@@ -145,7 +184,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
     }
 
     function isEmail(str) {
-        const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+        const reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$/;
         return  reg.test(str);
     }
 
@@ -264,7 +303,9 @@ export default function RootLayout({userReply,userLike,userPost}) {
                 <br/>
                 <Form
                     onFinish={content => {
-                        Toast.show({icon:'loading'})
+                        Toast.show({
+                            icon:'loading',
+                            duration:10000})
                         feedBack(document.cookie,content.content).then(res => {
                             if (res.status === 200) {
                                 setVisibleFeedBack(false)
@@ -345,6 +386,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     mode='card' className='fm'
                     style={{ '--prefix-width': '6em' }}
                     requiredMarkStyle='none'
+                    onFinish={submitInformation}
                     footer={
                         <>
                             <Button
@@ -354,7 +396,6 @@ export default function RootLayout({userReply,userLike,userPost}) {
                                 size='large'
                                 type='submit'
                                 style={{ marginTop: '10px' }}
-                                onFinish={submitInformation}
                             >
                                 <div style={{ fontWeight: 'bolder', fontSize: 18 }}>保 存</div>
                             </Button>

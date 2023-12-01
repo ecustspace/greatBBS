@@ -36,7 +36,8 @@ export async function POST(request) {
         status: 200,
         avatar: user_.Attributes.Avatar,
         contact_information: user_.Attributes.ContactInformation,
-        notify_email: user_.Attributes.NotifyEmail
+        notify_email: user_.Attributes.NotifyEmail,
+        last_change_anid: user_.Attributes.LastChangeAnid
     }),{
         status: 200,
         headers: {

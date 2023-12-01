@@ -13,9 +13,9 @@ export async function GET(request) {
         })
     }
     const data = JSON.parse(decodeURIComponent(request.nextUrl.searchParams.get('data')))
-    const user_item = await getUserItem(data.username, 'LastNotifyTime,InquireTime,NotifyEmail')
+    const user_item = await getUserItem(data.username, 'LastNotifyTime,InquireTime')
     const now = Date.now()
-    if (now < user_item.InquireTime || (now - user_item.LastNotifyTime) < 20 * 1000) {
+    if (now < user_item.InquireTime) {
         return
     }
     try {
@@ -60,15 +60,4 @@ export async function GET(request) {
         console.log(err)
         return NextResponse.json({tip: '发送失败，请检查邮箱', status: 500})
     }
-    await docClient.send(new UpdateCommand({
-        TableName: 'User',
-        Key: {
-            PK: 'user',
-            SK: data.username
-        },
-        UpdateExpression: 'SET LastNotifyTime = :time',
-        ExpressionAttributeValues: {
-            ':time': Date.now()
-        }
-    }))
 }

@@ -30,7 +30,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
     }
 
-    if (typeof isHuman !== 'number') {
+    if (typeof isHuman != 'number') {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
 
@@ -38,7 +38,6 @@ export async function POST(request) {
         await ban(username,(now/1000 + 60*60*2))
         return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
-
     const updatePostCountCommand = new UpdateCommand({
         TableName:'User',
         Key:{

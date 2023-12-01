@@ -42,7 +42,7 @@ export default function Home() {
             return
         }
         let last = window.localStorage.getItem("time") ? window.localStorage.getItem("time") : 0
-        if (last == 0 || (window.localStorage.getItem("time") && (Date.parse(new Date()) - window.localStorage.getItem("time") >= 120000))) {
+        if (last <= 0 || (window.localStorage.getItem("time") && (Date.parse(new Date()) - window.localStorage.getItem("time") >= 120000))) {
             captchaRef.current.executeAsync().then(token => {
                 let values = form.getFieldsValue(true)
                 values.recaptchaToken = token

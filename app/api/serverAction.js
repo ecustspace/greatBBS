@@ -704,3 +704,16 @@ export async function feedBack(cookie,content) {
     }
     return {tip:'感谢您的反馈',status:200}
 }
+
+export async function getUserCount() {
+    return await docClient.send(new QueryCommand({
+        TableName:'User',
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: {
+            ':pk' : 'user',
+        },
+        Select:'COUNT'
+    })).then((res => {
+        return res.Count
+    })).catch(() => {return 'err'})
+}

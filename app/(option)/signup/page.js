@@ -9,6 +9,7 @@ import {avatarList, emailAddress, emailWebsite, recaptcha_site_key_v2} from "@/a
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSearchParams} from "next/navigation";
+import {getUserCount} from "@/app/api/serverAction";
 
 export default function Home() {
     const [psw, setPsw] = useState('');
@@ -16,6 +17,7 @@ export default function Home() {
     const [visible, setVisible] = useState(false)
     const [disable, setDisable] = useState(false)
     const [time, setTime] = useState("获取验证码");
+    const [userCount,setCount] = useState(0)
     const [form] = Form.useForm()
     const captchaRef = useRef(null)
     const searchParams = useSearchParams()
@@ -25,6 +27,9 @@ export default function Home() {
     }
 
     useEffect(() => {
+        getUserCount().then(res => {
+            setCount(res)
+        })
         const data = JSON.parse(decodeURIComponent(searchParams.get('data')))
         if (data) {
             document.cookie = `SignUpToken=${data.signUpToken}`
@@ -189,6 +194,9 @@ export default function Home() {
                                  className={index === activeIndex ? 'fade-in' : 'fade-out'} />)}
                 </div>
                 <h1>注册账号</h1>
+                <AutoCenter>
+                    <div style={{marginTop:'10px'}}>已有{userCount}名Ecuster注册</div>
+                </AutoCenter>
             </AutoCenter>
             <Form
                 form={form}

@@ -84,6 +84,8 @@ export async function POST(request) {
                 Avatar: data.avatar,
                 InquireTime: now,
                 Anid: data.anid,
+                NotifyEmail: '',
+                ContactInformation: '',
                 LastChangeAnid: {
                     device: device,
                     time: 0

@@ -21,29 +21,30 @@ export default async function Home ({params}){
                 title:'验证失败',
             }} />
         )
+    } else {
+        return await docClient.send(new  UpdateCommand({
+            TableName: 'User',
+            Key: {
+                PK:'user',
+                SK: username
+            },
+            UpdateExpression:'SET NotifyEmail = :email',
+            ConditionExpression: "attribute_exists(SK)",
+            ExpressionAttributeValues: {
+                ':email' : notify_email
+            }
+        })).then(() => <TheResult props={{
+            status:'success',
+            title:'验证成功',
+            description:'请返回【修改资料】页面，保存'
+        }} />).catch((err) => {
+            console.log(err)
+            return (
+                <TheResult props={{
+                    status:'error',
+                    title:'验证失败',
+                }} />
+            )
+        })
     }
-    return await docClient.send(new  UpdateCommand({
-        TableName: 'User',
-        Key: {
-            PK:'user',
-            SK: username
-        },
-        UpdateExpression:'SET NotifyEmail = :email',
-        ConditionExpression: "attribute_exists(SK)",
-        ExpressionAttributeValues: {
-            ':email' : notify_email
-        }
-    })).then(() => <TheResult props={{
-        status:'success',
-        title:'验证成功',
-        description:'请返回【修改资料】页面，保存'
-    }} />).catch((err) => {
-        console.log(err)
-        return (
-            <TheResult props={{
-                status:'error',
-                title:'验证失败',
-            }} />
-        )
-    })
 }

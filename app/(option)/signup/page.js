@@ -194,9 +194,9 @@ export default function Home() {
                                  className={index === activeIndex ? 'fade-in' : 'fade-out'} />)}
                 </div>
                 <h1>注册账号</h1>
-                <AutoCenter>
-                    <div style={{marginTop:'10px'}}>已有{userCount}名Ecuster注册</div>
-                </AutoCenter>
+            </AutoCenter>
+            <AutoCenter>
+                <div style={{color:"grey"}}>已有{userCount}名Ecuster注册</div>
             </AutoCenter>
             <Form
                 form={form}

@@ -49,14 +49,15 @@ export async function POST(request) {
         console.log(err)
         return NextResponse.json({tip:'验证失败，请检查邮箱',status:500})
     }
+    const link = Url + '/api/changeNotifyEmail/verify/' + sha256(notify_email + username + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(notify_email) + '/' + encodeURIComponent(username) + '/' + now
     const mailData = {
         from: process.env.SMTP_USERNAME, // sender address
         to: notify_email, // list of receivers
         subject: `【${appName}】验证通知邮箱`, // Subject line
-        text: "你正在修改你的通知邮箱\n点此链接完成验证:" + Url + '/api/changeNotifyEmail/verify/' + sha256(notify_email + username + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(notify_email) + '/' + encodeURIComponent(username) + '/' + now, // plain text body
+        text: "你正在修改你的通知邮箱\n点此链接完成验证:" + link, // plain text body
         html: "<div>你正在修改你的通知邮箱</div>"
-            + `<a href='${Url + '/api/changeNotifyEmail/verify/' + sha256(notify_email + username + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(notify_email) + '/' + encodeURIComponent(username) + '/' + now}'>点此完成验证</a>`
-            + `<div>或者访问此链接:${Url + '/api/changeNotifyEmail/verify/' + sha256(notify_email + username + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(notify_email) + '/' + encodeURIComponent(username) + '/' + now}<div>`, // html body
+            + `<a href='${link}'>点此完成验证</a>`
+            + `<div>或者访问此链接:${link}<div>`, // html body
     };
     try {
         await new Promise((resolve, reject) => {

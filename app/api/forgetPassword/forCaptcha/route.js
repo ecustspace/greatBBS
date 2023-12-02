@@ -3,7 +3,7 @@ import {NextResponse} from "next/server";
 import {appName, emailAddress, Url} from "@/app/(app)/clientConfig";
 import {transporter} from "@/app/api/server";
 import {sha256} from "js-sha256";
-import {dataLengthVerify} from "@/app/api/forgetPassword/verify/route";
+import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()

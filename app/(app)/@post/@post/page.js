@@ -12,7 +12,7 @@ export default async function Home() {
         })
     return (
         <div>
-            <CardContainer type='Post' post={data} />
+            <CardContainer type='Post' />
         </div>
     )
 }

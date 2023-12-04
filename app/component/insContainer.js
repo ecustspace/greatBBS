@@ -9,15 +9,15 @@ import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
 
-export default function InsContainer({post}) {
+export default function InsContainer() {
     const [isHasMore, setHasMore] = useState(true)
     const [width,setWidth] = useState(0)
-    const [postList, setPostList] = useState(post.posts)
+    const [postList, setPostList] = useState([])
     const [loadLeftList, setLoadLeftList] = useState([])
     const [leftHeight,setLeftHeight] = useState(0)
     const [rightHeight,setRightHeight] = useState(0)
     const [loadRightList, setLoadRightList] = useState([])
-    const [lastKey,setKey] = useState(post.lastKey)
+    const [lastKey,setKey] = useState()
     const containerRef = useRef(null)
     const {showImgPopup} = useContext(detailsContext)
     const {addLike} = useContext(likeListContext)
@@ -26,21 +26,15 @@ export default function InsContainer({post}) {
 
     useEffect(() => {
         setWidth(containerRef.current.offsetWidth)
-        if (post.posts.length !== 0) {
-            getPostLikeList(document.cookie,post.posts[0].PostID,post.posts[post.posts.length - 1].PostID).then(res => {
-                addLike(res.map(item => {
-                    return item.SK
-                }))
-            }).catch(err => {console.log(err)})
-        } else {
-            setHasMore(false)
-        }
+        refresh(false)
     },[])
 
-    function refresh() {
-        Toast.show({
-            icon:'loading'
-        })
+    function refresh(showToast) {
+        if (showToast === true) {
+            Toast.show({
+                icon:'loading'
+            })
+        }
        fetchData('Image').then(data => {
            Toast.clear()
             if (data.posts) {
@@ -122,7 +116,7 @@ export default function InsContainer({post}) {
     }
     async function loadMore() {
         if (postList === 'err') {
-            refresh()
+            refresh(true)
             throw new Error('mock request failed')
         }
         if (width === 0) {
@@ -136,7 +130,7 @@ export default function InsContainer({post}) {
             }
             if (login.isLogin === false) {
                 showLoginModal(login.toLogin,function () {
-                    refresh()
+                    refresh(true)
                 })
                 setHasMore(false)
                 return
@@ -165,7 +159,7 @@ export default function InsContainer({post}) {
 
     return (
         <div>
-            <div className='FloatBubble' style={{bottom:'130px'}} onClick={refresh}>
+            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
                 <UndoOutline fontSize={32} color='#fff'/>
             </div>
             <div style={{display:'flex',width:'96%',margin:'auto',marginTop:'12px'}} ref={containerRef}>

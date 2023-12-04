@@ -9,11 +9,11 @@ import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
 
-export default function CardContainer({post,type}) {
+export default function CardContainer({type}) {
     const [isHasMore, setHasMore] = useState(true)
-    const [postList, setPostList] = useState(post.posts)
+    const [postList, setPostList] = useState([])
     const [loadPostList, setLoadPostList] = useState([])
-    const [lastKey,setKey] = useState(post.lastKey)
+    const [lastKey,setKey] = useState()
     const actionSheet = useRef()
     const {showPostPopup, showAnPostPopup,showUserPopup} = useContext(detailsContext)
     const {addLike} = useContext(likeListContext)
@@ -47,21 +47,15 @@ export default function CardContainer({post,type}) {
     }
 
    useEffect(() => {
-               if (post.posts.length !== 0) {
-                   getPostLikeList(document.cookie,post.posts[0].PostID,post.posts[post.posts.length - 1].PostID).then(res => {
-                       addLike(res.map(item => {
-                           return item.SK
-                       }))
-                   }).catch(err => {console.log(err)})
-               } else {
-                   setHasMore(false)
-               }
+               refresh(false)
    },[])
 
-    function refresh() {
-        Toast.show({
-            icon:'loading'
-        })
+    function refresh(showToast) {
+        if (showToast === true) {
+            Toast.show({
+                icon:'loading'
+            })
+        }
         fetchData(type).then(data => {
             Toast.clear()
             if (data.lastKey) {
@@ -90,13 +84,13 @@ export default function CardContainer({post,type}) {
 
     async function loadMore() {
         if (postList === 'err') {
-            refresh()
+            refresh(true)
             throw new Error('mock request failed')
         }
         if (postList.length !== 0 && postList.length <= loadPostList.length) {
             if (login.isLogin === false) {
                 showLoginModal(login.toLogin,function () {
-                    refresh()
+                    refresh(true)
                 })
                 setHasMore(false)
                 return
@@ -128,7 +122,7 @@ export default function CardContainer({post,type}) {
     }
     return (
         <div>
-                <div className='FloatBubble' style={{bottom:'130px'}} onClick={refresh}>
+                <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
                     <UndoOutline fontSize={32} color='#fff'/>
                 </div>
                 {loadPostList.map(post => <PostCard

@@ -12,7 +12,7 @@ export default async function Home() {
         })
     return (
         <div>
-            <InsContainer post={data}/>
+            <InsContainer />
         </div>
     )
 }

@@ -37,7 +37,7 @@ export default function InsContainer() {
         }
        fetchData('Image').then(data => {
            Toast.clear()
-            if (data.posts) {
+            if (data.posts.length > 0) {
                 getPostLikeList(document.cookie,data.posts[0].PostID,data.posts[data.posts.length - 1].PostID).then(
                     res => {
                         addLike(res.map(item => {

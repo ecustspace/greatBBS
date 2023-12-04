@@ -61,7 +61,7 @@ export default function CardContainer({type}) {
             if (data.lastKey) {
                 setKey(data.lastKey)
             }
-            if (data.posts) {
+            if (data.posts.length > 0) {
                 getPostLikeList(document.cookie,data.posts[0].PostID,data.posts[data.posts.length - 1].PostID).then(
                     res => {
                         addLike(res.map(item => {

@@ -111,7 +111,7 @@ const SendPost = forwardRef((props, ref) => {
                 }
             };
             xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.timeout = 10000
+            xhr.timeout = 100000
             xhr.ontimeout = function () {
                 Toast.show({
                     content: '请求超时'

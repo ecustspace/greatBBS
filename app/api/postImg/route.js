@@ -57,11 +57,9 @@ export async function POST(request) {
 
     let image_list = []
     for(let i = 0, len = data.images.length; i < len; i++) {
-        const type = uploadImage(data.images[i],'/post',post_id + '-' + i.toString())
+        const type = await uploadImage(data.images[i],'/post',post_id + '-' + i.toString())
         image_list.push(type)
     }
-    image_list = await Promise.all(image_list)
-
         return await docClient.send(new PutCommand({
             TableName: 'BBS',
             Item: {

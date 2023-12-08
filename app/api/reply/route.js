@@ -229,14 +229,13 @@ export async function POST(request) {
                 content: data.content,
                 inWhere: data.post_name + '#' + data.post_time
             }))
-            fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
+            await fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
         }
         let image_list = []
         for(let i = 0, len = data.images.length; i < len; i++) {
-            const type = uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())
+            const type = await uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())
             image_list.push(type)
         }
-        image_list = await Promise.all(image_list)
         if (image_list.length !== 0) {
             await docClient.send(new UpdateCommand({
                 TableName: 'BBS',

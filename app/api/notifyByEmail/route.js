@@ -12,7 +12,7 @@ export async function GET(request) {
         })
     }
     const data = JSON.parse(decodeURIComponent(request.nextUrl.searchParams.get('data')))
-    const user_item = await getUserItem(data.username, 'LastNotifyTime,InquireTime')
+    const user_item = await getUserItem(data.username, 'LastNotifyTime,InquireTime,NotifyEmail')
     const now = Date.now()
     if (now < user_item.InquireTime) {
         return

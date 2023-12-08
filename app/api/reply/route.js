@@ -229,7 +229,7 @@ export async function POST(request) {
                 content: data.content,
                 inWhere: data.post_name + '#' + data.post_time
             }))
-            await fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
+            fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
         }
         let image_list = []
         for(let i = 0, len = data.images.length; i < len; i++) {

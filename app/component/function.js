@@ -132,3 +132,31 @@ export function recaptchaExecute() {
         });
     });
 }
+
+export function level(score) {
+    if (score < 20) {
+        return '大学牲'
+    } else if (score >= 20 && score < 40) {
+        return '幼儿园'
+    } else if (score >= 40 && score < 60) {
+        return '小学生'
+    } else if (score >= 60 && score < 80) {
+        return '初中生'
+    } else if (score >= 80 && score < 100) {
+        return '高中生'
+    } else if (score >= 100 && score < 150) {
+        return '大学生'
+    } else if (score >= 150 && score < 250) {
+        return '研究生'
+    } else if (score >=250 && score <350) {
+        return '博士生'
+    } else if (score >= 350 && score < 600) {
+        return '博士生导师'
+    } else if (score >= 600 && score < 1000) {
+        return '教授'
+    } else if (score >= 1000 && score < 2000) {
+        return '学者'
+    } else if (score >= 2000) {
+        return '院士'
+    }
+}

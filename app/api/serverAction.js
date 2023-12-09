@@ -2,7 +2,7 @@
 
 import {sha256} from "js-sha256";
 import {getCookie} from "@/app/component/function";
-import {docClient, getUserItem, setUserInquireTime, transporter} from "@/app/api/server";
+import {decreaseUserScore, docClient, getUserItem, setUserInquireTime, transporter} from "@/app/api/server";
 import {
     BatchGetCommand,
     DeleteCommand,
@@ -66,7 +66,10 @@ export async function getUserData(cookie) {
             Select:'COUNT'
         })).then((res => {
             return  res.Count
-        })).catch(() => {return 'err'})
+        })).catch(() => {return 'err'}),
+        getUserItem(username,'UserScore').then(res => {
+            return res.UserScore
+        })
     ]
 
     try {
@@ -373,6 +376,7 @@ export async function deleteOperation(cookie,SK,string,where,type) {
     if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
+    let deleteType
     let input = {
             TableName:'BBS',
             Key:{
@@ -381,6 +385,7 @@ export async function deleteOperation(cookie,SK,string,where,type) {
             }
         }
     if (string === 'Reply#') {
+        deleteType = 'Reply'
         input.ExpressionAttributeValues = {
             ':where': where
         }
@@ -393,9 +398,13 @@ export async function deleteOperation(cookie,SK,string,where,type) {
         input.ConditionExpression = 'InWhere = :where'
     }
     if (['AnPost','Post','Image'].includes(type)) {
+        deleteType = 'Post'
         revalidateTag(type)
     }
     return await docClient.send(new DeleteCommand(input)).then(() => {
+        if (typeof deleteType == 'string') {
+            decreaseUserScore(username,deleteType,SK)
+        }
         if (string === 'Like#') {
             return docClient.send(new UpdateCommand({
                 TableName: 'BBS',

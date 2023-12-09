@@ -1,7 +1,7 @@
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
-import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
+import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
 import {revalidateTag} from "next/cache";
 
 export async function POST(request) {
@@ -14,7 +14,7 @@ export async function POST(request) {
     const token = cookieStore.get('Token').value
     const username = decodeURI(cookieStore.get('UserName').value)
 
-    const user_item = await getUserItem(username,'UserToken,Avatar,Anid')
+    const user_item = await getUserItem(username,'UserToken,Avatar,Anid,UserScore')
     if (user_item === 500 || !user_item){
         return NextResponse.json({tip:'用户不存在',status:401})
     }
@@ -33,7 +33,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
 
-    if (isHuman < 0.5) {
+    if (isHuman < 0.3) {
         await ban(username,(now/1000 + 60*60*2))
         return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
@@ -54,10 +54,9 @@ export async function POST(request) {
         .then(res => {
             return res.Attributes.PostCount
         }).catch(err => {return 'err'})
-
     let res
     if (post_id !== 'err' || post_id !== undefined) {
-        const putPostItem = new PutCommand({
+        let putInput = {
             TableName: 'BBS',
             Item: {
                 PK: username,
@@ -68,10 +67,13 @@ export async function POST(request) {
                 ReplyID: 0,
                 LikeCount: 0,
                 Avatar: user_item.Avatar,
-                Content: data.text.replace(/(\n)+/g, "\n"),
+                Content: data.text.replace(/(\n)+/g, "\n")
             }
-        })
-        res = await docClient.send(putPostItem)
+        }
+        if (data.showLevel === true) {
+            putInput.Item.UserScore = user_item.UserScore
+        }
+        res = await docClient.send(new PutCommand(putInput))
             .catch(error => {
                 console.log(error)
                 return 500})
@@ -80,6 +82,8 @@ export async function POST(request) {
     if (res === 500 || !res) {
         return NextResponse.json({tip:'err',status:500})
     }
+
+    await updateUserScore(username,'Post')
 
     let image_list = []
 

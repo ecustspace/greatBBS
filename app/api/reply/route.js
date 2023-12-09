@@ -1,4 +1,4 @@
-import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
+import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
@@ -16,7 +16,7 @@ export async function POST(request) {
     const token = cookieStore.get('Token').value
     const username = decodeURI(cookieStore.get('UserName').value)
 
-    const user_item = await getUserItem(username,'UserToken,Avatar,Anid')
+    const user_item = await getUserItem(username,'UserToken,Avatar,Anid,UserScore')
     if (user_item === 500 || !user_item){
         return NextResponse.json({tip:'用户不存在',status:401})
     }
@@ -35,7 +35,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
 
-    if (isHuman < 0.5) {
+    if (isHuman < 0.3) {
         await ban(username,(now/1000 + 60*60*2))
         return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
@@ -155,31 +155,28 @@ export async function POST(request) {
         if (replyID === 'err'){
             return NextResponse.json({tip:'err',status: 500})
         }
+        let putInput = {
+            PK: 'Reply#' + username,
+            SK: now,
+            Avatar: user_item.Avatar,
+            PostType: 'ReplyTo'+postData[0].PostID,
+            InWhere: data.post_name + '#' + data.post_time,
+            Content: data.content,
+            LikeCount: 0,
+            ReplyID: replyID
+        }
+        if (typeof data.reply_name === 'string') {
+            putInput.ReplyToID = postData[1].ReplyID
+            putInput.ReplyToName = data.reply_name
+        }
+        if (data.showLevel === true) {
+            putInput.UserScore = user_item.UserScore
+        }
         res = await docClient.send(new TransactWriteCommand({
             TransactItems: [{
                 Put: {
                     TableName: 'BBS',
-                    Item: data.reply_name !== undefined ? {
-                            PK: 'Reply#' + username,
-                            SK: now,
-                            Avatar: user_item.Avatar,
-                            PostType: 'ReplyTo'+postData[0].PostID,
-                            InWhere: data.post_name + '#' + data.post_time,
-                            Content: data.content,
-                            LikeCount: 0,
-                            ReplyID: replyID,
-                            ReplyToID: postData[1].ReplyID,
-                            ReplyToName: data.reply_name
-                        } : {
-                    PK: 'Reply#' + username,
-                    SK: now,
-                    Avatar: user_item.Avatar,
-                    PostType: 'ReplyTo'+postData[0].PostID,
-                    InWhere: data.post_name + '#' + data.post_time,
-                    Content: data.content,
-                    LikeCount: 0,
-                    ReplyID: replyID
-                    }
+                    Item: putInput
                 }
             },{
                 Update: {
@@ -221,7 +218,8 @@ export async function POST(request) {
             .catch((err) => {console.log(err); return 500})
     }
     if (res === 200 && (postData[0].PostType === 'Post' || 'Image')) {
-        if (data.post_name !== username) {
+        if (data.post_name !== username && (typeof data.reply_name == 'string' && username !== data.reply_name)) {
+            await updateUserScore(username,'Reply')
             const data_ = encodeURIComponent(JSON.stringify({
                 username: data.post_name,
                 type: '评论',

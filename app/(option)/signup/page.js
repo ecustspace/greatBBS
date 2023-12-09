@@ -225,7 +225,7 @@ export default function Home() {
                     },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
-                                if (!getFieldValue('username').includes('#')) {
+                                if (!/[【】#]/.test(value)) {
                                     return Promise.resolve();
                                 }
                                 return Promise.reject('用户名中不能包含特殊字符');
@@ -313,6 +313,13 @@ export default function Home() {
                         onChange={setPsw2}
                         type={visible ? 'text' : 'password'}
                     />
+                </Form.Item>
+                <Form.Item
+                    label='邀请码'
+                    name='invitor'
+                    help='邀请者用户名'
+                >
+                    <Input placeholder='选填' />
                 </Form.Item>
                 <Form.Item
                     rules={[{ required: true }]}

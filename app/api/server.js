@@ -55,6 +55,7 @@ export async function getUserItem(name,expect){
             return res.Item
         }
     ).catch((error) => {
+        console.log(error)
         return 500
     })
 }
@@ -170,6 +171,77 @@ export async function setUserInquireTime(username,time) {
     })
 }
 
+export async function updateUserScore(username,type) {
+    const now = Date.now()
+    const score = {
+        'Post':5,
+        'Reply':3,
+        'Invite':60
+    }
+    const currentDate = new Date();
+    currentDate.setUTCHours(24, 0, 0, 0);
+    const timestamp = currentDate.getTime();
+    let update = {
+        TableName:'User',
+        Key: {
+            PK: 'user',
+            SK: username,
+        }
+    }
+    if (type !== 'Invite') {
+        update.ConditionExpression = 'attribute_not_exists(#LastOperateTime) OR #LastOperateTime < :now'
+        update.UpdateExpression = 'SET #LastOperateTime = :time,UserScore = if_not_exists(UserScore, :default) + :score'
+        update.ExpressionAttributeValues = {
+            ':now': now,
+            ':score': score[type],
+            ':time': timestamp,
+            ':default': 0
+        }
+        update.ExpressionAttributeNames = {
+            '#LastOperateTime': 'Last' + type
+        }
+    } else {
+        update.UpdateExpression = 'SET UserScore = if_not_exists(UserScore, :default) + :score'
+        update.ExpressionAttributeValues = {
+            ':score': score[type],
+            ':default': 0
+        }
+    }
+    await docClient.send(new UpdateCommand(update)).catch(err => {
+        console.log(err)
+    })
+}
+
+export async function decreaseUserScore(username,type,time) {
+    const now = Date.now()
+    const currentDate = new Date();
+    currentDate.setUTCHours(0, 0, 0, 0);
+    const timestamp = currentDate.getTime();
+    const score = {
+        'Post':5,
+        'Reply':3
+    }
+    if (time > timestamp) {
+        const update = {
+            TableName:'User',
+            Key: {
+                PK: 'user',
+                SK: username,
+            },
+            ConditionExpression: '#LastOperateTime > :time',
+            UpdateExpression: 'SET UserScore = if_not_exists(UserScore, :score) - :score,#LastOperateTime = :default',
+            ExpressionAttributeNames: {
+                '#LastOperateTime': 'Last' + type
+            },
+            ExpressionAttributeValues: {
+                ':score': score[type],
+                ':time': time,
+                ':default': 0
+            }
+        }
+        await docClient.send(new UpdateCommand(update))
+    }
+}
 
 
 

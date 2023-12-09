@@ -6,7 +6,7 @@ import {HeartFill, HeartOutline, MessageOutline, MoreOutline, UploadOutline} fro
 import {useContext, useEffect, useState} from "react";
 import {likeListContext} from "@/app/(app)/layout";
 import {ImageContainer} from "@/app/component/imageContainer";
-import {share, timeConclude} from "@/app/component/function";
+import {level, share, timeConclude} from "@/app/component/function";
 import {like} from "@/app/api/serverAction";
 
 export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
@@ -52,7 +52,7 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
                 <div className='cardContent'>
                         <div style={{display:"flex"}} id={'card' + post.PostID}>
                             <div style={{flexGrow:1}}>
-                                <div style={{fontWeight:"bold",fontSize:16}}>{post.PostType === 'AnPost' ? '树洞#' + post.PostID : post.PK}</div>
+                                <div style={{fontWeight:"bold",fontSize:16}}>{(post.PostType === 'AnPost' ? '树洞#' + post.PostID : post.PK)}<span style={{fontSize:"small",color:"gray"}}>{(typeof post.UserScore == 'number' ? ` ${level(post.UserScore)}` : '')}</span></div>
                                 <div style={{marginTop:4,fontSize:14,color:"gray"}}>{timeConclude(post.SK)}</div>
                             </div>
                                 <MoreOutline style={{ fontSize: 22 }} onClick={(e)=>{

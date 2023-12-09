@@ -24,7 +24,7 @@ import {
 } from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
 import {SwitchLike} from "@/app/component/postCard";
-import {mockUpload, recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
+import {level, mockUpload, recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageSwiper} from "@/app/component/imageContainer";
 import Ellipsis from "@/app/component/ellipsis";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
@@ -146,6 +146,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                 data['reply_name'] = replyTo.reply_name
                 data['reply_time'] = replyTo.reply_time
             }
+            data.showLevel = localStorage.getItem('ShowLevel') != null ? JSON.parse(localStorage.getItem('ShowLevel')) : true
             if (uploadImage === true && fileList.length > 0) {
                 data['images'] = fileList
             }
@@ -245,9 +246,9 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                             avatar:post.Avatar
                                         })}}></Avatar>
                                 <div style={{flexGrow:1,position:"relative"}}>
-                                    <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{post.PK}</div>
+                                    <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{post.PK}<span style={{fontSize:"small",color:"gray"}}>{(typeof post.UserScore == 'number' ? ` ${level(post.UserScore)}` : '')}</span></div>
                                     <div style={{
-                                        fontSize:'medium',color:"gray",
+                                        fontSize:'small',color:"gray",
                                         position:"absolute",
                                         bottom:5}}>{timeConclude(post.SK)}
                                     </div>

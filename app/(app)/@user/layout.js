@@ -17,7 +17,7 @@ import {
 } from "antd-mobile";
 import {
     ArrowDownCircleOutline,
-    CloseShieldOutline,
+    CloseShieldOutline, FaceRecognitionOutline,
     LeftOutline,
     RightOutline,
     TagOutline,
@@ -26,18 +26,19 @@ import {
 } from "antd-mobile-icons";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {AboutUs, avatarList, emailWebsite, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
-import {getCookie, responseHandle} from "@/app/component/function";
+import {AboutUs, avatarList, emailWebsite, recaptcha_site_key_v2, Url} from "@/app/(app)/clientConfig";
+import {getCookie, level, responseHandle} from "@/app/component/function";
 import {feedBack, getUserData} from "@/app/api/serverAction";
 import ReCAPTCHA from "react-google-recaptcha";
 import {sha256} from "js-sha256";
+import {CopyToClipboard} from "react-copy-to-clipboard/src";
 
 export default function RootLayout({userReply,userLike,userPost}) {
     const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>]
     const [userData,setData] = useState({
         avatar:'dog.jpg',
         name:'user',
-        count:[0,0,0]
+        count:[0,0,0,0]
     })
     const {isLogin} = useContext(loginState)
     const [Text, setText] = useState('');
@@ -48,6 +49,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
     const [visibleFeedBack, setVisibleFeedBack] = useState(false)
     const [visibleData, setVisibleData] = useState(false)
     const [avatar,setAvatar] = useState(userData.avatar)
+    const [showLevel,setShowLevel] = useState(true)
     const ref = useRef(null);
     const captchaRef = useRef(null)
 
@@ -61,6 +63,8 @@ export default function RootLayout({userReply,userLike,userPost}) {
         data.avatar = localStorage.getItem('Avatar')
         data.name = decodeURI(getCookie('UserName'))
         setAvatar(localStorage.getItem('Avatar'))
+        setShowLevel(JSON.parse(localStorage.getItem('ShowLevel')))
+
         if (isLogin === false) {
             window.location.replace('/login')
         } else {
@@ -68,6 +72,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
             form.setFieldValue('anid',localStorage.getItem('Anid') !== null ?localStorage.getItem('Anid'):'')
             form.setFieldValue('email',localStorage.getItem('NotifyEmail') !== null ? localStorage.getItem('NotifyEmail') : '')
             getUserData(document.cookie).then(res => {
+                form.setFieldValue('level',`${level(res[3])} ` + res[3])
                 setData({
                     ...data,
                     count: res
@@ -134,7 +139,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         })
             .then((res)=>res.json())
             .then(data => {
-                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周') || values.anid != undefined) {
+                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周') && values.anid != undefined) {
                     localStorage.setItem('Anid',values.anid)
                 }
                 if (!data.tip.includes('邮箱未通过验证，请到邮箱打开链接')) {
@@ -253,15 +258,25 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     }}>
                         我要反馈
                     </List.Item>
+                    <List.Item prefix={<FaceRecognitionOutline fontSize={24}/>} onClick={() => {
+                        Dialog.alert({
+                            title: '这是你的邀请链接',
+                            content:
+                                <>
+                                    <div>{Url + '/signup/?data=' + encodeURIComponent(JSON.stringify({"invitor":userData.name}))}</div>
+                                    <CopyToClipboard text={Url + '/signup/?data=' + encodeURIComponent(JSON.stringify({"invitor":userData.name}))}
+                                                     onCopy={() => alert('复制成功')}>
+                                        <button>点此复制</button>
+                                    </CopyToClipboard>
+                                </>,
+                        })
+                    }}>
+                        邀请好友
+                    </List.Item>
                     <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
                         window.open('https://ecustspace.github.io', '_blank');
                     }}>
                         下载app
-                    </List.Item>
-                    <List.Item prefix={<Image src='chatgpt.svg' height={24}/>} onClick={() => {
-                        window.open('https://chatjbt.top', '_blank');
-                    }}>
-                        chatGPT
                     </List.Item>
                     <List.Item prefix={<CloseShieldOutline fontSize={24}/>} onClick={() => {
                         Dialog.confirm({
@@ -376,7 +391,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     form={form}
                     layout='horizontal'
                     mode='card' className='fm'
-                    style={{ '--prefix-width': '6em' }}
+                    style={{ '--prefix-width': '5.5em' }}
                     requiredMarkStyle='none'
                     footer={
                         <>
@@ -436,6 +451,28 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     >
                             <Input onChange={setNotifyEmail}
                                    placeholder='为空则默认不订阅通知' />
+                    </Form.Item>
+                    <Form.Item
+                        label='等级'
+                        name='level'
+                        help={'通过在论坛中活跃，可以提升等级\n每日评论：+3\n每日发帖：+5\n邀请好友：+60'
+                    }
+                        extra={<Checkbox
+                            style={{
+                                '--icon-size': '18px',
+                                '--font-size': '14px',
+                                '--gap': '6px',
+                            }}
+                            checked={showLevel}
+                            onChange={value => {
+                                localStorage.setItem('ShowLevel', value.toString())
+                                setShowLevel(value)
+                            }}
+                        >
+                            展示头衔
+                        </Checkbox>}
+                    >
+                        <Input readOnly/>
                     </Form.Item>
                 </Form>
             </CenterPopup>

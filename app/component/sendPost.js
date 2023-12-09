@@ -56,6 +56,7 @@ const SendPost = forwardRef((props, ref) => {
             images: fileList,
             text: Text,
         }
+        data.showLevel = localStorage.getItem('ShowLevel') != null ? JSON.parse(localStorage.getItem('ShowLevel')) : true
         if (activePart === 1) {
             if (localStorage.getItem('Anid')) {
                 data.isAnonymity = localStorage.getItem('Anid')

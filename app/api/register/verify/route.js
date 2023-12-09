@@ -1,5 +1,5 @@
 import {DeleteCommand, GetCommand, TransactWriteCommand,} from "@aws-sdk/lib-dynamodb";
-import {docClient, recaptchaVerify_v2} from "@/app/api/server";
+import {docClient, recaptchaVerify_v2, updateUserScore} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies, headers} from "next/headers";
 import {v4} from "uuid";
@@ -125,6 +125,7 @@ export async function POST(request) {
         }
 
         if (res === 200){
+            await updateUserScore(data.invitor,'Invite')
             return new Response(JSON.stringify({
                 tip:'注册成功',
                 status: 200,

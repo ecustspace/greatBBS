@@ -1,6 +1,6 @@
 import {Avatar, Dialog, Space} from "antd-mobile";
 import {DeleteOutline, ExclamationCircleOutline, HeartOutline} from "antd-mobile-icons";
-import {timeConclude} from "@/app/component/function";
+import {level, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {useEffect, useRef, useState} from "react";
 import Ellipsis from "@/app/component/ellipsis";
@@ -38,7 +38,7 @@ export default function ReplyCard({name,reply,onClickReply,replyToName,operate,o
             </div>
             <div style={{flexGrow:1}}>
                 <div style={{fontWeight:'bold',display:"flex"}}>
-                    <div>{name}{replyToName !== undefined ? ' ⇒ ' + replyToName : ''}</div>
+                    <div>{name}<span style={{fontSize:"smaller",color:"gray"}}>{(typeof reply.UserScore == 'number' ? ` ${level(reply.UserScore)}` : '')}</span>{replyToName !== undefined ? ' ⇒ ' + replyToName : ''}</div>
                     <div style={{color:'darkgrey',flexGrow:1}}>{reply.ReplyToID? ' #' + reply.ReplyToID : ''}</div>
                 #{!operate ? reply.ReplyID : reply.PostType.split('o')[1]}</div>
                 <Ellipsis content={reply.Content} style={{marginTop:'6px',marginBottom:'4px'}} />

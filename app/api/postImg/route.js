@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
-import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, uploadImage} from "@/app/api/server";
+import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 
@@ -14,7 +14,7 @@ export async function POST(request) {
     const token = cookieStore.get('Token').value
     const username = decodeURI(cookieStore.get('UserName').value)
 
-    const user_item = await getUserItem(username,'UserToken,Avatar')
+    const user_item = await getUserItem(username,'UserToken,Avatar,UserScore')
     if (user_item === 500 || !user_item){
         return NextResponse.json({tip:'用户不存在',status:401})
     }
@@ -33,7 +33,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
 
-    if (isHuman < 0.5) {
+    if (isHuman < 0.3) {
         await ban(username,(now/1000 + 60*60*2))
         return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
@@ -54,31 +54,35 @@ export async function POST(request) {
         .then(res => {
             return res.Attributes.PostCount
         }).catch(err => {return 'err'})
-
     let image_list = []
     for(let i = 0, len = data.images.length; i < len; i++) {
         const type = await uploadImage(data.images[i],'/post',post_id + '-' + i.toString())
         image_list.push(type)
     }
-        return await docClient.send(new PutCommand({
-            TableName: 'BBS',
-            Item: {
-                PK: username,
-                SK: now,
-                PostType: 'Image',
-                PostID: post_id,
-                ImageList:image_list,
-                ReplyCount: 0,
-                ReplyID: 0,
-                LikeCount: 0,
-                H_W: data.images[0].extra.height/data.images[0].extra.width,
-                Avatar: user_item.Avatar,
-                Content: data.text.replace(/(\n)+/g, "\n"),
-            }
-        })).then(() => {
-            revalidateTag('Image')
-            return NextResponse.json({tip:'发布成功',status:200})
-        }).catch(() => {
-            return NextResponse.json({tip:'发布失败',status:500})
-        })
+    let putInput = {
+        TableName: 'BBS',
+        Item: {
+            PK: username,
+            SK: now,
+            PostType: 'Image',
+            PostID: post_id,
+            ImageList:image_list,
+            ReplyCount: 0,
+            ReplyID: 0,
+            LikeCount: 0,
+            H_W: data.images[0].extra.height/data.images[0].extra.width,
+            Avatar: user_item.Avatar,
+            Content: data.text.replace(/(\n)+/g, "\n"),
+        }
+    }
+    if (data.showLevel === true) {
+        putInput.Item.UserScore = user_item.UserScore
+    }
+    return await docClient.send(new PutCommand(putInput)).then(() => {
+        revalidateTag('Image')
+        updateUserScore(username,'Post')
+        return NextResponse.json({tip:'发布成功',status:200})
+    }).catch(() => {
+        return NextResponse.json({tip:'发布失败',status:500})
+    })
 }

@@ -125,7 +125,9 @@ export async function POST(request) {
         }
 
         if (res === 200){
-            await updateUserScore(data.invitor,'Invite')
+            if (typeof data.invitor == 'string') {
+                await updateUserScore(data.invitor,'Invite')
+            }
             return new Response(JSON.stringify({
                 tip:'注册成功',
                 status: 200,

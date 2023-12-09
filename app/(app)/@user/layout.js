@@ -63,7 +63,11 @@ export default function RootLayout({userReply,userLike,userPost}) {
         data.avatar = localStorage.getItem('Avatar')
         data.name = decodeURI(getCookie('UserName'))
         setAvatar(localStorage.getItem('Avatar'))
-        setShowLevel(JSON.parse(localStorage.getItem('ShowLevel')))
+        if (typeof localStorage.getItem('ShowLevel') != "string") {
+            setShowLevel(true)
+        } else {
+            setShowLevel(JSON.parse(localStorage.getItem('ShowLevel')))
+        }
 
         if (isLogin === false) {
             window.location.replace('/login')

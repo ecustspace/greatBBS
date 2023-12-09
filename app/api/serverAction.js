@@ -403,7 +403,9 @@ export async function deleteOperation(cookie,SK,string,where,type) {
     }
     return await docClient.send(new DeleteCommand(input)).then(() => {
         if (typeof deleteType == 'string') {
-            decreaseUserScore(username,deleteType,SK)
+            decreaseUserScore(username,deleteType,SK).catch(err => {
+                console.log(err)
+            })
         }
         if (string === 'Like#') {
             return docClient.send(new UpdateCommand({

@@ -239,8 +239,6 @@ export default function Home() {
                 <Form.Item
                     rules={[{
                         required: true,
-                        max: 8,
-                        min: 8,
                         message: '请输入正确的邮箱'
                     }]}
                     name='useremail'

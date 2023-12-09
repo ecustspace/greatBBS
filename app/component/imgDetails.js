@@ -146,7 +146,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                 data['reply_name'] = replyTo.reply_name
                 data['reply_time'] = replyTo.reply_time
             }
-            data.showLevel = localStorage.getItem('ShowLevel') != null ? JSON.parse(localStorage.getItem('ShowLevel')) : true
+            data.showLevel = typeof localStorage.getItem('ShowLevel') == "string" ? JSON.parse(localStorage.getItem('ShowLevel')) : true
             if (uploadImage === true && fileList.length > 0) {
                 data['images'] = fileList
             }

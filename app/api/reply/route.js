@@ -218,7 +218,7 @@ export async function POST(request) {
             .catch((err) => {console.log(err); return 500})
     }
     if (res === 200 && (postData[0].PostType === 'Post' || 'Image')) {
-        if (data.post_name !== username && (typeof data.reply_name == 'string' && username !== data.reply_name)) {
+        if (data.post_name !== username || (typeof data.reply_name == 'string' && username !== data.reply_name)) {
             await updateUserScore(username,'Reply')
             const data_ = encodeURIComponent(JSON.stringify({
                 username: data.post_name,

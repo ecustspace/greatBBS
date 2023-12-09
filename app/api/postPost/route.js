@@ -53,7 +53,9 @@ export async function POST(request) {
     const post_id= await docClient.send(updatePostCountCommand)
         .then(res => {
             return res.Attributes.PostCount
-        }).catch(err => {return 'err'})
+        }).catch(err => {
+            console.log(err)
+            return 'err'})
     let res
     if (post_id !== 'err' || post_id !== undefined) {
         let putInput = {

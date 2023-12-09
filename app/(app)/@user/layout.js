@@ -72,7 +72,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
             form.setFieldValue('anid',localStorage.getItem('Anid') !== null ?localStorage.getItem('Anid'):'')
             form.setFieldValue('email',localStorage.getItem('NotifyEmail') !== null ? localStorage.getItem('NotifyEmail') : '')
             getUserData(document.cookie).then(res => {
-                form.setFieldValue('level',`${level(res[3])} ` + res[3])
+                form.setFieldValue('level',typeof res[3] == 'number' ? `${level(res[3])} ` + res[3] : '大学牲 0')
                 setData({
                     ...data,
                     count: res

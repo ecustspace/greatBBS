@@ -170,7 +170,7 @@ export async function POST(request) {
             putInput.ReplyToName = data.reply_name
         }
         if (data.showLevel === true) {
-            putInput.UserScore = user_item.UserScore
+            putInput.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
         }
         res = await docClient.send(new TransactWriteCommand({
             TransactItems: [{

@@ -76,7 +76,7 @@ export async function POST(request) {
         }
     }
     if (data.showLevel === true) {
-        putInput.Item.UserScore = user_item.UserScore
+        putInput.Item.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
     }
     return await docClient.send(new PutCommand(putInput)).then(() => {
         revalidateTag('Image')

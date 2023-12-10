@@ -118,13 +118,6 @@ export default function RootLayout({ post,message,user }) {
 
     useEffect(() => {
         if (login.isLogin === true) {
-            let count = localStorage.getItem('messageCount') ?
-                parseInt(localStorage.getItem('messageCount')) : 0
-            getMessageCount(document.cookie).then(res => {
-                count = count + (res === 'err' ? 0 : res)
-                localStorage.setItem('messageCount',count)
-                setMessageCount(count)
-            })
             updateUserToken(document.cookie).then(res => {
                 if (res === 500 || res === 401) {
                     return;

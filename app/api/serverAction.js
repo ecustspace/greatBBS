@@ -2,7 +2,13 @@
 
 import {sha256} from "js-sha256";
 import {getCookie} from "@/app/component/function";
-import {decreaseUserScore, docClient, getUserItem, setUserInquireTime, transporter} from "@/app/api/server";
+import {
+    decreaseUserScore,
+    docClient,
+    getUserItem,
+    setUserInquireTime,
+    transporter
+} from "@/app/api/server";
 import {
     BatchGetCommand,
     DeleteCommand,
@@ -728,3 +734,4 @@ export async function getUserCount() {
         return res.Count
     })).catch(() => {return 'err'})
 }
+

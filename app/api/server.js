@@ -179,7 +179,7 @@ export async function updateUserScore(username,type) {
         'Invite':60
     }
     const currentDate = new Date();
-    currentDate.setUTCHours(24, 0, 0, 0);
+    currentDate.setUTCHours(0, 0, 0, 0);
     const timestamp = currentDate.getTime();
     let update = {
         TableName:'User',
@@ -189,8 +189,8 @@ export async function updateUserScore(username,type) {
         }
     }
     if (type !== 'Invite') {
-        update.ConditionExpression = 'attribute_not_exists(#LastOperateTime) OR #LastOperateTime < :now'
-        update.UpdateExpression = 'SET #LastOperateTime = :time,UserScore = if_not_exists(UserScore, :default) + :score'
+        update.ConditionExpression = 'attribute_not_exists(#LastOperateTime) OR #LastOperateTime < :time'
+        update.UpdateExpression = 'SET #LastOperateTime = :now,UserScore = if_not_exists(UserScore, :default) + :score'
         update.ExpressionAttributeValues = {
             ':now': now,
             ':score': score[type],

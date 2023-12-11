@@ -61,6 +61,7 @@ const PostDetails = forwardRef(({post},ref) => {
     },[]);
 
     useEffect(() => {
+        setReplyLikeList([])
         if (!isPopupVisible) {
             unlock(document.getElementById('postDetails'))
             return
@@ -129,7 +130,6 @@ const PostDetails = forwardRef(({post},ref) => {
     useEffect(() => {
         setTextContent('')
         setReplyTo({})
-        setReplyLikeList([])
     },[post])
     function submitReply() {
         setDisable(true)

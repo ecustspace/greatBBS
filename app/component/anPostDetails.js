@@ -15,7 +15,7 @@ import {
     TextArea,
     Toast
 } from "antd-mobile";
-import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
+import React, {forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {
     ExclamationCircleOutline,
     LoopOutline,
@@ -31,8 +31,9 @@ import {names} from "@/app/(app)/clientConfig";
 import {SwitchLike} from "@/app/component/postCard";
 import {recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
-import {Report} from "@/app/api/serverAction";
+import {getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
+import {likeListContext} from "@/app/(app)/layout";
 
 // eslint-disable-next-line react/display-name
 const AnPostDetails = forwardRef(({post,like},ref) => {
@@ -50,6 +51,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     const [hasMore,setHasMore] = useState(false)
     const [sortMethod,setMethod] = useState(true)
     const [lastKey,setLastKey] = useState({})
+    const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const myText = useRef(null)
     useImperativeHandle(ref, () => {
         return {
@@ -63,6 +65,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     },[]);
 
     useEffect(() => {
+        setReplyLikeList([])
         if (!isPopupVisible) {
             unlock(document.getElementById('anPostDetails'))
             return
@@ -184,6 +187,17 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
         }).then(data => {
             return data
         })
+        if (data.data.length !== 0) {
+            getPostLikeList(
+                document.cookie,
+                data.data[0].ReplyID,
+                data.data[data.data.length - 1].ReplyID,
+                post.PostID).then(res => {
+                setReplyLikeList([...replyLikeList,...res.map(item => {
+                    return item.SK
+                })])
+            }).catch(err => {console.log(err)})
+        }
         if (data['lastEvaluatedKey'] !== null) {
             setLastKey(data['lastEvaluatedKey'])
         } else {
@@ -314,7 +328,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 <div style={{flexGrow:1,position:"relative"}}>
                                     <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
                                     <div style={{
-                                        fontSize:'medium',color:"gray",
+                                        fontSize:'small',color:"gray",
                                         position:"absolute",
                                         bottom:5}}>{timeConclude(post.SK)}
                                     </div>

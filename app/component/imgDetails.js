@@ -63,6 +63,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
     },[]);
 
     useEffect(() => {
+        setReplyLikeList([])
         if (!isPopupVisible) {
             unlock(document.getElementById('imgDetails'))
             return

@@ -70,7 +70,7 @@ export async function POST(request) {
         const putPostItem = new PutCommand({
             TableName: 'BBS',
             Item: {
-                PK: sha256(data.isAnonymity + username + post_id + process.env.JWT_SECRET),
+                PK: sha256(data.isAnonymity + '#' + username + '#' + post_id + process.env.JWT_SECRET),
                 SK: now,
                 PostType: 'AnPost',
                 PostID: post_id,

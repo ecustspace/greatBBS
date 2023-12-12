@@ -112,7 +112,7 @@ export async function POST(request) {
                 Put: {
                     TableName: 'BBS',
                     Item: data.reply_name !== undefined ? {
-                        PK: 'Reply#' + sha256(data.isAnonymity+username+postData[0].PostID+process.env.JWT_SECRET),
+                        PK: 'Reply#' + sha256(data.isAnonymity+'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
                         SK: now,
                         PostType: 'ReplyTo'+postData[0].PostID,
                         Content: data.content.replace(/(\n)+/g, "\n"),
@@ -123,7 +123,7 @@ export async function POST(request) {
                         ReplyToName: data.reply_name
                     } :
                         {
-                            PK: 'Reply#' + sha256(data.isAnonymity+username+postData[0].PostID+process.env.JWT_SECRET),
+                            PK: 'Reply#' + sha256(data.isAnonymity+'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
                             SK: now,
                             PostType: 'ReplyTo'+postData[0].PostID,
                             Content: data.content.replace(/(\n)+/g, "\n"),

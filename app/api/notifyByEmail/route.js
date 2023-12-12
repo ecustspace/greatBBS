@@ -14,24 +14,8 @@ export async function GET(request) {
     const data = JSON.parse(decodeURIComponent(request.nextUrl.searchParams.get('data')))
     const user_item = await getUserItem(data.username, 'LastNotifyTime,InquireTime,NotifyEmail')
     const now = Date.now()
-    if (now < user_item.InquireTime) {
+    if (typeof user_item.NotifyEmail != 'string') {
         return
-    }
-    try {
-        await new Promise((resolve, reject) => {
-            // verify connection configuration
-            transporter.verify(function (error, success) {
-                if (error) {
-                    console.log(error);
-                    reject(error);
-                } else {
-                    resolve(success);
-                }
-            });
-        });
-    } catch (err) {
-        console.log(err)
-        return NextResponse.json({tip: '发送失败，请检查邮箱', status: 500})
     }
     const link = Url + '?where=' + encodeURIComponent(data.inWhere)
     const mailData = {

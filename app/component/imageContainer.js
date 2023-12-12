@@ -1,4 +1,4 @@
-import {Image, Swiper} from "antd-mobile";
+import {Image, Skeleton, Swiper} from "antd-mobile";
 import Viewer from 'react-viewer'
 import {imageUrl} from "@/app/(app)/clientConfig";
 import React, {useEffect, useRef, useState} from "react";
@@ -32,6 +32,8 @@ export function ImageContainer({list,from,style}) {
         <div style={{...style,display:'flex',width:'100%',flexWrap:"wrap"}} ref={ref}>
             {list.map((item,index) =>
                 <Image
+                    placeholder={<Skeleton animated style={list.length >= 3 ? {'--width':`${width/3-2}px`,'--height': `${width/3-2}px`,paddingRight:'2px',paddingTop:'2px'}
+                        : {'--width':`${width/2-2}px`,'--height': `${width/2-2}px`,paddingRight:'2px',paddingTop:'2px'}} />}
                     key={item.id}
                     style={list.length >= 3 ? {width:`${width/3-2}px`,height: `${width/3-2}px`,paddingRight:'2px',paddingTop:'2px'}
                 : {width:`${width/2-2}px`,height: `${width/2-2}px`,paddingRight:'2px',paddingTop:'2px'}}

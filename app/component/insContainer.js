@@ -1,7 +1,7 @@
 'use client'
 
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Image, InfiniteScroll, Toast,} from "antd-mobile";
+import {Image, InfiniteScroll, Skeleton, Toast,} from "antd-mobile";
 import {imageUrl} from "@/app/(app)/clientConfig";
 import {detailsContext, likeListContext, messageCountContext} from "@/app/(app)/layout";
 import {fetchData, getMessageCount, getPostLikeList, getPostList} from "@/app/api/serverAction";
@@ -92,6 +92,7 @@ export default function InsContainer() {
             let height = width/2*height_width(item.H_W)
             if (leftHeight_ > rightHeight_) {
                 addRightList.push(<Image
+                    placeholder={<Skeleton animated style={{'--width': `${width/2}px`,'--height':`${height}px`}} />}
                     onClick={() => {
                         showImgPopup(item)
                     }}
@@ -104,6 +105,7 @@ export default function InsContainer() {
                 rightHeight_ += height
             } else {
                 addLeftList.push(<Image
+                    placeholder={<Skeleton style={{'--width': `${width/2}px`,'--height':`${height}px`}} />}
                     onClick={() => {
                         showImgPopup(item)
                     }}

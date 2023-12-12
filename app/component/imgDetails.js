@@ -259,7 +259,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                     }} />
                             </div>
                             <ImageSwiper list={post.ImageList? post.ImageList:[]} from={'/post/' + post.PostID} style={{marginTop:'8px'}} />
-                            <Ellipsis style={{marginTop:'12px',marginBottom:'4px',fontSize:'large',wordBreak:'break-word'}} content={post.Content}></Ellipsis>
+                            <Ellipsis style={{marginTop:'14px',marginBottom:'4px',fontSize:'large',wordBreak:'break-word'}} content={post.Content}></Ellipsis>
                         </div>
                         <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>
                             <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>

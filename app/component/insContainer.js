@@ -105,7 +105,7 @@ export default function InsContainer() {
                 rightHeight_ += height
             } else {
                 addLeftList.push(<Image
-                    placeholder={<Skeleton style={{'--width': `${width/2}px`,'--height':`${height}px`}} />}
+                    placeholder={<Skeleton animated style={{'--width': `${width/2}px`,'--height':`${height}px`}} />}
                     onClick={() => {
                         showImgPopup(item)
                     }}

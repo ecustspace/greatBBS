@@ -32,11 +32,11 @@ export function ImageContainer({list,from,style}) {
         <div style={{...style,display:'flex',width:'100%',flexWrap:"wrap"}} ref={ref}>
             {list.map((item,index) =>
                 <Image
-                    placeholder={<Skeleton animated style={list.length >= 3 ? {'--width':`${width/3-2}px`,'--height': `${width/3-2}px`,paddingRight:'2px',paddingTop:'2px'}
-                        : {'--width':`${width/2-2}px`,'--height': `${width/2-2}px`,paddingRight:'2px',paddingTop:'2px'}} />}
+                    placeholder={<Skeleton animated style={list.length >= 3 ? {'--width':`${width/3-2}px`,'--height': `${width/3-2}px`}
+                        : {'--width':`${width/2-2}px`,'--height': `${width/2-2}px`}} />}
                     key={item.id}
-                    style={list.length >= 3 ? {width:`${width/3-2}px`,height: `${width/3-2}px`,paddingRight:'2px',paddingTop:'2px'}
-                : {width:`${width/2-2}px`,height: `${width/2-2}px`,paddingRight:'2px',paddingTop:'2px'}}
+                    style={list.length >= 3 ? {width:`${width/3-2}px`,height: `${width/3-2}px`,marginRight:'2px',marginTop:'2px'}
+                : {width:`${width/2-2}px`,height: `${width/2-2}px`,marginRight:'2px',marginTop:'2px'}}
                     alt=''
                     src={imageUrl + from + '-' + index + '.' + item}
                     fit='cover'

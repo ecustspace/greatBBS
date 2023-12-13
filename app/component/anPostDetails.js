@@ -317,10 +317,10 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                 visible={isPopupVisible}
                 bodyStyle={{height:'100%'}}
             >
+                <div style={{display:'flex',flexDirection:'column',width:'100%',height:'100%'}}>
                 <NavBar onBack={() => setIsVisible(false)}>
                     帖子详情
                 </NavBar>
-                <div style={{display:'flex',flexDirection:'column',width:'100%',height:'100%'}}>
                     <div style={{overflowX:"scroll",flexGrow:1,position:'sticky'}} id='anPostDetails'>
                         <div className='postDetail'>
                             <div style={{display:'flex'}}>

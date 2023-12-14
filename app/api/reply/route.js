@@ -5,11 +5,12 @@ import {GetCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dyna
 import {sha256} from "js-sha256";
 import {revalidateTag} from "next/cache";
 import {Url} from "@/app/(app)/clientConfig";
+import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
     const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
-    if (data.images.length > 3 || data.content.length > 500 || !data.content){
+    if (data.images.length > 3 || !dataLengthVerify(0,500,data.content) || (!data.content && !data.images)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()

@@ -148,7 +148,7 @@ export async function POST(request) {
         })).then(() => {return 200})
             .catch(() => {return 500})
     }
-    else if (postData[0].PostType === 'Post' || 'Image') {
+    else if (postData[0].PostType === 'Post' || postData[0].PostType === 'Image') {
         replyID = await docClient.send(updateReplyID)
             .then(res => {return res.Attributes.ReplyID})
             .catch(err => {console.log(err);return 'err'})
@@ -217,7 +217,7 @@ export async function POST(request) {
         })).then(() => {return 200})
             .catch((err) => {console.log(err); return 500})
     }
-    if (res === 200 && (postData[0].PostType === 'Post' || 'Image')) {
+    if (res === 200 && (postData[0].PostType !== 'AnPost')) {
         if (data.post_name !== username || (typeof data.reply_name == 'string' && username !== data.reply_name)) {
             await updateUserScore(username,'Reply')
             const data_ = encodeURIComponent(JSON.stringify({

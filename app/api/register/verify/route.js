@@ -8,7 +8,7 @@ import {sha256} from "js-sha256";
 import parser from "ua-parser-js";
 
 export function dataLengthVerify(min,max,data) {
-    return !(data.length > max || data.length < min);
+    return !(data.length > max || data.length < min || typeof data != 'string');
 }
 export async function POST(request) {
     const data = await request.json()

@@ -7,7 +7,7 @@ import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
-    if (!dataLengthVerify(5,20,data.useremail) ||
+    if (!dataLengthVerify(1,20,data.useremail) ||
         !dataLengthVerify(5,20,data.password) ||
         !data.useremail) {
         return NextResponse.json({tip:'数据格式不正确',status:500})

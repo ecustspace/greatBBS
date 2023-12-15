@@ -218,11 +218,11 @@ export async function POST(request) {
         })).then(() => {return 200})
             .catch((err) => {console.log(err); return 500})
     }
-    if (res === 200 && (postData[0].PostType !== 'AnPost')) {
+    if (res === 200 && postData[0].PostType !== 'AnPost') {
         if (data.post_name !== username || (typeof data.reply_name == 'string' && username !== data.reply_name)) {
             await updateUserScore(username,'Reply')
             const data_ = encodeURIComponent(JSON.stringify({
-                username: data.post_name,
+                username: typeof data.reply_name == 'string' ? data.reply_name : data.post_name,
                 type: '评论',
                 from: username,
                 content: data.content,
@@ -250,7 +250,11 @@ export async function POST(request) {
         }
         revalidateTag(postData[0].PostType)
         return NextResponse.json({tip:'评论成功',status:200})
-    } else {
+    }
+    else if (res === 200 && postData[0].PostType === 'AnPost') {
+        return NextResponse.json({tip:'评论成功',status:200})
+    }
+    else {
         return NextResponse.json({tip:'评论失败',status:500})
     }
 }

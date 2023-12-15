@@ -59,16 +59,6 @@ export default function RootLayout({ Report, Post, BlackList }) {
     return (
         <>
             <div className='mainContainer'>
-                <div className='DataList'>
-                    <Space direction='vertical' block>
-                        <div>
-                            帖子数量：XX
-                        </div>
-                        <div>
-                            用户数量：XX
-                        </div>
-                    </Space>
-                </div>
                 <div id='navigation'>
                     <Tabs
                         activeKey={tabItems[activeIndex].key}

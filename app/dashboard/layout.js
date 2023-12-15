@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {Button, Input, Space, Stepper, Tabs, Toast} from "antd-mobile";
 import {ban_} from "@/app/dashboard/api/serverAction";
 import {getCookie} from "@/app/component/function";
+import {admin} from "@/app/(app)/clientConfig";
 
 const tabItems = [
     { key: 'dongtai', title: <div style={{ fontWeight: 'bold', fontSize: 15 }}>动态</div> },
@@ -51,7 +52,7 @@ export default function RootLayout({ Report, Post, BlackList }) {
     const childrenList = [<>{Post}</>, <>{Report}</>, <>{BlackList}</>]
     const [activeIndex, setActiveIndex] = useState(0)
     useEffect(() => {
-        if (!getCookie('Admin')) {
+        if (decodeURI(getCookie('UserName')) !== admin) {
             window.location.replace('/login')
         }
     },[])

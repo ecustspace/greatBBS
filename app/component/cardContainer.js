@@ -47,7 +47,9 @@ export default function CardContainer({type}) {
     }
 
    useEffect(() => {
-               refresh(false)
+       setMessageCount(typeof localStorage.getItem('messageCount') == 'number' ?
+           localStorage.getItem('messageCount') : 0)
+       refresh(false)
    },[])
 
     function refresh(showToast) {

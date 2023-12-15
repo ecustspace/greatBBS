@@ -252,6 +252,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'评论成功',status:200})
     }
     else if (res === 200 && postData[0].PostType === 'AnPost') {
+        revalidateTag(postData[0].PostType)
         return NextResponse.json({tip:'评论成功',status:200})
     }
     else {

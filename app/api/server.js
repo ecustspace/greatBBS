@@ -71,6 +71,8 @@ export async function uploadImage(image,path,id) {
         type = 'jpeg'
     } else if (imageDate[0] === 'data:image/gif;base64'){
         type = 'gif'
+    } else if (imageDate[0] === 'data:image/webp;base64'){
+        type = 'webp'
     }
 
     return await fetch(`https://api.github.com/repos/ecustspace/image/contents${path}/${id}.${type}`,

@@ -1,6 +1,8 @@
 export const imageUrl = 'https://d2ekmn0x4fiphu.cloudfront.net'
 export const Url = 'https://ecust.space'
 
+export const admin = '方昆亮'
+
 export const appName = 'Ecust Space'
 
 export const emailAddress = '@mail.ecust.edu.cn'

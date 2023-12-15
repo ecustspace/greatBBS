@@ -4,10 +4,21 @@ import {getCookie} from "@/app/component/function";
 import {ban, docClient} from "@/app/api/server";
 import {BatchGetCommand, DeleteCommand, PutCommand, QueryCommand, ScanCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
+import {sha256} from "js-sha256";
+import {admin} from "@/app/(app)/clientConfig";
 
 export async function getTrends(cookie,lastKey,from) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (username !== admin) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     const scanInput = {
@@ -36,8 +47,17 @@ export async function getTrends(cookie,lastKey,from) {
 }
 
 export async function ban_(cookie,username,reason,time) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const user = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (user !== admin) {
+        return 401
+    }
+    if (sha256(user+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     const now = Date.now()
@@ -61,8 +81,17 @@ export async function ban_(cookie,username,reason,time) {
 }
 
 export async function deleteTrends(cookie,post) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (username !== admin) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     if (['Image','Post','AnPost'].includes(post.PostType)) {
@@ -82,8 +111,17 @@ export async function deleteTrends(cookie,post) {
 }
 
 export async function getReportList(cookie,lastKey) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (username !== admin) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     const queryInput = {
@@ -135,8 +173,17 @@ export async function getReportList(cookie,lastKey) {
 }
 
 export async function deleteBan(cookie,username) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const user = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (user !== admin) {
+        return 401
+    }
+    if (sha256(user+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     return await docClient.send(new DeleteCommand({
@@ -153,8 +200,17 @@ export async function deleteBan(cookie,username) {
 }
 
 export async function getBlackList(cookie,lastKey) {
-    const Token = getCookie('Admin',cookie)
-    if (Token !== process.env.JWT_SECRET) {
+    const jwt = getCookie('JWT',cookie)
+    const username = decodeURI(getCookie('UserName',cookie))
+    const token = getCookie('Token',cookie)
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (username !== admin) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
     const queryInput = {

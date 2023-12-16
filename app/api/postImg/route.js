@@ -3,11 +3,12 @@ import {cookies} from "next/headers";
 import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
+import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
     const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
-    if (data.images.length > 6 || data.images.length === 0 || data.text.length > 50){
+    if (data.images.length > 6 || data.images.length === 0 || !dataLengthVerify(0,50,data.text)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()

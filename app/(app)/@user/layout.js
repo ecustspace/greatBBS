@@ -26,7 +26,7 @@ import {
 } from "antd-mobile-icons";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {AboutUs, avatarList, emailWebsite, recaptcha_site_key_v2, Url} from "@/app/(app)/clientConfig";
+import {AboutUs, avatarList, recaptcha_site_key_v2, Url} from "@/app/(app)/clientConfig";
 import {getCookie, level, responseHandle} from "@/app/component/function";
 import {feedBack, getUserData} from "@/app/api/serverAction";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -131,8 +131,8 @@ export default function RootLayout({userReply,userLike,userPost}) {
             duration:0
         })
         values.avatar = avatar
-        values.shaAnid = values.anid !== ('' && null && undefined) ? sha256(values.anid) : ''
-        values.email = values.email !== ('' && null && undefined) ? values.email : ''
+        values.shaAnid = (typeof values.anid == 'string' && values.anid.length > 0) ? sha256(values.anid) : ''
+        values.email = typeof values.email == 'string' ? values.email : ''
         fetch(window.location.origin + '/api/changeInformation',{
             method:'POST',
             credentials:'include',
@@ -143,7 +143,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         })
             .then((res)=>res.json())
             .then(data => {
-                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周') && values.anid != undefined) {
+                if (!data.tip.includes('修改匿名密钥距离上次必须大于一周') && (typeof values.anid == 'string' && values.anid.length > 0)) {
                     localStorage.setItem('Anid',values.anid)
                 }
                 if (!data.tip.includes('邮箱未通过验证，请到邮箱打开链接')) {

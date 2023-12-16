@@ -3,11 +3,12 @@ import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
 import {revalidateTag} from "next/cache";
+import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
     const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
-    if (data.images.length > 3 || data.text.length > 500 || !data.text ){
+    if (data.images.length > 3 || !dataLengthVerify(1,500,data.text)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()
@@ -57,7 +58,7 @@ export async function POST(request) {
             console.log(err)
             return 'err'})
     let res
-    if (post_id !== 'err' || post_id !== undefined) {
+    if (typeof post_id == 'number') {
         let putInput = {
             TableName: 'BBS',
             Item: {

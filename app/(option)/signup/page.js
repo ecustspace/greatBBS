@@ -10,6 +10,7 @@ import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
 import {useSearchParams} from "next/navigation";
 import {getUserCount} from "@/app/api/serverAction";
+import {v4} from "uuid";
 
 export default function Home() {
     const [psw, setPsw] = useState('');
@@ -137,7 +138,7 @@ export default function Home() {
         captchaRef.current.executeAsync().then(token => {
             const values = form.getFieldsValue(true)
             values.recaptchaToken = token
-            const anid = (Math.round(Math.random() * (999999 - 100000)) + 100000).toString();
+            const anid = v4();
             values.anid = sha256(anid)
             values.avatar = avatarList[Math.floor(Math.random() * avatarList.length)];
             Toast.show({

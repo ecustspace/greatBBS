@@ -31,7 +31,7 @@ import {getCookie, level, responseHandle} from "@/app/component/function";
 import {feedBack, getUserData} from "@/app/api/serverAction";
 import ReCAPTCHA from "react-google-recaptcha";
 import {sha256} from "js-sha256";
-import {CopyToClipboard} from "react-copy-to-clipboard/src";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 export default function RootLayout({userReply,userLike,userPost}) {
     const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>]

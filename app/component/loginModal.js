@@ -57,14 +57,14 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             block
                             color={"primary"}
                             shape={"rounded"}
-                            size='small'
+                            size='middle'
                             type="submit"
                             >
-                            <div style={{ fontWeight: 'bolder', fontSize: 18 }}>登 录</div>
+                            <div style={{ fontWeight: 'bolder', fontSize: "small" }}>登 录</div>
                         </Button>
                         <Button onClick={
-                            () => {window.location.replace('/signup')}} block color={"default"} shape={"rounded"} size='small' fill='outline' style={{ marginTop: '10px' }}>
-                            <div style={{ fontWeight: 'bolder', fontSize: 18 }}>注 册</div>
+                            () => {window.location.replace('/signup')}} block color={"default"} shape={"rounded"} size='middle' fill='outline' style={{ marginTop: '10px' }}>
+                            <div style={{ fontWeight: 'bolder', fontSize: "small" }}>注 册</div>
                         </Button>
                     </>
                 }>
@@ -88,7 +88,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                 </Form.Item>
             </Form>
             <div className='forget'>
-                <a onClick={() => {window.location.replace('/forgetPassword')}}>
+                <a style={{fontSize:"small"}} onClick={() => {window.location.replace('/forgetPassword')}}>
                     忘记密码？
                 </a>
             </div>

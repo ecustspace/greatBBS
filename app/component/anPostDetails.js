@@ -9,7 +9,7 @@ import {
     InfiniteScroll,
     Input,
     Mask,
-    NavBar,
+    NavBar, Popover,
     Popup,
     Space,
     TextArea,
@@ -34,7 +34,8 @@ import {ImageContainer} from "@/app/component/imageContainer";
 import {getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
 import {likeListContext} from "@/app/(app)/layout";
-import {CopyToClipboard} from "react-copy-to-clipboard/src";
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import EmojiPicker from "emoji-picker-react";
 
 // eslint-disable-next-line react/display-name
 const AnPostDetails = forwardRef(({post,like},ref) => {
@@ -54,6 +55,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     const [lastKey,setLastKey] = useState({})
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const myText = useRef(null)
+    const emojiRef = useRef(null)
     useImperativeHandle(ref, () => {
         return {
             showPopup(){
@@ -283,18 +285,18 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 block
                                 color={"primary"}
                                 shape={"rounded"}
-                                size='small'
+                                size='middle'
                                 onClick={() => {
                                     localStorage.setItem('Anid',anid.toString())
                                     submitReply()
                                     setDialogVisible(false)
                                 }}
                             >
-                                <div style={{ fontWeight: 'bolder', fontSize: 18 }}>确 认</div>
+                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>确 认</div>
                             </Button>
                             <Button onClick={
                                 () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='small' fill='outline' style={{ marginTop: '10px' }}>
-                                <div style={{ fontWeight: 'bolder', fontSize: 18 }}>取 消</div>
+                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>取 消</div>
                             </Button>
                         </>}
                 >
@@ -381,6 +383,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                   setMaskVisible(false)
                               }}
                               afterClose={() => {
+                                  emojiRef.current.hide()
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')
@@ -416,7 +419,18 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 <PictureOutline style={{fontSize:22}} onClick={()=> {
                                    Toast.show('树洞不可以发送图片')
                                 }} />
-                                <SmileOutline style={{fontSize:22}} />
+                                <Popover
+                                    content={<EmojiPicker
+                                        previewConfig={{showPreview:false}}
+                                        height={300}
+                                        onEmojiClick={value => {
+                                            emojiRef.current.hide()
+                                            setTextContent(text => text + value.emoji)}} />}
+                                    trigger='click'
+                                    ref={emojiRef}
+                                >
+                                    <SmileOutline style={{fontSize:22}} onClick={() => setMaskVisible(true)} />
+                                </Popover>
                             </Space>
                             <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary' onClick={submitReply}>评论</Button>
                         </div>

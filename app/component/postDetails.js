@@ -6,7 +6,7 @@ import {
     ImageUploader,
     InfiniteScroll,
     Mask,
-    NavBar,
+    NavBar, Popover,
     Popup,
     Space,
     TextArea,
@@ -29,7 +29,8 @@ import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
 import {ContactTa, getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
-import {CopyToClipboard} from "react-copy-to-clipboard/src";
+import {CopyToClipboard} from "react-copy-to-clipboard";
+import EmojiPicker from 'emoji-picker-react';
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post},ref) => {
     const [isPopupVisible, setIsVisible] = useState(false)
@@ -45,6 +46,7 @@ const PostDetails = forwardRef(({post},ref) => {
     const [sortMethod,setMethod] = useState(true)
     const [lastKey,setLastKey] = useState({})
     const myText = useRef(null)
+    const emojiRef = useRef(null)
     const actionSheet = useRef()
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const {showUserPopup} = useContext(detailsContext)
@@ -309,6 +311,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                   setMaskVisible(false)
                                   }}
                               afterClose={() => {
+                                  emojiRef.current.hide()
                                   setUploadImage(false)
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
@@ -367,7 +370,18 @@ const PostDetails = forwardRef(({post},ref) => {
                                     <PictureOutline style={{fontSize:22}} onClick={()=>{
                                         setMaskVisible(true)
                                         setUploadImage(true)}} />
-                                    <SmileOutline style={{fontSize:22}} />
+                                    <Popover
+                                        content={<EmojiPicker
+                                            height={300}
+                                            previewConfig={{showPreview:false}}
+                                            onEmojiClick={value => {
+                                            emojiRef.current.hide()
+                                            setTextContent(text => text + value.emoji)}} />}
+                                        trigger='click'
+                                        ref={emojiRef}
+                                    >
+                                        <SmileOutline style={{fontSize:22}} onClick={() => setMaskVisible(true)} />
+                                    </Popover>
                                 </Space>
                                 <Button disabled={btnDisable || (textContent.length === 0 && fileList.length === 0)} size='mini' color='primary' onClick={submitReply}>评论</Button>
                             </div>

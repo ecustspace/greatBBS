@@ -8,7 +8,7 @@ import {likeListContext} from "@/app/(app)/layout";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {level, share, timeConclude} from "@/app/component/function";
 import {like} from "@/app/api/serverAction";
-import {CopyToClipboard} from "react-copy-to-clipboard/src";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
     const {likeList,addLike,replyLikeList,setReplyLikeList} = useContext(likeListContext)

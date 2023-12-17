@@ -138,18 +138,18 @@ const SendPost = forwardRef((props, ref) => {
                                 block
                                 color={"primary"}
                                 shape={"rounded"}
-                                size='small'
+                                size='middle'
                                 onClick={() => {
                                     localStorage.setItem('Anid',anid.toString())
                                     onSubmit()
                                     setDialogVisible(false)
                                 }}
                             >
-                                <div style={{ fontWeight: 'bolder', fontSize: 18 }}>确 认</div>
+                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>确 认</div>
                             </Button>
                             <Button onClick={
                                 () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='small' fill='outline' style={{ marginTop: '10px' }}>
-                                <div style={{ fontWeight: 'bolder', fontSize: 18 }}>取 消</div>
+                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>取 消</div>
                             </Button>
                         </>}
                 >

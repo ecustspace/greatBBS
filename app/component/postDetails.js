@@ -6,7 +6,7 @@ import {
     ImageUploader,
     InfiniteScroll,
     Mask,
-    NavBar, Popover,
+    NavBar,
     Popup,
     Space,
     TextArea,
@@ -43,10 +43,10 @@ const PostDetails = forwardRef(({post},ref) => {
     const [btnDisable,setDisable] = useState(false)
     const [replyList,setReplyList] = useState([])
     const [hasMore,setHasMore] = useState(false)
+    const [pickerVisible,setPickerVisible] = useState(false)
     const [sortMethod,setMethod] = useState(true)
     const [lastKey,setLastKey] = useState({})
     const myText = useRef(null)
-    const emojiRef = useRef(null)
     const actionSheet = useRef()
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const {showUserPopup} = useContext(detailsContext)
@@ -312,7 +312,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                   }}
                               afterClose={() => {
                                   lock(document.getElementById('postDetails'))
-                                  emojiRef.current.hide()
+                                  setPickerVisible(false)
                                   setUploadImage(false)
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
@@ -365,27 +365,24 @@ const PostDetails = forwardRef(({post},ref) => {
                                 style={isTextAreaFocus?{'--color':'black'}:{'--color':'#cccccc'}}
                             />
                         </div>
-
-                            <div style={{display:'flex',paddingBottom:'10px',paddingRight:'10px',marginLeft:'18px'}} >
+                        {pickerVisible ? <div style={{marginBottom:'12px'}}><EmojiPicker
+                            searchDisabled
+                            height={300}
+                            width='100%'
+                            previewConfig={{showPreview:false}}
+                            onEmojiClick={value => {
+                                lock(document.getElementById('postDetails'))
+                                setPickerVisible(false)
+                                setTextContent(text => text + value.emoji)}} /></div> : ''}
+                         <div style={{display:'flex',paddingBottom:'10px',paddingRight:'10px',marginLeft:'18px'}} >
                                 <Space style={{'--gap':'16px',flexGrow:1}}>
                                     <PictureOutline style={{fontSize:22}} onClick={()=>{
                                         setMaskVisible(true)
                                         setUploadImage(true)}} />
-                                    <Popover
-                                        content={<EmojiPicker
-                                            searchDisabled
-                                            previewConfig={{showPreview:false}}
-                                            onEmojiClick={value => {
-                                                lock(document.getElementById('postDetails'))
-                                            emojiRef.current.hide()
-                                            setTextContent(text => text + value.emoji)}} />}
-                                        trigger='click'
-                                        ref={emojiRef}
-                                    >
                                         <SmileOutline style={{fontSize:22}} onClick={() => {
                                             unlock(document.getElementById('postDetails'))
+                                            setPickerVisible(value => !value)
                                             setMaskVisible(true)}} />
-                                    </Popover>
                                 </Space>
                                 <Button disabled={btnDisable || (textContent.length === 0 && fileList.length === 0)} size='mini' color='primary' onClick={submitReply}>评论</Button>
                             </div>

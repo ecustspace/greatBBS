@@ -9,7 +9,7 @@ import {
     InfiniteScroll,
     Input,
     Mask,
-    NavBar, Popover,
+    NavBar,
     Popup,
     Space,
     TextArea,
@@ -45,6 +45,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     const [isMaskVisible,setMaskVisible] = useState(false)
     const [dialogVisible,setDialogVisible] = useState(false)
     const [btnDisable,setDisable] = useState(false)
+    const [pickerVisible,setPickerVisible] = useState(false)
     const [anid,setAnid] = useState('')
     const [textContent,setTextContent] = useState('')
     const [replyTo,setReplyTo] = useState({})
@@ -55,7 +56,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     const [lastKey,setLastKey] = useState({})
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const myText = useRef(null)
-    const emojiRef = useRef(null)
     useImperativeHandle(ref, () => {
         return {
             showPopup(){
@@ -384,7 +384,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                               }}
                               afterClose={() => {
                                   lock(document.getElementById('anPostDetails'))
-                                  emojiRef.current.hide()
+                                  setPickerVisible(false)
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')
@@ -414,27 +414,24 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 style={isTextAreaFocus?{'--color':'black'}:{'--color':'#cccccc'}}
                             />
                         </div>
-
+                        {pickerVisible ? <div style={{marginBottom:'12px'}}><EmojiPicker
+                            searchDisabled
+                            height={300}
+                            width='100%'
+                            previewConfig={{showPreview:false}}
+                            onEmojiClick={value => {
+                                lock(document.getElementById('postDetails'))
+                                setPickerVisible(false)
+                                setTextContent(text => text + value.emoji)}} /></div> : ''}
                         <div style={{display:'flex',paddingBottom:'10px',paddingRight:'10px',marginLeft:'18px'}} >
                             <Space style={{'--gap':'16px',flexGrow:1}}>
                                 <PictureOutline style={{fontSize:22}} onClick={()=> {
                                    Toast.show('树洞不可以发送图片')
                                 }} />
-                                <Popover
-                                    content={<EmojiPicker
-                                        searchDisabled
-                                        previewConfig={{showPreview:false}}
-                                        onEmojiClick={value => {
-                                            lock(document.getElementById('anPostDetails'))
-                                            emojiRef.current.hide()
-                                            setTextContent(text => text + value.emoji)}} />}
-                                    trigger='click'
-                                    ref={emojiRef}
-                                >
                                     <SmileOutline style={{fontSize:22}} onClick={() => {
                                         unlock(document.getElementById('anPostDetails'))
+                                        setPickerVisible(value => !value)
                                         setMaskVisible(true)}} />
-                                </Popover>
                             </Space>
                             <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary' onClick={submitReply}>评论</Button>
                         </div>

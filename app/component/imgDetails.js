@@ -325,7 +325,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                               }} />
                         {replyList.map(data => <ReplyCard
                             reply={data}
-                            type={post.PostType}
+                            type={'Image'}
                             avatarClick={() => {
                                 showUserPopup({
                                     name: data.PK.split('#')[1],

@@ -67,11 +67,11 @@ const PostDetails = forwardRef(({post,like},ref) => {
 
     useEffect(() => {
         if (!isPopupVisible) {
-            unlock(document.getElementById('imgDetails'))
+            unlock([document.getElementById('imgDetails'),document.getElementById('imgText')])
             return
         }
         let timer = setInterval(() => {
-            const element = document.getElementById('imgDetails');
+            const element = [document.getElementById('imgDetails'),document.getElementById('imgText')];
             if (element) {
                 lock(element)
                 clearInterval(timer)
@@ -355,7 +355,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                         <br />
                         <br />
                     </div>
-                    <div style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
+                    <div id='imgText' style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
                         <div style={{borderTop:'solid 0.5px lightgrey'}}></div>
                         <div style={{marginLeft:'10px',padding:'10px'}} >
                             <TextArea
@@ -379,7 +379,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                     setMaskVisible(true)
                                     setUploadImage(true)}} />
                                 <Popover
-                                    getContainer={document.getElementById('imgDetails')}
+                                    getContainer={document.getElementById('imgText')}
                                     content={<EmojiPicker
                                         height={300}
                                         previewConfig={{showPreview:false}}

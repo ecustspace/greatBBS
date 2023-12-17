@@ -69,11 +69,11 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
 
     useEffect(() => {
         if (!isPopupVisible) {
-            unlock(document.getElementById('anPostDetails'))
+            unlock([document.getElementById('anPostDetails'),document.getElementById('anPostText')])
             return
         }
         let timer = setInterval(() => {
-            const element = document.getElementById('anPostDetails');
+            const element = [document.getElementById('anPostDetails'),document.getElementById('anPostText')];
             if (element) {
                 lock(element)
                 clearInterval(timer)
@@ -396,7 +396,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         <br />
                         <br />
                     </div>
-                    <div style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
+                    <div id='anPostText' style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
                         <div style={{borderTop:'solid 0.5px lightgrey'}}></div>
                         <div style={{marginLeft:'10px',padding:'10px'}} >
                             <TextArea
@@ -420,7 +420,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                    Toast.show('树洞不可以发送图片')
                                 }} />
                                 <Popover
-                                    getContainer={document.getElementById('anPostDetails')}
+                                    getContainer={document.getElementById('anPostText')}
                                     content={<EmojiPicker
                                         previewConfig={{showPreview:false}}
                                         height={300}

@@ -223,7 +223,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     name={names[index]}
                     replyToName={replyName === null ? undefined : replyName}
                     reply={data.data[i]}
-                    type={post.PostType}
+                    type={'AnPost'}
                     onClickReply={()=>{
                         setReplyTo(
                             {

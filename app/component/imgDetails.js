@@ -379,6 +379,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                     setMaskVisible(true)
                                     setUploadImage(true)}} />
                                 <Popover
+                                    getContainer={document.getElementById('imgDetails')}
                                     content={<EmojiPicker
                                         height={300}
                                         previewConfig={{showPreview:false}}

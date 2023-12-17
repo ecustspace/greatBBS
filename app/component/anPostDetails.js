@@ -420,6 +420,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                    Toast.show('树洞不可以发送图片')
                                 }} />
                                 <Popover
+                                    getContainer={document.getElementById('anPostDetails')}
                                     content={<EmojiPicker
                                         previewConfig={{showPreview:false}}
                                         height={300}

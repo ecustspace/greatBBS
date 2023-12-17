@@ -311,6 +311,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                   setMaskVisible(false)
                                   }}
                               afterClose={() => {
+                                  lock(document.getElementById('postDetails'))
                                   emojiRef.current.hide()
                                   setUploadImage(false)
                                   if(replyTo.reply_name) {
@@ -347,7 +348,7 @@ const PostDetails = forwardRef(({post},ref) => {
                             <br />
                             <br />
                         </div>
-                    <div id='postText' style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
+                    <div style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
                         <div style={{borderTop:'solid 0.5px lightgrey'}}></div>
                         <div style={{marginLeft:'10px',padding:'10px'}} >
                             <TextArea
@@ -371,19 +372,18 @@ const PostDetails = forwardRef(({post},ref) => {
                                         setMaskVisible(true)
                                         setUploadImage(true)}} />
                                     <Popover
-                                        getContainer={document.getElementById('postText')}
                                         content={<EmojiPicker
                                             height={300}
                                             previewConfig={{showPreview:false}}
                                             onEmojiClick={value => {
-                                                unlock(document.getElementById('postText'))
+                                                lock(document.getElementById('postText'))
                                             emojiRef.current.hide()
                                             setTextContent(text => text + value.emoji)}} />}
                                         trigger='click'
                                         ref={emojiRef}
                                     >
                                         <SmileOutline style={{fontSize:22}} onClick={() => {
-                                            lock(document.getElementById('postText'))
+                                            unlock(document.getElementById('postDetails'))
                                             setMaskVisible(true)}} />
                                     </Popover>
                                 </Space>

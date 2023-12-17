@@ -67,11 +67,11 @@ const PostDetails = forwardRef(({post,like},ref) => {
 
     useEffect(() => {
         if (!isPopupVisible) {
-            unlock([document.getElementById('imgDetails'),document.getElementById('imgText')])
+            unlock(document.getElementById('imgDetails'))
             return
         }
         let timer = setInterval(() => {
-            const element = [document.getElementById('imgDetails'),document.getElementById('imgText')];
+            const element = document.getElementById('imgDetails');
             if (element) {
                 lock(element)
                 clearInterval(timer)

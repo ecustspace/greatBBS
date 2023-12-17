@@ -65,11 +65,11 @@ const PostDetails = forwardRef(({post},ref) => {
 
     useEffect(() => {
         if (!isPopupVisible) {
-            unlock([document.getElementById('postDetails'),document.getElementById('postText')])
+            unlock(document.getElementById('postDetails'))
             return
         }
         let timer = setInterval(() => {
-            const element = [document.getElementById('postDetails'),document.getElementById('postText')];
+            const element = document.getElementById('postDetails');
             if (element) {
                 lock(element)
                 clearInterval(timer)
@@ -376,12 +376,15 @@ const PostDetails = forwardRef(({post},ref) => {
                                             height={300}
                                             previewConfig={{showPreview:false}}
                                             onEmojiClick={value => {
+                                                unlock(document.getElementById('postText'))
                                             emojiRef.current.hide()
                                             setTextContent(text => text + value.emoji)}} />}
                                         trigger='click'
                                         ref={emojiRef}
                                     >
-                                        <SmileOutline style={{fontSize:22}} onClick={() => setMaskVisible(true)} />
+                                        <SmileOutline style={{fontSize:22}} onClick={() => {
+                                            lock(document.getElementById('postText'))
+                                            setMaskVisible(true)}} />
                                     </Popover>
                                 </Space>
                                 <Button disabled={btnDisable || (textContent.length === 0 && fileList.length === 0)} size='mini' color='primary' onClick={submitReply}>评论</Button>

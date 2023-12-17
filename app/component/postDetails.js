@@ -373,6 +373,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                         setUploadImage(true)}} />
                                     <Popover
                                         content={<EmojiPicker
+                                            searchDisabled
                                             previewConfig={{showPreview:false}}
                                             onEmojiClick={value => {
                                                 lock(document.getElementById('postDetails'))

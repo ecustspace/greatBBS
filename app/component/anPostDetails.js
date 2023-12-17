@@ -422,6 +422,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 }} />
                                 <Popover
                                     content={<EmojiPicker
+                                        searchDisabled
                                         previewConfig={{showPreview:false}}
                                         onEmojiClick={value => {
                                             lock(document.getElementById('anPostDetails'))

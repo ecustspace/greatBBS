@@ -433,6 +433,15 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     <Form.Item
                         label='匿名密钥'
                         name='anid'
+                        extra={<CopyToClipboard text={localStorage.getItem('Anid')}
+                                                onCopy={() => Toast.show('匿名密钥已复制到剪切板')}>
+                            <Button
+                                size='small'
+                                block
+                                color='primary'
+                                fill='none'
+                                >复制</Button>
+                        </CopyToClipboard>}
                     >
                         <Input placeholder='为空则默认不修改'/>
                     </Form.Item>

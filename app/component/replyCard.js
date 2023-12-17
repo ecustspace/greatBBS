@@ -8,7 +8,7 @@ import {SwitchLike} from "@/app/component/postCard";
 import {Report} from "@/app/api/serverAction";
 
 
-export default function ReplyCard({name,reply,onClickReply,replyToName,operate,onClick,avatarClick}) {
+export default function ReplyCard({name,reply,onClickReply,replyToName,operate,onClick,avatarClick,type}) {
     const ref = useRef(null)
     const [isExceed,setExceed] = useState(false)
     const [isExtend,setExtend] = useState(false)
@@ -57,7 +57,7 @@ export default function ReplyCard({name,reply,onClickReply,replyToName,operate,o
                                     PK={reply.PK}
                                     SK={reply.SK}
                                     postID={reply.ReplyID}
-                                    reply />
+                                    reply={type} />
                         <ExclamationCircleOutline
                             onClick={(e) => {
                                 e.stopPropagation()

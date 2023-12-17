@@ -1,6 +1,6 @@
 'use client'
 
-import {Avatar} from "antd-mobile";
+import {Avatar, Toast} from "antd-mobile";
 import Ellipsis from "@/app/component/ellipsis"
 import {HeartFill, HeartOutline, MessageOutline, MoreOutline, UploadOutline} from "antd-mobile-icons";
 import {useContext, useEffect, useState} from "react";
@@ -8,6 +8,7 @@ import {likeListContext} from "@/app/(app)/layout";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {level, share, timeConclude} from "@/app/component/function";
 import {like} from "@/app/api/serverAction";
+import {CopyToClipboard} from "react-copy-to-clipboard/src";
 
 export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
     const {likeList,addLike,replyLikeList,setReplyLikeList} = useContext(likeListContext)
@@ -17,12 +18,12 @@ export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
                 setLikeCount(initialLikeCount)
             }
     },[])
-    if(!(reply ? replyLikeList.includes(postID) : likeList.includes(postID))) {
+    if(!(reply ? replyLikeList[reply].includes(postID) : likeList.includes(postID))) {
         return(
         <div style={{display:"flex",alignItems:"center",justifyContent:"center"}} onClick={(event) => event.stopPropagation()}>
             <HeartOutline onClick={
                 () => {
-                    reply ? setReplyLikeList([...replyLikeList,postID]) : addLike([postID])
+                    reply ? setReplyLikeList[reply]([...replyLikeList[reply],postID]) : addLike([postID])
                     like(document.cookie,PK,SK,localStorage.getItem('Avatar')).then(res => {
                         if (res === 200) {
                             if (typeof initialLikeCount === "number") {
@@ -72,11 +73,12 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
                                     <MessageOutline />
                                     <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{post.ReplyCount}</div>
                                 </div>
-                        <UploadOutline onClick={(e) => {
-                            share(post)
-                            e.stopPropagation()
-                        }} />
-
+                        <div onClick={e => e.stopPropagation()}>
+                            <CopyToClipboard text={share(post)}
+                                             onCopy={() => Toast.show('分享链接已复制到剪切板')}>
+                                <UploadOutline />
+                            </CopyToClipboard>
+                        </div>
                     </div>
                 </div>
             </div>

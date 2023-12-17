@@ -26,7 +26,7 @@ export async function POST(request){
         return NextResponse.json({tip:'登录信息过期,请重新登录',status:401})
     }
 
-    const couldChangeAnid = typeof user_item.LastChangeAnid.time != 'number' ? true : ((now - user_item.LastChangeAnid.time) >= 3600 * 1000 * 24 * 7)
+    const couldChangeAnid = user_item.LastChangeAnid == null ? true : ((now - user_item.LastChangeAnid.time) >= 3600 * 1000 * 24 * 7)
     let update = {UpdateExpression:'SET ',ExpressionAttributeValues:{}}
     let tip = ''
     if (user_item.Avatar !== data.avatar) {

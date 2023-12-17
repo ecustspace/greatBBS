@@ -19,7 +19,9 @@ export const messageCountContext = createContext(null)
 export default function RootLayout({ post,message,user }) {
     const pages = [<>{post}</>,<>{message}</>,<>{user}</>]
     const [likeList,setLikeList] = useState([])
-    const [replyLikeList,setReplyLikeList] = useState([])
+    const [replyLikePostList,setReplyPostLikeList] = useState([])
+    const [replyLikeAnPostList,setReplyAnPostLikeList] = useState([])
+    const [replyLikeImgList,setReplyImgLikeList] = useState([])
     const [focusPost,setFocusPost] = useState({})
     const [focusAnPost,setFocusAnPost] = useState({})
     const [focusImg,setFocusImg] = useState({})
@@ -39,8 +41,16 @@ export default function RootLayout({ post,message,user }) {
     const like = {
         likeList,
         addLike,
-        replyLikeList,
-        setReplyLikeList
+        replyLikeList: {
+            Post: replyLikePostList,
+            AnPost: replyLikeAnPostList,
+            Image: replyLikeImgList
+        },
+        setReplyLikeList: {
+            Post: setReplyPostLikeList,
+            AnPost: setReplyAnPostLikeList,
+            Image: setReplyImgLikeList
+        }
     }
 
     const showPostPopup = (post)=> {

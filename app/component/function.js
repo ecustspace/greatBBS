@@ -106,15 +106,13 @@ export function showLoginModal(onSubmit,loginSuccess) {
 
 export function share (post) {
     if (post.PostType !== 'AnPost') {
-        navigator.clipboard.writeText(`${post.PK}发布了帖子：` +
+         return (`${post.PK}发布了帖子：` +
             `${post.Content.length > 10 ? post.Content.slice(0, 10) + '...' : post.Content}
-快去看看吧：${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
-            .then(() => {Toast.show('分享链接已复制到剪切板')})
+${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
     } else {
-        navigator.clipboard.writeText(`树洞#${post.PostID}：` +
+        return (`树洞#${post.PostID}：` +
             `${post.Content.length > 10 ? post.Content.slice(0, 10) + '...' : post.Content}
-快去看看吧：${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
-            .then(() => {Toast.show('分享链接已复制到剪切板')})
+${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
     }
 }
 

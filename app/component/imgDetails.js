@@ -30,6 +30,7 @@ import Ellipsis from "@/app/component/ellipsis";
 import {detailsContext, likeListContext} from "@/app/(app)/layout";
 import {ContactTa, getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
+import {CopyToClipboard} from "react-copy-to-clipboard/src";
 
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post,like},ref) => {
@@ -63,7 +64,6 @@ const PostDetails = forwardRef(({post,like},ref) => {
     },[]);
 
     useEffect(() => {
-        setReplyLikeList([])
         if (!isPopupVisible) {
             unlock(document.getElementById('imgDetails'))
             return
@@ -130,6 +130,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
     },[post,sortMethod])
 
     useEffect(() => {
+        setReplyLikeList.Image([])
         setTextContent('')
         setReplyTo({})
     },[post])
@@ -209,7 +210,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                 data.data[0].ReplyID,
                 data.data[data.data.length - 1].ReplyID,
                 post.PostID).then(res => {
-                setReplyLikeList([...replyLikeList,...res.map(item => {
+                setReplyLikeList.Image([...replyLikeList.Image,...res.map(item => {
                     return item.SK
                 })])
             }).catch(err => {console.log(err)}) }
@@ -265,10 +266,10 @@ const PostDetails = forwardRef(({post,like},ref) => {
                             <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>
                                 <LoopOutline style={{fontSize:20 ,marginLeft:6}} onClick={() => setMethod(sortMethod => !sortMethod)} />
                                 <SwitchLike size={20} postID={post.PostID} PK={post.PK} SK={post.SK}/>
-                                <UploadOutline style={{fontSize:20}}  onClick={(e) => {
-                                    share(post)
-                                    e.stopPropagation()
-                                }}/>
+                                <CopyToClipboard text={typeof post.PostType == 'string' ? share(post) : ''}
+                                                 onCopy={() => Toast.show('分享链接已复制到剪切板')}>
+                                    <UploadOutline style={{fontSize:20}} />
+                                </CopyToClipboard>
                             </Space>
                             <Space style={{'--gap':'16px',margin:8}}>
                                 <UserAddOutline style={{fontSize:20}} onClick={() => {
@@ -324,6 +325,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                               }} />
                         {replyList.map(data => <ReplyCard
                             reply={data}
+                            type={post.PostType}
                             avatarClick={() => {
                                 showUserPopup({
                                     name: data.PK.split('#')[1],

@@ -74,7 +74,7 @@ const PostDetails = forwardRef(({post},ref) => {
                 lock(element)
                 clearInterval(timer)
             }
-        },1000)
+        },250)
         return () => {clearInterval(timer)}
     },[isPopupVisible])
 
@@ -373,10 +373,9 @@ const PostDetails = forwardRef(({post},ref) => {
                                         setUploadImage(true)}} />
                                     <Popover
                                         content={<EmojiPicker
-                                            height={300}
                                             previewConfig={{showPreview:false}}
                                             onEmojiClick={value => {
-                                                lock(document.getElementById('postText'))
+                                                lock(document.getElementById('postDetails'))
                                             emojiRef.current.hide()
                                             setTextContent(text => text + value.emoji)}} />}
                                         trigger='click'

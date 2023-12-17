@@ -78,7 +78,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                 lock(element)
                 clearInterval(timer)
             }
-        },1000)
+        },250)
         return () => {clearInterval(timer)}
     },[isPopupVisible])
     function operateClick(post) {
@@ -383,6 +383,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                   setMaskVisible(false)
                               }}
                               afterClose={() => {
+                                  lock(document.getElementById('anPostDetails'))
                                   emojiRef.current.hide()
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
@@ -396,7 +397,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         <br />
                         <br />
                     </div>
-                    <div id='anPostText' style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
+                    <div style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
                         <div style={{borderTop:'solid 0.5px lightgrey'}}></div>
                         <div style={{marginLeft:'10px',padding:'10px'}} >
                             <TextArea
@@ -420,17 +421,18 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                    Toast.show('树洞不可以发送图片')
                                 }} />
                                 <Popover
-                                    getContainer={document.getElementById('anPostText')}
                                     content={<EmojiPicker
                                         previewConfig={{showPreview:false}}
-                                        height={300}
                                         onEmojiClick={value => {
+                                            lock(document.getElementById('anPostDetails'))
                                             emojiRef.current.hide()
                                             setTextContent(text => text + value.emoji)}} />}
                                     trigger='click'
                                     ref={emojiRef}
                                 >
-                                    <SmileOutline style={{fontSize:22}} onClick={() => setMaskVisible(true)} />
+                                    <SmileOutline style={{fontSize:22}} onClick={() => {
+                                        unlock(document.getElementById('anPostDetails'))
+                                        setMaskVisible(true)}} />
                                 </Popover>
                             </Space>
                             <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary' onClick={submitReply}>评论</Button>

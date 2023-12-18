@@ -11,6 +11,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import {useSearchParams} from "next/navigation";
 import {getUserCount} from "@/app/api/serverAction";
 import {v4} from "uuid";
+import Counter from "@/app/component/counter";
 
 export default function Home() {
     const [psw, setPsw] = useState('');
@@ -197,7 +198,7 @@ export default function Home() {
                 <h1>注册账号</h1>
             </AutoCenter>
             <AutoCenter>
-                <div style={{color:"grey"}}>已有{userCount}名Ecuster注册</div>
+                <div style={{color:"grey"}}>已有<Counter counts={userCount} />名Ecuster注册</div>
             </AutoCenter>
             <Form
                 form={form}

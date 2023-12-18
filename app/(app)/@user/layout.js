@@ -32,6 +32,7 @@ import {feedBack, getUserData} from "@/app/api/serverAction";
 import ReCAPTCHA from "react-google-recaptcha";
 import {sha256} from "js-sha256";
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import Counter from "@/app/component/counter";
 
 export default function RootLayout({userReply,userLike,userPost}) {
     const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>]
@@ -223,21 +224,21 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     setIndex(0)
                     setPopupVisible(true)
                 }}>
-                    <div className='count'>{userData.count[0]}</div>
+                    <div className='count'><Counter counts={userData.count[0]} /></div>
                     <div className='name'>发布</div>
                 </div>
                 <div className='postData' onClick={() => {
                     setIndex(1)
                     setPopupVisible(true)
                 }}>
-                    <div className='count'>{userData.count[1]}</div>
+                    <div className='count'><Counter counts={userData.count[1]} /></div>
                     <div className='name'>评论</div>
                 </div>
                 <div className='postData' onClick={() => {
                     setIndex(2)
                     setPopupVisible(true)
                 }}>
-                    <div className='count'>{userData.count[2]}</div>
+                    <div className='count'><Counter counts={userData.count[2]} /></div>
                     <div className='name'>点赞</div>
                 </div>
             </div>

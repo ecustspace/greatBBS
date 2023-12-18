@@ -311,7 +311,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                             </>
                         }
                     >
-                        <Input placeholder='匿名密钥' onChange={setAnid}/>
+                        <Input placeholder='请输入' onChange={setAnid}/>
                     </Form.Item>
                 </Form>
             </CenterPopup>

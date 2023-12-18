@@ -245,7 +245,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                 }
                             }></Avatar>
                             <div style={{flexGrow:1,position:"relative"}}>
-                                <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{post.PK}<span style={{fontSize:"small",color:"gray"}}>{(typeof post.UserScore == 'number' ? ` ${level(post.UserScore)}` : '')}</span></div>
+                                <div style={{fontWeight:'bold',fontSize:"medium",top:4,position:"absolute"}}>{post.PK}<span style={{fontSize:"small",color:"gray"}}>{(typeof post.UserScore == 'number' ? ` ${level(post.UserScore)}` : '')}</span></div>
                                 <div style={{
                                     fontSize:'small',color:"gray",
                                     position:"absolute",

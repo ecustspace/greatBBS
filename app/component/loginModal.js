@@ -63,7 +63,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             <div style={{ fontWeight: 'bolder', fontSize: "small" }}>登 录</div>
                         </Button>
                         <Button onClick={
-                            () => {window.location.replace('/signup')}} block color={"default"} shape={"rounded"} size='middle' fill='outline' style={{ marginTop: '10px' }}>
+                            () => {window.location.replace('/signup')}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
                             <div style={{ fontWeight: 'bolder', fontSize: "small" }}>注 册</div>
                         </Button>
                     </>

@@ -148,7 +148,7 @@ const SendPost = forwardRef((props, ref) => {
                                 <div style={{ fontWeight: 'bolder', fontSize: "small" }}>确 认</div>
                             </Button>
                             <Button onClick={
-                                () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='middle' fill='outline' style={{ marginTop: '10px' }}>
+                                () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
                                 <div style={{ fontWeight: 'bolder', fontSize: "small" }}>取 消</div>
                             </Button>
                         </>}

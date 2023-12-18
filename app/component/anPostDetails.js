@@ -295,7 +295,9 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 <div style={{ fontWeight: 'bolder', fontSize: "small" }}>确 认</div>
                             </Button>
                             <Button onClick={
-                                () => {setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='middle' fill='outline' style={{ marginTop: '10px' }}>
+                                () => {
+                                    setDisable(false)
+                                    setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
                                 <div style={{ fontWeight: 'bolder', fontSize: "small" }}>取 消</div>
                             </Button>
                         </>}
@@ -331,7 +333,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                             <div style={{display:'flex'}}>
                                 <Avatar src={post.Avatar} style={{'--size': '54px',marginRight:18}}></Avatar>
                                 <div style={{flexGrow:1,position:"relative"}}>
-                                    <div style={{fontWeight:'bold',fontSize:18,top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
+                                    <div style={{fontWeight:'bold',fontSize:"medium",top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
                                     <div style={{
                                         fontSize:'small',color:"gray",
                                         position:"absolute",

@@ -277,7 +277,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     "--z-index":1001,
                     '--border-radius':'16px'}}
             >
-                <AutoCenter><div style={{fontSize:'large',padding:'9px'}}>请输入匿名密钥</div></AutoCenter>
+                <AutoCenter><div style={{fontWeight:"bold",fontSize:'large',padding:'9px'}}>请输入匿名密钥</div></AutoCenter>
                 <Form
                     footer={
                         <>

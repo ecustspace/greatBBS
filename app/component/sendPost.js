@@ -209,22 +209,22 @@ const SendPost = forwardRef((props, ref) => {
                                 value: 2,
                             },
                         ]}
-                        defaultValue={[0]}
+                        value={[activePart]}
                         onChange={(value) => {
+                            if (value.length) {
+                                setPart(value[0])
+                            }
                             if (value[0] === 0) {
                                 setShowUpload(true)
                                 setMaxLength(500)
-                                setPart(value[0])
                             }
                             else if (value[0] === 1) {
                                 setShowUpload(false)
                                 setMaxLength(500)
-                                setPart(value[0])
                             }
-                            else {
+                            else if (value[0] === 2) {
                                 setShowUpload(true)
                                 setMaxLength(50)
-                                setPart(value[0])
                             }
                         }}
                     />

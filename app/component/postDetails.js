@@ -308,12 +308,12 @@ const PostDetails = forwardRef(({post},ref) => {
                               visible={isMaskVisible}
                               opacity='thin'
                               onMaskClick={()=> {
+                                  setPickerVisible(false)
+                                  setUploadImage(false)
                                   setMaskVisible(false)
                                   }}
                               afterClose={() => {
                                   lock(document.getElementById('postDetails'))
-                                  setPickerVisible(false)
-                                  setUploadImage(false)
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')
@@ -384,7 +384,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                             setPickerVisible(value => !value)
                                             setMaskVisible(true)}} />
                                 </Space>
-                                <Button disabled={btnDisable || (textContent.length === 0 && fileList.length === 0)} size='mini' color='primary' onClick={submitReply}>评论</Button>
+                                <Button disabled={btnDisable || (textContent.length === 0 && ((fileList.length === 0 && uploadImage) || !uploadImage))} size='mini' color='primary' onClick={submitReply}>评论</Button>
                             </div>
                         {uploadImage? <ImageUploader
                             maxCount={3}

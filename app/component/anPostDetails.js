@@ -382,11 +382,11 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                               visible={isMaskVisible}
                               opacity='thin'
                               onMaskClick={()=> {
+                                  setPickerVisible(false)
                                   setMaskVisible(false)
                               }}
                               afterClose={() => {
                                   lock(document.getElementById('anPostDetails'))
-                                  setPickerVisible(false)
                                   if(replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')

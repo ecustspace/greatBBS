@@ -47,3 +47,10 @@ h1 {
     margin-right: 30px;
     margin-bottom: 8px;
 }
+
+.text {
+    color: #999999;
+    font-family: -apple-system, blinkmacsystemfont, 'Helvetica Neue',
+    helvetica, segoe ui, arial, roboto, 'PingFang SC', 'miui',
+    'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+}

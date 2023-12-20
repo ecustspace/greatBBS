@@ -13,10 +13,10 @@ export async function POST(request) {
     const jwtSecret = process.env.JWT_SECRET
     const user_item = await getUserIDItem(data.useremail)
     if (user_item === 500 || !user_item){
-        return NextResponse.json({tip:'用户不存在',status:500})
+        return NextResponse.json({tip:'用户名或密码错误',status:500})
     }
     if (data.password !== user_item.Password.toString()) {
-        return NextResponse.json({tip:'密码错误',status:500})
+        return NextResponse.json({tip:'用户名或密码错误',status:500})
     }
     const token = (Date.now() + 1000*3600*24*7) + '#' + v4()
     const user_ = await docClient.send(new UpdateCommand({

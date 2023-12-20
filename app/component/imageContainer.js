@@ -17,7 +17,7 @@ export function ImageContainer({list,from,style}) {
             <div className="foo">
                 <div style={{...style, display: 'flex', width: '100%', flexWrap: "wrap"}} ref={ref}>
                     {list.map((item, index) => (
-                        <PhotoView key={index} src={imageUrl + from + '-' + index + '.' + item}>
+                        <PhotoView key={from + '-' + index + '.' + item} src={imageUrl + from + '-' + index + '.' + item}>
                             <Image
                                 placeholder={<Skeleton animated style={list.length >= 3 ? {
                                         '--width': `${width / 3 - 2}px`,
@@ -60,7 +60,7 @@ export function ImageSwiper({
         <Swiper>
             {list.map((item,index) => {
                 return <Swiper.Item key={item.id}>
-                    <PhotoView key={index} src={imageUrl + from + '-' + index + '.' + list[index]}>
+                    <PhotoView key={from + '-' + index + '.' + list[index]} src={imageUrl + from + '-' + index + '.' + list[index]}>
                     <Image
                         height={250}
                         alt=''

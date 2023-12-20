@@ -240,7 +240,9 @@ export async function decreaseUserScore(username,type,time) {
                 ':default': 0
             }
         }
-        await docClient.send(new UpdateCommand(update))
+        await docClient.send(new UpdateCommand(update)).catch(err => {
+            console.log(err)
+        })
     }
 }
 

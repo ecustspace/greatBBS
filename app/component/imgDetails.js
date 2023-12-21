@@ -78,7 +78,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
             const element = document.getElementById('imgDetails');
             if (element) {
                 let hammertime = new Hammer(document.getElementById("imgDetails"));
-                hammertime.on("panright", function () {
+                hammertime.on("swiperigh", function () {
                     setIsVisible(false)
                 });
                 lock(element)

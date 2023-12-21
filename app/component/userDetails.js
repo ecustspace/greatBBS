@@ -29,7 +29,7 @@ const UserDetails = forwardRef(({user},ref) => {
             const element = document.getElementById('userDetails');
             if (element) {
                 let hammertime = new Hammer(document.getElementById("userDetails"));
-                hammertime.on("panright", function () {
+                hammertime.on("swiperigh", function () {
                     setIsVisible(false)
                 });
                 lock(element)

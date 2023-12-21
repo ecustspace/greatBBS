@@ -7,6 +7,7 @@ import Ellipsis from "@/app/component/ellipsis";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext} from "@/app/(app)/layout";
 import {lock, unlock} from "tua-body-scroll-lock";
+import Hammer from "hammerjs";
 
 const { Step } = Steps
 
@@ -27,10 +28,14 @@ const UserDetails = forwardRef(({user},ref) => {
         let timer = setInterval(() => {
             const element = document.getElementById('userDetails');
             if (element) {
+                let hammertime = new Hammer(document.getElementById("userDetails"));
+                hammertime.on("pan", function () {
+                    setIsVisible(false)
+                });
                 lock(element)
                 clearInterval(timer)
             }
-        },1000)
+        },250)
         return () => {clearInterval(timer)}
     },[isVisible])
 

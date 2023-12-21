@@ -1,13 +1,23 @@
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
-import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3, updateUserScore, uploadImage} from "@/app/api/server";
+import {
+    docClient,
+    getUserItem,
+    isBan,
+    recaptchaVerify_v2,
+    updateUserScore,
+    uploadImage
+} from "@/app/api/server";
 import {revalidateTag} from "next/cache";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
+    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     if (data.images.length > 3 || !dataLengthVerify(1,500,data.text)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
@@ -28,15 +38,6 @@ export async function POST(request) {
     const is_ban = await isBan(username)
     if (is_ban !== false) {
         return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
-    }
-
-    if (typeof isHuman != 'number') {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
-    }
-
-    if (isHuman < 0.3) {
-        await ban(username,(now/1000 + 60*60*2))
-        return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
     }
     const updatePostCountCommand = new UpdateCommand({
         TableName:'User',

@@ -1,14 +1,17 @@
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
-import {ban, docClient, getUserItem, isBan, recaptchaVerify_v3} from "@/app/api/server";
+import { docClient, getUserItem, isBan, recaptchaVerify_v2 } from "@/app/api/server";
 import {sha256} from "js-sha256";
 import {revalidateTag} from "next/cache";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v3(data.recaptchaToken)
+    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    if (isHuman !== true) {
+        return NextResponse.json({tip:'未通过人机验证',status:500})
+    }
     if (!dataLengthVerify(1,500,data.text)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
@@ -30,16 +33,6 @@ export async function POST(request) {
     if (is_ban !== false) {
         return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
     }
-
-    if (typeof isHuman !== 'number') {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
-    }
-
-    if (isHuman < 0.5) {
-        await ban(username,(now/1000 + 60*60*2))
-        return NextResponse.json({tip:'违规操作，已被禁言2小时',status:500})
-    }
-
     if (!data.isAnonymity) {
         return NextResponse.json({tip:'匿名密钥错误',status:500})
     } else {

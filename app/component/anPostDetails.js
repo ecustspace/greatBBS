@@ -27,15 +27,17 @@ import {
     UserOutline
 } from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
-import {names} from "@/app/(app)/clientConfig";
+import {names, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {SwitchLike} from "@/app/component/postCard";
-import {recaptchaExecute, responseHandle, share, timeConclude} from "@/app/component/function";
+import { responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
 import {likeListContext} from "@/app/(app)/layout";
 import {CopyToClipboard} from "react-copy-to-clipboard";
 import EmojiPicker from "emoji-picker-react";
+import Hammer from "hammerjs";
+import ReCAPTCHA from "react-google-recaptcha";
 
 // eslint-disable-next-line react/display-name
 const AnPostDetails = forwardRef(({post,like},ref) => {
@@ -56,6 +58,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     const [lastKey,setLastKey] = useState({})
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const myText = useRef(null)
+    const captchaRef = useRef(null)
     useImperativeHandle(ref, () => {
         return {
             showPopup(){
@@ -75,6 +78,10 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
         let timer = setInterval(() => {
             const element = document.getElementById('anPostDetails');
             if (element) {
+                let hammertime = new Hammer(document.getElementById("anPostDetails"));
+                hammertime.on("pan", function () {
+                    setIsVisible(false)
+                });
                 lock(element)
                 clearInterval(timer)
             }
@@ -123,7 +130,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
 
     function submitReply() {
         setDisable(true)
-        recaptchaExecute().then(token => {
+        captchaRef.current.executeAsync().then(token => {
             const data = {
                 post_name: post.PK,
                 post_time: post.SK,
@@ -155,6 +162,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
             }).then(res => {
                 return res.json()})
                 .then(data => {
+                    captchaRef.current.reset()
                     setDisable(false)
                     if (data.tip === '匿名密钥错误') {
                         localStorage.setItem('Anid','')
@@ -166,6 +174,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     }
                     responseHandle(data)
                 }).catch(() => {
+                captchaRef.current.reset()
                 setDisable(false)
                 Toast.show({
                     icon:"fail",
@@ -271,13 +280,24 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     }
     return (
         <>
+            <script>
+                window.recaptchaOptions = useRecaptchaNet: true
+            </script>
+            <ReCAPTCHA
+                sitekey={recaptcha_site_key_v2}
+                ref={captchaRef}
+                size="invisible"
+            />
             <CenterPopup
                 visible={dialogVisible}
                 style={{
-                    "--z-index":1001,
-                    '--border-radius':'16px'}}
+                    "--z-index": 1001,
+                    '--border-radius': '16px'
+                }}
             >
-                <AutoCenter><div style={{fontWeight:"bold",fontSize:'large',padding:'9px'}}>请输入匿名密钥</div></AutoCenter>
+                <AutoCenter>
+                    <div style={{fontWeight: "bold", fontSize: 'large', padding: '9px'}}>请输入匿名密钥</div>
+                </AutoCenter>
                 <Form
                     footer={
                         <>
@@ -287,18 +307,19 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                 shape={"rounded"}
                                 size='middle'
                                 onClick={() => {
-                                    localStorage.setItem('Anid',anid.toString())
+                                    localStorage.setItem('Anid', anid.toString())
                                     submitReply()
                                     setDialogVisible(false)
                                 }}
                             >
-                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>确 认</div>
+                                <div style={{fontWeight: 'bolder', fontSize: "small"}}>确 认</div>
                             </Button>
                             <Button onClick={
                                 () => {
                                     setDisable(false)
-                                    setDialogVisible(false)}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
-                                <div style={{ fontWeight: 'bolder', fontSize: "small" }}>取 消</div>
+                                    setDialogVisible(false)
+                                }} block color={"default"} shape={"rounded"} size='middle' style={{marginTop: '10px'}}>
+                                <div style={{fontWeight: 'bolder', fontSize: "small"}}>取 消</div>
                             </Button>
                         </>}
                 >
@@ -306,7 +327,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         label='匿名密钥'
                         help={
                             <>
-                                <div>请到上次注册/修改密钥的设备(浏览器)→打开我们的web app → 个人中心<UserOutline /> → 修改资料【匿名密钥】查看</div>
+                                <div>请到上次注册/修改密钥的设备(浏览器)→打开我们的web app → 个人中心<UserOutline/> → 修改资料【匿名密钥】查看</div>
                                 <div>上一次修改：{localStorage.getItem('LastChangeAnid') != null ? JSON.parse(localStorage.getItem('LastChangeAnid')).device : null}</div>
                             </>
                         }
@@ -322,51 +343,68 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                 }
                 }
                 visible={isPopupVisible}
-                bodyStyle={{height:'100%'}}
+                bodyStyle={{height: '100%'}}
             >
-                <div style={{display:'flex',flexDirection:'column',width:'100%',height:'100%'}}>
-                <NavBar onBack={() => setIsVisible(false)}>
-                    帖子详情
-                </NavBar>
-                    <div style={{overflowX:"scroll",flexGrow:1,position:'sticky'}} id='anPostDetails'>
+                <div style={{display: 'flex', flexDirection: 'column', width: '100%', height: '100%'}}>
+                    <NavBar onBack={() => setIsVisible(false)}>
+                        帖子详情
+                    </NavBar>
+                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='anPostDetails'>
                         <div className='postDetail'>
-                            <div style={{display:'flex'}}>
-                                <Avatar src={post.Avatar} style={{'--size': '54px',marginRight:18}}></Avatar>
-                                <div style={{flexGrow:1,position:"relative"}}>
-                                    <div style={{fontWeight:'bold',fontSize:"medium",top:4,position:"absolute"}}>{'树洞#' + post.PostID}</div>
+                            <div style={{display: 'flex'}}>
+                                <Avatar src={post.Avatar} style={{'--size': '54px', marginRight: 18}}></Avatar>
+                                <div style={{flexGrow: 1, position: "relative"}}>
                                     <div style={{
-                                        fontSize:'small',color:"gray",
-                                        position:"absolute",
-                                        bottom:5}}>{timeConclude(post.SK)}
+                                        fontWeight: 'bold',
+                                        fontSize: "medium",
+                                        top: 4,
+                                        position: "absolute"
+                                    }}>{'树洞#' + post.PostID}</div>
+                                    <div style={{
+                                        fontSize: 'small', color: "gray",
+                                        position: "absolute",
+                                        bottom: 5
+                                    }}>{timeConclude(post.SK)}
                                     </div>
                                 </div>
-                                <MoreOutline style={{ fontSize: 26 }} onClick={() => {operateClick(post)}} />
+                                <MoreOutline style={{fontSize: 26}} onClick={() => {
+                                    operateClick(post)
+                                }}/>
                             </div>
-                            <div style={{marginTop:'14px',fontSize:'medium',wordBreak:'break-word'}}>{post.Content}</div>
-                            {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/post/' + post.PostID} style={{marginTop:10}} /> : ''}
+                            <div style={{
+                                marginTop: '14px',
+                                fontSize: 'medium',
+                                wordBreak: 'break-word'
+                            }}>{post.Content}</div>
+                            {post.ImageList !== undefined ?
+                                <ImageContainer list={post.ImageList} from={'/post/' + post.PostID}
+                                                style={{marginTop: 10}}/> : ''}
                         </div>
-                        <div style={{display:'flex',borderBottom:'0.5px solid lightgrey'}}>
-                            <Space style={{margin:8,'--gap':'16px' ,flexGrow:1}}>
-                                <LoopOutline style={{fontSize:20 ,marginLeft:6}} onClick={() => setMethod(sortMethod => !sortMethod)} />
+                        <div style={{display: 'flex', borderBottom: '0.5px solid lightgrey'}}>
+                            <Space style={{margin: 8, '--gap': '16px', flexGrow: 1}}>
+                                <LoopOutline style={{fontSize: 20, marginLeft: 6}}
+                                             onClick={() => setMethod(sortMethod => !sortMethod)}/>
                                 <SwitchLike size={20} postID={post.PostID} PK={post.PK} SK={post.SK}/>
                                 <CopyToClipboard text={typeof post.PostType == 'string' ? share(post) : ''}
                                                  onCopy={() => Toast.show('分享链接已复制到剪切板')}>
-                                    <UploadOutline style={{fontSize:20}} />
+                                    <UploadOutline style={{fontSize: 20}}/>
                                 </CopyToClipboard>
                             </Space>
-                            <Space style={{'--gap':'16px',margin:8}}>
-                                <UserAddOutline style={{fontSize:20}} onClick={() => {
+                            <Space style={{'--gap': '16px', margin: 8}}>
+                                <UserAddOutline style={{fontSize: 20}} onClick={() => {
                                     Toast.show('树洞无法获取对方信息')
-                                }} />
-                                <ExclamationCircleOutline style={{fontSize:20,marginRight:6}} onClick={() => {
+                                }}/>
+                                <ExclamationCircleOutline style={{fontSize: 20, marginRight: 6}} onClick={() => {
                                     Dialog.confirm({
                                         content: '确认要举报该帖子吗',
                                         onConfirm: () => {
-                                            Report(document.cookie,post.PK,post.SK).then(
+                                            Report(document.cookie, post.PK, post.SK).then(
                                                 res => {
                                                     if (res === 200) {
                                                         alert('举报成功')
-                                                    } else {alert('举报失败')}
+                                                    } else {
+                                                        alert('举报失败')
+                                                    }
                                                 }
                                             )
                                         },
@@ -378,64 +416,70 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                             </Space>
                         </div>
                         <Mask className='textAreaMask'
-                              style={{'--z-index':1005}}
+                              style={{'--z-index': 1005}}
                               visible={isMaskVisible}
                               opacity='thin'
-                              onMaskClick={()=> {
+                              onMaskClick={() => {
                                   setPickerVisible(false)
                                   setMaskVisible(false)
                               }}
                               afterClose={() => {
                                   lock(document.getElementById('anPostDetails'))
-                                  if(replyTo.reply_name) {
+                                  if (replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')
                                   }
-                              }} />
+                              }}/>
                         {replyList}
-                        <InfiniteScroll loadMore={getReply} hasMore={hasMore} />
-                        <br />
-                        <br />
-                        <br />
-                        <br />
+                        <InfiniteScroll loadMore={getReply} hasMore={hasMore}/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
                     </div>
-                    <div style={{position: 'sticky',bottom:0,width:'100%',zIndex:1006,backgroundColor:'white'}} >
-                        <div style={{borderTop:'solid 0.5px lightgrey'}}></div>
-                        <div style={{marginLeft:'10px',padding:'10px'}} >
+                    <div style={{position: 'sticky', bottom: 0, width: '100%', zIndex: 1006, backgroundColor: 'white'}}>
+                        <div style={{borderTop: 'solid 0.5px lightgrey'}}></div>
+                        <div style={{marginLeft: '10px', padding: '10px'}}>
                             <TextArea
-                                placeholder={'reply to ' + (replyTo.reply_name ? (replyTo.reply_name+'#'+replyTo.reply_id) : '楼主：')}
-                                autoSize= {!isTextAreaFocus? { minRows: 1, maxRows: 1 } : { minRows: 3, maxRows: 5 }}
+                                placeholder={'reply to ' + (replyTo.reply_name ? (replyTo.reply_name + '#' + replyTo.reply_id) : '楼主：')}
+                                autoSize={!isTextAreaFocus ? {minRows: 1, maxRows: 1} : {minRows: 3, maxRows: 5}}
                                 ref={myText}
-                                onFocus={() => {setFocus(true);setMaskVisible(true)}}
+                                onFocus={() => {
+                                    setFocus(true);
+                                    setMaskVisible(true)
+                                }}
                                 onBlur={() => setFocus(false)}
                                 onChange={setTextContent}
-                                value={!isTextAreaFocus?
-                                    `reply to ${replyTo.reply_name ? (replyTo.reply_name+'#'+replyTo.reply_id) : '楼主'}：${(textContent.length > 10 ? textContent.slice(0,10) + '...' : textContent)}`
+                                value={!isTextAreaFocus ?
+                                    `reply to ${replyTo.reply_name ? (replyTo.reply_name + '#' + replyTo.reply_id) : '楼主'}：${(textContent.length > 10 ? textContent.slice(0, 10) + '...' : textContent)}`
                                     :
                                     textContent}
-                                style={isTextAreaFocus?{'--color':'black'}:{'--color':'#cccccc'}}
+                                style={isTextAreaFocus ? {'--color': 'black'} : {'--color': '#cccccc'}}
                             />
                         </div>
-                        {pickerVisible ? <div style={{marginBottom:'12px'}}><EmojiPicker
+                        {pickerVisible ? <div style={{marginBottom: '12px'}}><EmojiPicker
                             searchDisabled
                             height={300}
                             width='100%'
-                            previewConfig={{showPreview:false}}
+                            previewConfig={{showPreview: false}}
                             onEmojiClick={value => {
                                 lock(document.getElementById('postDetails'))
                                 setPickerVisible(false)
-                                setTextContent(text => text + value.emoji)}} /></div> : ''}
-                        <div style={{display:'flex',paddingBottom:'10px',paddingRight:'10px',marginLeft:'18px'}} >
-                            <Space style={{'--gap':'16px',flexGrow:1}}>
-                                <PictureOutline style={{fontSize:22}} onClick={()=> {
-                                   Toast.show('树洞不可以发送图片')
-                                }} />
-                                    <SmileOutline style={{fontSize:22}} onClick={() => {
-                                        unlock(document.getElementById('anPostDetails'))
-                                        setPickerVisible(value => !value)
-                                        setMaskVisible(true)}} />
+                                setTextContent(text => text + value.emoji)
+                            }}/></div> : ''}
+                        <div style={{display: 'flex', paddingBottom: '10px', paddingRight: '10px', marginLeft: '18px'}}>
+                            <Space style={{'--gap': '16px', flexGrow: 1}}>
+                                <PictureOutline style={{fontSize: 22}} onClick={() => {
+                                    Toast.show('树洞不可以发送图片')
+                                }}/>
+                                <SmileOutline style={{fontSize: 22}} onClick={() => {
+                                    unlock(document.getElementById('anPostDetails'))
+                                    setPickerVisible(value => !value)
+                                    setMaskVisible(true)
+                                }}/>
                             </Space>
-                            <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary' onClick={submitReply}>评论</Button>
+                            <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary'
+                                    onClick={submitReply}>评论</Button>
                         </div>
                     </div>
                 </div>

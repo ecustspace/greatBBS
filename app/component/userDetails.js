@@ -23,21 +23,17 @@ const UserDetails = forwardRef(({user},ref) => {
     useEffect(() => {
         if (!isVisible) {
             unlock(document.getElementById('userDetails'))
-            return
+        } else {
+            lock(document.getElementById('userDetails'))
         }
-        let timer = setInterval(() => {
-            const element = document.getElementById('userDetails');
-            if (element) {
-                let hammertime = new Hammer(document.getElementById("userDetails"));
-                hammertime.on("swiperight", function () {
-                    setIsVisible(false)
-                });
-                lock(element)
-                clearInterval(timer)
-            }
-        },250)
-        return () => {clearInterval(timer)}
     },[isVisible])
+
+    useEffect(() => {
+        let hammertime = new Hammer(document.getElementById("userDetails"));
+        hammertime.on("swiperight", function () {
+            setIsVisible(false)
+        });
+    },[])
 
     async function loadMore() {
         await getUserPost(document.cookie,user.name,lastKey).then(res => {
@@ -76,6 +72,7 @@ const UserDetails = forwardRef(({user},ref) => {
                setIsVisible(false)
            }
            }
+           forceRender
            visible={isVisible}
            bodyStyle={{height:'100%'}}
            style={{'--z-index': index}}

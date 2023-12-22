@@ -34,6 +34,7 @@ import {CopyToClipboard} from "react-copy-to-clipboard";
 import EmojiPicker from "emoji-picker-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import Hammer from "hammerjs";
 
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post,like},ref) => {
@@ -71,17 +72,17 @@ const PostDetails = forwardRef(({post,like},ref) => {
     useEffect(() => {
         if (!isPopupVisible) {
             unlock(document.getElementById('imgDetails'))
-            return
+        } else {
+            lock(document.getElementById('imgDetails'))
         }
-        let timer = setInterval(() => {
-            const element = document.getElementById('imgDetails');
-            if (element) {
-                lock(element)
-                clearInterval(timer)
-            }
-        },250)
-        return () => {clearInterval(timer)}
     },[isPopupVisible])
+
+    useEffect(() => {
+        let hammertime = new Hammer(document.getElementById("reply"));
+        hammertime.on("swiperight", function (e) {
+            setIsVisible(false)
+        });
+    },[])
 
     function operateClick(post) {
         actionSheet.current = ActionSheet.show({
@@ -241,6 +242,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                     setMaskVisible(false)
                 }
                 }
+                forceRender
                 visible={isPopupVisible}
                 bodyStyle={{height: '100%'}}
             >
@@ -254,7 +256,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                     <NavBar onBack={() => setIsVisible(false)}>
                         帖子详情
                     </NavBar>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='imgDetails'>
+                    <div style={{overflowX: "scroll", flexGrow: 1, display:'flex', flexDirection:"column", height:'100%'}} id='imgDetails'>
                         <div className='postDetail'>
                             <div style={{display: 'flex'}}>
                                 <Avatar
@@ -364,7 +366,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                                       setTextContent('')
                                   }
                               }}/>
-                        {replyList.map(data => <ReplyCard
+                        <div id='reply' style={{flexGrow:1}}>{replyList.map(data => <ReplyCard
                             reply={data}
                             type={'Image'}
                             avatarClick={() => {
@@ -392,6 +394,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                         <br/>
                         <br/>
                         <br/>
+                        </div>
                     </div>
                     <div style={{position: 'sticky', bottom: 0, width: '100%', zIndex: 1006, backgroundColor: 'white'}}>
                         <div style={{borderTop: 'solid 0.5px lightgrey'}}></div>

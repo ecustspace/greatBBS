@@ -70,21 +70,17 @@ const PostDetails = forwardRef(({post},ref) => {
     useEffect(() => {
         if (!isPopupVisible) {
             unlock(document.getElementById('postDetails'))
-            return
+        } else {
+            lock(document.getElementById('postDetails'))
         }
-        let timer = setInterval(() => {
-            const element = document.getElementById('postDetails');
-            if (element) {
-                let hammertime = new Hammer(document.getElementById("postDetails"));
-                hammertime.on("swiperight", function () {
-                    setIsVisible(false)
-                });
-                lock(element)
-                clearInterval(timer)
-            }
-        },250)
-        return () => {clearInterval(timer)}
     },[isPopupVisible])
+
+    useEffect(() => {
+        let hammertime = new Hammer(document.getElementById("postDetails"));
+        hammertime.on("swiperight", function () {
+            setIsVisible(false)
+        });
+    },[])
 
     function operateClick(post) {
         actionSheet.current = ActionSheet.show({
@@ -244,6 +240,7 @@ const PostDetails = forwardRef(({post},ref) => {
                         setMaskVisible(false)
                     }
                     }
+                    forceRender
                     visible={isPopupVisible}
                     bodyStyle={{height: '100%'}}
                 >

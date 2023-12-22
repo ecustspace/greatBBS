@@ -168,6 +168,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                         localStorage.setItem('Anid','')
                     }
                     if (data.status === 200) {
+                        setPickerVisible(false)
                         setMaskVisible(false)
                         setTextContent('')
                         setReplyTo({})

@@ -178,6 +178,8 @@ const PostDetails = forwardRef(({post},ref) => {
                     captchaRef.current.reset()
                     setDisable(false)
                     if (data.status === 200) {
+                        setPickerVisible(false)
+                        setUploadImage(false)
                         setMaskVisible(false)
                         setTextContent('')
                         setReplyTo({})

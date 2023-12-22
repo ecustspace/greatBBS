@@ -32,7 +32,6 @@ import {ContactTa, getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
 import {CopyToClipboard} from "react-copy-to-clipboard";
 import EmojiPicker from "emoji-picker-react";
-import Hammer from "hammerjs";
 import ReCAPTCHA from "react-google-recaptcha";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 
@@ -77,11 +76,6 @@ const PostDetails = forwardRef(({post,like},ref) => {
         let timer = setInterval(() => {
             const element = document.getElementById('imgDetails');
             if (element) {
-                let hammertime = new Hammer(document.getElementById("imgDetails"));
-                hammertime.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
-                hammertime.on("swipedown", function () {
-                    setIsVisible(false)
-                });
                 lock(element)
                 clearInterval(timer)
             }
@@ -182,6 +176,8 @@ const PostDetails = forwardRef(({post,like},ref) => {
                     setDisable(false)
                     responseHandle(data)
                     if (data.status === 200) {
+                        setPickerVisible(false)
+                        setUploadImage(false)
                         setMaskVisible(false)
                         setTextContent('')
                         setReplyTo({})

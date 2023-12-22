@@ -78,6 +78,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
             const element = document.getElementById('imgDetails');
             if (element) {
                 let hammertime = new Hammer(document.getElementById("imgDetails"));
+                hammertime.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
                 hammertime.on("swipedown", function () {
                     setIsVisible(false)
                 });
@@ -145,8 +146,8 @@ const PostDetails = forwardRef(({post,like},ref) => {
         setReplyTo({})
     },[post])
     function submitReply() {
-        setDisable(true)
         captchaRef.current.executeAsync().then(token => {
+            setDisable(true)
             const data = {
                 post_name: post.PK,
                 post_time: post.SK,

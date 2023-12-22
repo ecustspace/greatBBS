@@ -143,8 +143,8 @@ const PostDetails = forwardRef(({post},ref) => {
         setReplyTo({})
     },[post])
     function submitReply() {
-        setDisable(true)
         captchaRef.current.executeAsync().then(token => {
+            setDisable(true)
             const data = {
                 post_name: post.PK,
                 post_time: post.SK,

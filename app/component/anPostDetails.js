@@ -129,8 +129,8 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     },[post])
 
     function submitReply() {
-        setDisable(true)
         captchaRef.current.executeAsync().then(token => {
+            setDisable(true)
             const data = {
                 post_name: post.PK,
                 post_time: post.SK,

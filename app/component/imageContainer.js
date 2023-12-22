@@ -9,9 +9,17 @@ import React, {useEffect, useRef, useState} from "react";
 export function ImageContainer({list,from,style}) {
     const ref = useRef(null)
     const [width,setWidth] = useState(0)
+
     useEffect(() => {
-        setWidth(ref.current.offsetWidth)
-    },[])
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                setWidth(entry.contentRect.width)
+            }
+        });
+        observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, []);
+
     return(
         <PhotoProvider>
             <div className="foo">

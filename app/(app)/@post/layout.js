@@ -1,12 +1,13 @@
 'use client'
 import './post.css'
 import SendPost from "@/app/component/sendPost";
-import React, {useContext, useRef, useState} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 import {Button, NavBar, Tabs, Toast} from 'antd-mobile'
 import Image from 'next/image'
 import {AddOutline} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
 import {showLoginModal} from "@/app/component/function";
+import Hammer from "hammerjs";
 
 const tabItems = [
     { key: 'tiezi', title: <div style={{fontWeight:'bold' ,fontSize:15}}>帖子</div> },
@@ -38,8 +39,19 @@ export default function RootLayout({ post,anPost,ins }) {
         }
         popup.current.showPopup()
     }
+
+    useEffect(() => {
+        let hammertime = new Hammer(document.getElementById("post"));
+        hammertime.on("swiperight", function () {
+            setActiveIndex(value => (value === 0 ? value : value - 1))
+        });
+        hammertime.on("swipeleft", function () {
+            setActiveIndex(value => (value === 2 ? value : value + 1))
+        });
+    },[])
+
     return (
-        <div>
+        <div id='post' style={{height:'100vh'}}>
                 <div className='FloatBubble' onClick={showPopup} style={{bottom:'65px'}}>
                     <AddOutline fontSize={32} color='#fff' />
                 </div>
@@ -54,6 +66,7 @@ export default function RootLayout({ post,anPost,ins }) {
                         onChange={key => {
                             const index = tabItems.findIndex(item => item.key === key)
                             setActiveIndex(index)
+                            console.log(index)
                         }}
                         className='tabs'
                     >

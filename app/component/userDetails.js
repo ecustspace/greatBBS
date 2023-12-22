@@ -1,6 +1,6 @@
 import '@/app/(app)/@user/user.css'
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
-import {Button, Dialog, Image, InfiniteScroll, NavBar, Popup, Steps, Toast} from "antd-mobile";
+import {Button, Image, InfiniteScroll, NavBar, Popup, Steps, Toast} from "antd-mobile";
 import {ContactTa, getUserPost} from "@/app/api/serverAction";
 import {responseHandle, timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
@@ -87,19 +87,13 @@ const UserDetails = forwardRef(({user},ref) => {
                shape={"rounded"}
                size='small'
                fill='outline' onClick={() => {
+               Toast.show({icon:"loading"})
                ContactTa(document.cookie, user.name).then(res => {
+                   Toast.clear()
                    if (res.status !== 200) {
                        responseHandle(res)
                    } else {
-                       Dialog.confirm({
-                           content: res.tip,
-                           onConfirm: () => {
-                               Dialog.clear()
-                           },
-                           onCancel: () => {
-                               Dialog.clear()
-                           }
-                       })
+                       alert(res.tip)
                    }
                })
            }}>

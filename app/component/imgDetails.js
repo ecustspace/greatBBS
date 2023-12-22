@@ -312,7 +312,9 @@ const PostDetails = forwardRef(({post,like},ref) => {
                             </Space>
                             <Space style={{'--gap': '16px', margin: 8}}>
                                 <UserAddOutline style={{fontSize: 20}} onClick={() => {
+                                    Toast.show({icon:"loading"})
                                     ContactTa(document.cookie, post.PK).then(res => {
+                                        Toast.clear()
                                         if (res.status !== 200) {
                                             responseHandle(res)
                                         } else {

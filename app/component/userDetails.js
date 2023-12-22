@@ -1,8 +1,8 @@
 import '@/app/(app)/@user/user.css'
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
-import {Image, InfiniteScroll, NavBar, Popup, Steps} from "antd-mobile";
-import {getUserPost} from "@/app/api/serverAction";
-import {timeConclude} from "@/app/component/function";
+import {Button, Dialog, Image, InfiniteScroll, NavBar, Popup, Steps, Toast} from "antd-mobile";
+import {ContactTa, getUserPost} from "@/app/api/serverAction";
+import {responseHandle, timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext} from "@/app/(app)/layout";
@@ -82,6 +82,29 @@ const UserDetails = forwardRef(({user},ref) => {
        <div className='ava'>
            <Image src={user.avatar} alt='这是一个头像' width={75} height={75} style={{ borderRadius: 60, display: 'inline-block' }} />
            <h3>{user.name}</h3>
+           <Button
+               color={"default"}
+               shape={"rounded"}
+               size='small'
+               fill='outline' onClick={() => {
+               ContactTa(document.cookie, user.name).then(res => {
+                   if (res.status !== 200) {
+                       responseHandle(res)
+                   } else {
+                       Dialog.confirm({
+                           content: res.tip,
+                           onConfirm: () => {
+                               Dialog.clear()
+                           },
+                           onCancel: () => {
+                               Dialog.clear()
+                           }
+                       })
+                   }
+               })
+           }}>
+               联系Ta
+           </Button>
        </div>
             <div style={{overflowX:"scroll",flexGrow:1,position:'sticky'}} id='userDetails'>
         <Steps

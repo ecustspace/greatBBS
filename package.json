@@ -20,7 +20,7 @@
     "eslint-config-next": "13.4.19",
     "hammerjs": "^2.0.8",
     "js-sha256": "^0.10.1",
-    "next": "13.4.19",
+    "next": "13.4.20-canary.13",
     "nodemailer": "^6.9.5",
     "react": "18.2.0",
     "react-copy-to-clipboard": "^5.1.0",

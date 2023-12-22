@@ -66,7 +66,6 @@ export default function RootLayout({ post,anPost,ins }) {
                         onChange={key => {
                             const index = tabItems.findIndex(item => item.key === key)
                             setActiveIndex(index)
-                            console.log(index)
                         }}
                         className='tabs'
                     >

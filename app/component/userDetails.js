@@ -1,6 +1,6 @@
 import '@/app/(app)/@user/user.css'
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
-import {Button, Image, InfiniteScroll, NavBar, Popup, Steps, Toast} from "antd-mobile";
+import {Button, Image, InfiniteScroll, NavBar, Popup, Steps} from "antd-mobile";
 import {ContactTa, getUserPost} from "@/app/api/serverAction";
 import {responseHandle, timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
@@ -18,6 +18,7 @@ const UserDetails = forwardRef(({user},ref) => {
     const [lastKey,setKey] = useState(null)
     const [index,setIndex] = useState(1010)
     const [hasMore,setHasMore] = useState(true)
+    const [btnLoading,setBtnLoading] = useState(false)
     const {showPostPopup,showImgPopup,hideAllPostPopup} = useContext(detailsContext)
 
     useEffect(() => {
@@ -85,11 +86,11 @@ const UserDetails = forwardRef(({user},ref) => {
            <Button
                color={"default"}
                shape={"rounded"}
-               size='small'
+               loading={btnLoading}
                fill='outline' onClick={() => {
-               Toast.show({icon:"loading"})
+               setBtnLoading(true)
                ContactTa(document.cookie, user.name).then(res => {
-                   Toast.clear()
+                   setBtnLoading(false)
                    if (res.status !== 200) {
                        responseHandle(res)
                    } else {

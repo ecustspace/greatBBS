@@ -1,11 +1,10 @@
 'use client'
 
 import './login.css'
-import React, {useContext, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
-import TranslationAvatar from "@/app/component/translationAvatar";
 import {avatarList, emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -14,7 +13,19 @@ export default function Home() {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
     const captchaRef = useRef(null)
+    const [activeIndex,setIndex] = useState(0)
     const toLogin = useContext(loginState).toLogin
+
+    function nextImg() {
+        setIndex(activeIndex => (activeIndex + 1) % avatarList.length)
+    }
+
+    useEffect(() => {
+        let timer = setInterval(nextImg, 3000)
+        return () => {
+            clearInterval(timer)
+        }
+    },[])
 
     const onSubmit = () => {
         captchaRef.current.executeAsync().then(token => {
@@ -57,14 +68,18 @@ export default function Home() {
                 size="invisible"
             />
             <NavBar onBack={back}></NavBar>
-            <AutoCenter style={{marginTop:'10px'}}>
-                <TranslationAvatar
-                    avatarList={avatarList}
-                    size={'96px'}/>
-            </AutoCenter>
-            <div>
+            <AutoCenter>
+                <div style={{width:'96px',height:'96px',position:"relative"}}>
+                    {avatarList.map(
+                        (avatar,index) =>
+                            <img key={avatar.id}
+                                 src={avatar}
+                                 alt={index}
+                                 style={{borderRadius: 16,position:"absolute",left:0,top:0,width:'96px',height:'96px'}}
+                                 className={index === activeIndex ? 'fade-in' : 'fade-out'} />)}
+                </div>
                 <h1>登录账号</h1>
-            </div>
+            </AutoCenter>
             <Form
                 form={form}
                 onFinish={onSubmit}

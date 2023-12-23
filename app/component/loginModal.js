@@ -72,7 +72,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                     label='邮箱'
                     name='useremail'>
                     <div style={{display:"flex"}}>
-                        <Input style={{'--font-size': 'small'}} placeholder='你的学号' clearable></Input>
+                        <Input style={{'--font-size': 'medium'}} placeholder='你的学号' clearable></Input>
                         <div className='text'>{emailAddress}</div>
                     </div>
                 </Form.Item>
@@ -82,7 +82,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                 >
                     <Input
                         placeholder='请输入密码'
-                        style={{'--font-size': 'small'}}
+                        style={{'--font-size': 'medium'}}
                         clearable
                         type='password'
                     />

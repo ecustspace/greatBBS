@@ -51,7 +51,7 @@ export default function RootLayout({ post,anPost,ins }) {
     },[])
 
     return (
-        <div id='post' style={{height:'100vh'}}>
+        <div id='post'>
                 <div className='FloatBubble' onClick={showPopup} style={{bottom:'65px'}}>
                     <AddOutline fontSize={32} color='#fff' />
                 </div>

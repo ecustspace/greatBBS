@@ -49,6 +49,7 @@ h1 {
 }
 
 .text {
+    font-size: small;
     color: #999999;
     font-family: -apple-system, blinkmacsystemfont, 'Helvetica Neue',
     helvetica, segoe ui, arial, roboto, 'PingFang SC', 'miui',

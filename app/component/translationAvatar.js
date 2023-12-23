@@ -16,14 +16,14 @@ export default function TranslationAvatar({avatarList,size}) {
     },[])
 
     return (
-            <div className='container' style={{width:size,height:size}}>
+            <div style={{width:size,height:size,position:"relative"}}>
                 {avatarList.map(
                     (avatar,index) =>
                         <img key={avatar.id}
                              src={avatar}
                              alt={index}
-                             style={{borderRadius: 16,width:size,height:size}}
-                             className={(index === activeIndex ? 'fade-in' : 'fade-out') + ' image'} />)}
+                             style={{borderRadius: 16,width:size,height:size,position:"absolute",top:0,left:0}}
+                             className={(index === activeIndex ? 'fade-in' : 'fade-out')} />)}
             </div>
     )
 }

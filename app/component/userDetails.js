@@ -86,6 +86,7 @@ const UserDetails = forwardRef(({user},ref) => {
            <Button
                color={"default"}
                shape={"rounded"}
+               size={"small"}
                loading={btnLoading}
                fill='outline' onClick={() => {
                setBtnLoading(true)

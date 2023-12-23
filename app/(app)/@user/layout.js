@@ -496,7 +496,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                 bodyStyle={{height:'100%'}}
                 style={{'--z-index':999}}
             >
-                <NavBar onBack={() => {setPopupVisible(false)}} />
+                <NavBar back='返回' onBack={() => {setPopupVisible(false)}} />
                 <div style={{display:'flex',flexDirection:"column",width:'100%',height:'100%'}}>
                     <div style={{overflowX:"scroll",flexGrow:1,position:'sticky'}}>
                     {userOperationPage[activeIndex]}

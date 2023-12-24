@@ -54,7 +54,7 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
                         <div style={{display:"flex"}} id={'card' + post.PostID}>
                             <div style={{flexGrow:1}}>
                                 <div style={{fontWeight:"bold",fontSize:16}}>{(post.PostType === 'AnPost' ? '树洞#' + post.PostID : post.PK)}<span style={{fontSize:"small",color:"gray"}}>{(typeof post.UserScore == 'number' ? ` ${level(post.UserScore)}` : '')}</span></div>
-                                <div style={{marginTop:4,fontSize:14,color:"gray"}}>{post.SK !== 0 ? timeConclude(post.SK) : '置顶'}</div>
+                                <div style={{marginTop:4,fontSize:14,color:"gray"}}>{post.SK < Date.now() ? timeConclude(post.SK) : '置顶'}</div>
                             </div>
                                 <MoreOutline style={{ fontSize: 22 }} onClick={(e)=>{
                                     operateClick()

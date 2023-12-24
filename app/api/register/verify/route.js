@@ -55,7 +55,7 @@ export async function POST(request) {
                 PK: 'userID',
                 SK: data.useremail,
                 UserName: data.username,
-                Password: data.password
+                Password: sha256(data.password)
             },
             ConditionExpression: "attribute_not_exists(SK)"
         }

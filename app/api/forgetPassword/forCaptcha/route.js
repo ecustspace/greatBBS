@@ -17,7 +17,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
     const user_email = data.useremail
-    const new_password = data.password
+    const new_password = sha256(data.password)
     const now = Date.now()
     try {
         await new Promise((resolve, reject) => {

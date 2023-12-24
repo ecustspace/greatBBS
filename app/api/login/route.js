@@ -15,7 +15,7 @@ export async function POST(request) {
     if (user_item === 500 || !user_item){
         return NextResponse.json({tip:'用户名或密码错误',status:500})
     }
-    if (data.password !== user_item.Password.toString()) {
+    if (sha256(data.password) !== user_item.Password) {
         return NextResponse.json({tip:'用户名或密码错误',status:500})
     }
     const token = (Date.now() + 1000*3600*24*7) + '#' + v4()

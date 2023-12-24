@@ -3,7 +3,6 @@ import {sha256} from "js-sha256";
 import TheResult from "@/app/component/result";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {v4} from "uuid";
-import {NextResponse} from "next/server";
 
 export default async function Home ({params}){
     const token = params.props[0]

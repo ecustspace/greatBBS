@@ -77,6 +77,22 @@ export default function Home() {
         hammertime.on("swiperight", function () {
             window.location.replace('/')
         });
+        let hammerWikiDetails = new Hammer(document.getElementById("wikiDetails"));
+        hammerWikiDetails.on("swiperight", function () {
+            setWikiDetailsVisible(false)
+        });
+        let hammerMyEvaluate = new Hammer(document.getElementById("myEvaluate"));
+        hammerMyEvaluate.on("swiperight", function () {
+            setMyEvaluateVisible(false)
+        });
+        let hammerSearch = new Hammer(document.getElementById("search"));
+        hammerSearch.on("swiperight", function () {
+            setSearchVisible(false)
+        });
+        let hammerMyLike = new Hammer(document.getElementById("myLike"));
+        hammerMyLike.on("swiperight", function () {
+            setMyLikeVisible(false)
+        });
     },[])
 
     const right = (
@@ -433,11 +449,14 @@ export default function Home() {
                         setInstituteSelectVisible(false)
                     }}/>
             <Popup
+                forceRender
                 visible={wikiDetailsVisible}
                 bodyStyle={{height: '100%'}}
                 style={{'--z-index': 999}}
             >
-                <div style={{
+                <div
+                    id='wikiDetails'
+                    style={{
                     display: 'flex',
                     flexDirection: 'column',
                     width: '100%',
@@ -552,6 +571,7 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                forceRender
                 visible={searchVisible}
                 bodyStyle={{height: '100%'}}
                 style={{'--z-index': 998}}
@@ -572,7 +592,7 @@ export default function Home() {
                             '--padding-left': '12px',
                         }}
                         placeholder='请输入词条的关键字'/></div>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                    <div id='search' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
                         {searchResult.map(post =>
                             <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)} />
                         )}
@@ -591,12 +611,13 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                forceRender
                 visible={myEvaluateVisible}
                 bodyStyle={{height: '100%'}}
                 style={{'--z-index': 998}}
             >
                 <NavBar back='返回' onBack={() => {setMyEvaluateVisible(false)}} />
-                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                <div id='myEvaluate' style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
                     <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
                         {myEvaluateList.map(post =>
                             <MyEvaluateCard evaluate={post} key={post.id}
@@ -618,12 +639,13 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                forceRender
                 visible={myLikeVisible}
                 bodyStyle={{height: '100%'}}
                 style={{'--z-index': 998}}
             >
                 <NavBar back='返回' onBack={() => {setMyLikeVisible(false)}} />
-                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                <div id='myLike' style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
                     <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
                         <List>
                             {myLikeLoadList.map(post =>

@@ -134,6 +134,7 @@ export async function searchWiki(cookie,content,lastKey) {
         },
         FilterExpression: 'contains(SK, :content)',
         PageSize:20,
+        Limit: 50
     }
     if (lastKey !== null) {
         queryCommand.ExclusiveStartKey = lastKey

@@ -9,14 +9,6 @@ import {Report} from "@/app/api/serverAction";
 
 
 export default function ReplyCard({name,reply,onClickReply,replyToName,operate,onClick,avatarClick,type}) {
-    const ref = useRef(null)
-    const [isExceed,setExceed] = useState(false)
-    const [isExtend,setExtend] = useState(false)
-    useEffect(() => {
-        if (ref.current?.scrollHeight > ref.current?.clientHeight) {
-            setExceed(true)
-        }
-    },[])
     function onClickJustify() {
         if (onClick) {
             onClick()

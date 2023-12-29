@@ -1,4 +1,5 @@
 'use client'
+
 import './post.css'
 import SendPost from "@/app/component/sendPost";
 import React, {useContext, useEffect, useRef, useState} from 'react'

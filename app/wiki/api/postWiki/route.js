@@ -1,4 +1,4 @@
-import {getUserItem, recaptchaVerify_v2, transporter} from "@/app/api/server";
+import {recaptchaVerify_v2, transporter} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {Url} from "@/app/(app)/clientConfig";
 import {dataLengthVerify} from "@/app/api/register/verify/route";

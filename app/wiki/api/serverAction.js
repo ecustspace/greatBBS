@@ -282,7 +282,7 @@ export async function likeEvaluate(cookie,key,other_name) {
         return {tip:'ok',status:200}
     }).catch(err => {
         console.log(err)
-        return {tip:'error',status:500}
+        return {tip:'检查是否有足够的积分',status:500}
     })
     if (result.status !== 200) {
         return result

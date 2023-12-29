@@ -251,6 +251,11 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     >
                         修改资料
                     </List.Item>
+                    <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
+                        window.location.replace(window.location.origin + '/wiki')
+                    }}>
+                        EcustSpace Wiki
+                    </List.Item>
                     <List.Item prefix={<TeamOutline fontSize={24}/>} onClick={() => {
                         Dialog.alert({
                             content: <AboutUs />
@@ -467,9 +472,9 @@ export default function RootLayout({userReply,userLike,userPost}) {
                                    placeholder='为空则默认不订阅通知' />
                     </Form.Item>
                     <Form.Item
-                        label='等级'
+                        label='积分'
                         name='level'
-                        help={'通过在论坛中活跃，可以提升等级\n每日评论：+3\n每日发帖：+5\n邀请好友：+60'
+                        help={'通过在论坛中活跃，可以获取积分\n每日评论：+3\n每日发帖：+5\n邀请好友：+60'
                     }
                         extra={<Checkbox
                             style={{

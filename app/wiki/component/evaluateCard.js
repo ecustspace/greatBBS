@@ -1,22 +1,14 @@
 import {Avatar, Button, Dialog, Rate, Space, TextArea, Toast} from "antd-mobile";
-import {level, responseHandle, share, timeConclude} from "@/app/component/function";
+import {responseHandle, timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
-import {ImageContainer} from "@/app/component/imageContainer";
-import {SwitchLike} from "@/app/component/postCard";
 import {
-    DeleteOutline,
     ExclamationCircleOutline,
     HeartOutline,
-    MessageOutline,
-    MoreOutline,
-    UploadOutline
 } from "antd-mobile-icons";
-import {deleteOperation, Report} from "@/app/api/serverAction";
 import {evaluateScore} from "@/app/wiki/component/function";
 import {useEffect, useRef, useState} from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
-import {CopyToClipboard} from "react-copy-to-clipboard";
 import {likeEvaluate, reportEvaluate} from "@/app/wiki/api/serverAction";
 
 export function EvaluateCard({evaluate,onClick,avatarClick}) {

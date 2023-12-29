@@ -2,8 +2,7 @@ import {docClient, getUserItem, isBan, recaptchaVerify_v2} from "@/app/api/serve
 import {NextResponse} from "next/server";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 import {cookies} from "next/headers";
-import {v4} from "uuid";
-import {PutCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {TransactWriteCommand} from "@aws-sdk/lib-dynamodb";
 import {institute} from "@/app/wiki/config";
 
 export async function POST(request) {

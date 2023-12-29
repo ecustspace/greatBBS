@@ -39,6 +39,7 @@ import {
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import ReCAPTCHA from "react-google-recaptcha";
 import {EditEvaluateCard, EvaluateCard, MyEvaluateCard, WikiCard} from "@/app/wiki/component/evaluateCard";
+import Hammer from "hammerjs";
 
 export default function Home() {
     const [hasMore, setHasMore] = useState(true)
@@ -72,6 +73,10 @@ export default function Home() {
 
     useEffect(() => {
         setMyLikeList(JSON.parse(typeof localStorage.getItem('MyLike') == 'string' ? localStorage.getItem('MyLike') : '[]'))
+        let hammertime = new Hammer(document.getElementById("wiki"));
+        hammertime.on("swiperight", function () {
+            window.location.replace('/')
+        });
     },[])
 
     const right = (
@@ -296,7 +301,9 @@ export default function Home() {
                 ref={captchaRef}
                 size="invisible"
             />
-            <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
+            <NavBar right={right} backArrow={false} left={<Image onClick={() => {
+                window.location.replace('/')
+            }} alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
             <div style={{margin:'5px',marginBottom:'10px'}}><SearchBar
                 onChange={setSearch}
@@ -353,10 +360,12 @@ export default function Home() {
             }}>
                 <AddOutline fontSize={32} color='#fff'/>
             </div>
-            {wikiList.map(post =>
-                <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)} />
-            )}
-            {part !== '全部'? <InfiniteScroll loadMore={loadMoreWiki} hasMore={wikiHasMore} /> : ''}
+            <div id='wiki'>
+                {wikiList.map(post =>
+                    <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)} />
+                )}
+                {part !== '全部'? <InfiniteScroll loadMore={loadMoreWiki} hasMore={wikiHasMore} /> : ''}
+            </div>
             <CenterPopup
                 visible={evaluateVisible}
                 onMaskClick={() => {

@@ -19,7 +19,7 @@ import {
     ArrowDownCircleOutline,
     CloseShieldOutline, FaceRecognitionOutline,
     LeftOutline,
-    RightOutline,
+    RightOutline, SearchOutline,
     TagOutline,
     TeamOutline,
     TextOutline
@@ -251,10 +251,10 @@ export default function RootLayout({userReply,userLike,userPost}) {
                     >
                         修改资料
                     </List.Item>
-                    <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
+                    <List.Item prefix={<SearchOutline fontSize={24} />} onClick={() => {
                         window.location.replace(window.location.origin + '/wiki')
                     }}>
-                        EcustSpace Wiki
+                        EcustSpace Wiki(公测版)
                     </List.Item>
                     <List.Item prefix={<TeamOutline fontSize={24}/>} onClick={() => {
                         Dialog.alert({

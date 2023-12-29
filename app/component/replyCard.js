@@ -2,7 +2,6 @@ import {Avatar, Dialog, Space} from "antd-mobile";
 import {DeleteOutline, ExclamationCircleOutline, HeartOutline} from "antd-mobile-icons";
 import {level, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
-import {useEffect, useRef, useState} from "react";
 import Ellipsis from "@/app/component/ellipsis";
 import {SwitchLike} from "@/app/component/postCard";
 import {Report} from "@/app/api/serverAction";

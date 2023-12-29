@@ -1,7 +1,7 @@
 import {docClient} from "@/app/api/server";
 import {sha256} from "js-sha256";
 import TheResult from "@/app/component/result";
-import {PutCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {PutCommand, TransactWriteCommand} from "@aws-sdk/lib-dynamodb";
 import {v4} from "uuid";
 import {revalidateTag} from "next/cache";
 

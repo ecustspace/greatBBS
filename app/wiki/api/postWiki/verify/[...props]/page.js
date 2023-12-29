@@ -47,12 +47,24 @@ export default async function Home ({params}){
                 LastChange: now
             }
         }
+        const putNotify = {
+            TableName: 'BBS',
+            Item: {
+                PK: 'Notify#' + data.username,
+                SK: now,
+                Avatar: '/admin.jpg',
+                From: '系统消息',
+                Content: `你申请创建的词条[${data.name}]已审核通过`,
+                ttl: (now + 1000*60*60*24*7)/1000
+            }
+        }
         const TransactWrite = new TransactWriteCommand({
             TransactItems: [{
                 Put: putWiki
-            },
-                {
+            }, {
                     Put: putEvaluate
+                },{
+                    Put: putNotify
                 }
             ]
         })

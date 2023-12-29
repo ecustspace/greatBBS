@@ -12,7 +12,7 @@ export async function POST(request) {
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
-    if (!dataLengthVerify(1,10,data.name) || data.name.includes('#') ||
+    if (!dataLengthVerify(1,20,data.name) || data.name.includes('#') ||
         !dataLengthVerify(1,200,data.content) ||
         !institute.includes(data.institute) ||
         (typeof data.evaluate != 'number' || data.evaluate > 7 || data.evaluate < 1)){

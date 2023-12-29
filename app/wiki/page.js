@@ -391,7 +391,7 @@ export default function Home() {
                         paddingLeft: 12,
                         fontWeight: "bold",
                         fontSize: 'medium'
-                    }}><Input maxLength={10} placeholder='输入词条' onChange={value => {
+                    }}><Input maxLength={20} placeholder='输入词条' onChange={value => {
                         setAddWiki({...addWiki, name: value})
                     }}/><span onClick={() => setInstituteSelectVisible(true)} style={{
                         fontSize: "small",

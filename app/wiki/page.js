@@ -320,7 +320,8 @@ export default function Home() {
                 window.location.replace('/')
             }} alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
-            <div style={{margin:'5px',marginBottom:'10px'}}><SearchBar
+            <div style={{margin:'5px',marginBottom:'10px'}}>
+                <SearchBar
                 onChange={setSearch}
                 value={search}
                 onSearch={() => {
@@ -451,10 +452,9 @@ export default function Home() {
                 forceRender
                 visible={wikiDetailsVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 999}}
+                style={{'--z-index': 1001}}
             >
                 <div
-                    id='wikiDetails'
                     style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -465,7 +465,7 @@ export default function Home() {
                     <NavBar back='返回' onBack={() => setWikiDetailsVisible(false)}>
                         {focusWiki.SK}
                     </NavBar>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='wikiDetails'>
                         <div style={{marginLeft: '12px', marginRight: '12px'}}>
                             <div style={{display: 'flex'}}>
                                 <Avatar
@@ -573,7 +573,7 @@ export default function Home() {
                 forceRender
                 visible={searchVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 998}}
+                style={{'--z-index': 1000}}
             >
                 <NavBar back='返回' onBack={() => setSearchVisible(false)}></NavBar>
                 <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
@@ -613,11 +613,11 @@ export default function Home() {
                 forceRender
                 visible={myEvaluateVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 998}}
+                style={{'--z-index': 997}}
             >
                 <NavBar back='返回' onBack={() => {setMyEvaluateVisible(false)}} />
-                <div id='myEvaluate' style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                    <div id='myEvaluate' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
                         {myEvaluateList.map(post =>
                             <MyEvaluateCard evaluate={post} key={post.id}
                                             onClick={() => {
@@ -641,11 +641,11 @@ export default function Home() {
                 forceRender
                 visible={myLikeVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 998}}
+                style={{'--z-index': 999}}
             >
                 <NavBar back='返回' onBack={() => {setMyLikeVisible(false)}} />
-                <div id='myLike' style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                    <div id='myLike' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
                         <List>
                             {myLikeLoadList.map(post =>
                                 <List.Item title={post.institute} key={post.id}

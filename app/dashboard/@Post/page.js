@@ -1,7 +1,7 @@
 'use client'
 
 import {useRef, useState} from "react";
-import {ActionSheet, Button, CenterPopup, DatePicker, InfiniteScroll, Toast} from "antd-mobile";
+import {ActionSheet, Button, CenterPopup, DatePicker, InfiniteScroll, Space, Toast} from "antd-mobile";
 import {timeConclude} from "@/app/component/function";
 import {deleteTrends, getTrends} from "@/app/dashboard/api/serverAction";
 import {Ban} from "@/app/dashboard/layout";
@@ -76,13 +76,19 @@ export default function Home() {
 
     return (
         <div>
-            <Button
-                onClick={() => {
-                    setPickerVisible(true)
-                }}
+            <Space>
+                <Button
+                    shape='rounded'
+                    onClick={() => {
+                        setPickerVisible(true)
+                    }}
             >
                 {date.toDateString()}
-            </Button>
+                </Button>
+                <Button
+                    shape='rounded'
+                ></Button>
+            </Space>
             <DatePicker
                 visible={datePickerVisible}
                 onClose={() => {

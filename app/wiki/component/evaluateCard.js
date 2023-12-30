@@ -90,7 +90,7 @@ export function EvaluateCard({evaluate,onClick,avatarClick}) {
         onClick={onClickJustify}
     >
         <div className='cardAvatar'>
-            <Avatar src={'evaluate/' + evaluate.Evaluate + '.png'} style={{'--size': '42px'}} onClick={avatarClickJustify}/>
+            <Avatar src={'evaluate/' + evaluate.Evaluate + '.png'} style={{'--size': '42px',"--border-radius":'4px'}} onClick={avatarClickJustify}/>
         </div>
         <div style={{flexGrow: 1}}>
             <div style={{marginBottom:'6px',fontWeight: 'bold', display: "flex"}}>
@@ -127,7 +127,7 @@ export function MyEvaluateCard({evaluate,onClick}) {
         onClick={onClickJustify}
     >
         <div className='cardAvatar'>
-            <Avatar src={'evaluate/' + evaluate.Evaluate + '.png'} style={{'--size': '42px'}}/>
+            <Avatar src={'evaluate/' + evaluate.Evaluate + '.png'} style={{'--size': '42px',"--border-radius":'4px'}}/>
         </div>
         <div style={{flexGrow: 1}}>
             <div style={{marginBottom: '6px', fontWeight: 'bold'}}>
@@ -240,7 +240,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
             size="invisible"
         />
         <div className='cardAvatar'>
-            <Avatar src={'evaluate/' + evaluate + '.png'} style={{'--size': '42px'}}/>
+            <Avatar src={'evaluate/' + evaluate + '.png'} style={{'--size': '42px',"--border-radius":'4px'}}/>
         </div>
         <div style={{marginBottom: '8px', width: '100%'}}>
             <div style={{marginBottom: '6px', fontWeight: 'bold', display: "flex"}}>我的评价</div>

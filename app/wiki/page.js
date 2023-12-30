@@ -30,7 +30,7 @@ import {loginState} from "@/app/layout";
 import Image from "next/image";
 import {evaluateScore} from "@/app/wiki/component/function";
 import {
-    AddOutline,
+    AddOutline, CompassOutline,
     LoopOutline,
     TagOutline,
     UndoOutline,
@@ -73,10 +73,6 @@ export default function Home() {
 
     useEffect(() => {
         setMyLikeList(JSON.parse(typeof localStorage.getItem('MyLike') == 'string' ? localStorage.getItem('MyLike') : '[]'))
-        let hammertime = new Hammer(document.getElementById("wiki"));
-        hammertime.on("swiperight", function () {
-            window.location.replace('/')
-        });
         let hammerWikiDetails = new Hammer(document.getElementById("wikiDetails"));
         hammerWikiDetails.on("swiperight", function () {
             setWikiDetailsVisible(false)
@@ -100,6 +96,7 @@ export default function Home() {
             actions={[
                 { key: 'evaluate', icon: <UserOutline />, text: '我的评价' },
                 { key: 'like', icon: <TagOutline />, text: '我的收藏' },
+                { key: 'back', icon: <CompassOutline />, text: '返回Ecust Space' }
             ]}
             placement='bottom-start'
             onAction={node => {
@@ -111,8 +108,10 @@ export default function Home() {
                         return
                     }
                     setMyEvaluateVisible(true)
-                } else {
+                } else if (node.key === 'like') {
                     setMyLikeVisible(true)
+                } else {
+                    window.location.replace('/')
                 }
             }}
             trigger='click'
@@ -399,7 +398,7 @@ export default function Home() {
                 <div style={{display: "flex", paddingLeft: 12}}>
                     <Avatar
                         src={typeof addWiki.evaluate == 'number' ? 'evaluate/' + addWiki.evaluate + '.png' : 'evaluate/4.png'}
-                        style={{borderRadius: 20}}
+                        style={{borderRadius: 4}}
                         fit='cover'
                         width={40}
                         height={40}/>
@@ -471,7 +470,7 @@ export default function Home() {
                             <div style={{display: 'flex'}}>
                                 <Avatar
                                     src={focusWiki.SK ? 'evaluate/' + evaluateScore(focusWiki.Evaluate) + '.png' : 'evaluate/7.png'}
-                                    style={{'--size': '54px', marginRight: 18}}
+                                    style={{'--size': '54px', marginRight: 18,"--border-radius":'4px'}}
                                 ></Avatar>
                                 <div style={{flexGrow: 1, position: "relative"}}>
                                     <div style={{

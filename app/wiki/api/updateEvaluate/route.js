@@ -7,7 +7,7 @@ import {institute} from "@/app/wiki/config";
 
 export async function POST(request) {
     const data = await request.json()
-    if (!dataLengthVerify(1,10,data.name) ||
+    if (!dataLengthVerify(1,20,data.name) ||
         !dataLengthVerify(1,200,data.content) ||
         !institute.includes(data.institute) ||
         (typeof data.evaluate != 'number' || data.evaluate > 7 || data.evaluate < 1)){

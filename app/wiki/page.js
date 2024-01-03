@@ -450,6 +450,7 @@ export default function Home() {
                     }}/>
             <Popup
                 forceRender
+                mask={false}
                 visible={wikiDetailsVisible}
                 bodyStyle={{height: '100%'}}
                 style={{'--z-index': 901}}
@@ -570,6 +571,7 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                mask={false}
                 forceRender
                 visible={searchVisible}
                 bodyStyle={{height: '100%'}}
@@ -610,6 +612,7 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                mask={false}
                 forceRender
                 visible={myEvaluateVisible}
                 bodyStyle={{height: '100%'}}
@@ -638,6 +641,7 @@ export default function Home() {
                 </div>
             </Popup>
             <Popup
+                mask={false}
                 forceRender
                 visible={myLikeVisible}
                 bodyStyle={{height: '100%'}}

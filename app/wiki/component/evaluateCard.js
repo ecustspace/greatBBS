@@ -134,7 +134,7 @@ export function MyEvaluateCard({evaluate,onClick}) {
                 {evaluate.SK.split('#')[1]}<span style={{
                 fontSize: "smaller",
                 color: "gray"
-            }}>{evaluate.SK.split('#')[0]}</span>
+            }}>{' '+evaluate.SK.split('#')[0]}</span>
             </div>
             <Rate style={{"--star-size": '12px'}} count={7} value={evaluate.Evaluate}></Rate>
             <Ellipsis content={evaluate.Content} style={{marginTop: '6px', marginBottom: '4px'}}/>
@@ -253,8 +253,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
                 } : {
                     maxRows: 2
                 }
-            } rows={1} disabled={!isEdit} showCount={isEdit} value={content.length > 0? content : '没有留下评价'}
-                                                                             onChange={setContent}/></div>
+            } rows={1} disabled={!isEdit} showCount={isEdit} value={content} onChange={setContent}/></div>
             <Space justify='end' block>
                 {isEdit ?
                     <>
@@ -263,7 +262,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
                             size='small' shape='rounded'
                             onClick={() => {
                                 setContent(myEvaluate.Content ? myEvaluate.Content : '没有留下评价')
-                                setEvaluate(myEvaluate.Evaluate ? myEvaluate.Evaluate : 0)
+                                setEvaluate(myEvaluate.Evaluate ? myEvaluate.Evaluate : 4)
                                 setEdit(false)
                             }}>取消</Button>
                         <Button loading={loading || !myEvaluate} onClick={submitChange} size='small' shape='rounded' color='primary'>提交</Button>
@@ -304,7 +303,7 @@ export function WikiCard({wiki,onClick}) {
                 {wiki.SK}<span style={{
                 fontSize: "small",
                 color: "gray"
-            }}>{wiki.PK}</span>
+            }}>{' '+wiki.PK}</span>
             </div>
             <div style={{
                 color: "gray",

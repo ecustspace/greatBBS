@@ -481,7 +481,7 @@ export default function Home() {
                                     }}>{focusWiki.SK}<span style={{
                                         fontSize: "small",
                                         color: "gray"
-                                    }}>{focusWiki.PK}</span>
+                                    }}>{' '+focusWiki.PK}</span>
                                     </div>
                                     <div style={{
                                         fontSize: 'small', color: "gray",

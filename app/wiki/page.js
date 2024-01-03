@@ -452,7 +452,7 @@ export default function Home() {
                 forceRender
                 visible={wikiDetailsVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 1001}}
+                style={{'--z-index': 901}}
             >
                 <div
                     style={{
@@ -547,7 +547,7 @@ export default function Home() {
                         position: 'fixed',
                         bottom: 0,
                         width: '100%',
-                        zIndex: 1006,
+                        zIndex: 906,
                         backgroundColor: 'white',
                         borderTop: '0.5px solid lightgrey'
                     }}>
@@ -573,7 +573,7 @@ export default function Home() {
                 forceRender
                 visible={searchVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 1000}}
+                style={{'--z-index': 900}}
             >
                 <NavBar back='返回' onBack={() => setSearchVisible(false)}></NavBar>
                 <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
@@ -613,7 +613,7 @@ export default function Home() {
                 forceRender
                 visible={myEvaluateVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 997}}
+                style={{'--z-index': 897}}
             >
                 <NavBar back='返回' onBack={() => {setMyEvaluateVisible(false)}} />
                 <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
@@ -641,7 +641,7 @@ export default function Home() {
                 forceRender
                 visible={myLikeVisible}
                 bodyStyle={{height: '100%'}}
-                style={{'--z-index': 999}}
+                style={{'--z-index': 899}}
             >
                 <NavBar back='返回' onBack={() => {setMyLikeVisible(false)}} />
                 <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>

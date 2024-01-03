@@ -64,7 +64,6 @@ export function EvaluateCard({evaluate,onClick,avatarClick}) {
                 })
                 reportEvaluate(document.cookie,evaluate.SK,evaluate.PK,evaluate.Content).then((res) => {
                     if (res.status === 200) {
-                        setLikeCount(likeCount => likeCount + 1)
                         Toast.show({
                             icon: 'success',
                             content: 'ok!'

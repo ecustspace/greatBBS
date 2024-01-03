@@ -336,7 +336,7 @@ export async function reportEvaluate(cookie,key,other_name,content) {
     const mailData = {
         from: process.env.SMTP_USERNAME, // sender address
         to: process.env.SMTP_USERNAME, // list of receivers
-        subject: `对【${key}】词条下的${other_name}的评价的举报`, // Subject line
+        subject: `${username}对【${key}】词条下的${other_name}的评价的举报`, // Subject line
         text: content
     };
     try {

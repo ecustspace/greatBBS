@@ -476,7 +476,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                     setMaskVisible(true)
                                 }}/>
                             </Space>
-                            <Button disabled={btnDisable || textContent.length === 0} size='mini' color='primary'
+                            <Button shape='rounded' disabled={btnDisable || textContent.length === 0} size='mini' color='primary'
                                     onClick={submitReply}>评论</Button>
                         </div>
                     </div>

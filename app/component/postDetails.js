@@ -446,7 +446,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                 </Space>
                                 <Button
                                     disabled={btnDisable || (textContent.length === 0 && ((fileList.length === 0 && uploadImage) || !uploadImage))}
-                                    size='mini' color='primary' onClick={submitReply}>评论</Button>
+                                    size='mini' shape='rounded' color='primary' onClick={submitReply}>评论</Button>
                             </div>
                             {uploadImage ? <ImageUploader
                                 maxCount={3}

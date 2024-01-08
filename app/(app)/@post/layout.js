@@ -11,9 +11,9 @@ import {showLoginModal} from "@/app/component/function";
 import Hammer from "hammerjs";
 
 const tabItems = [
-    { key: 'tiezi', title: <div style={{fontWeight:'bold' ,fontSize:15}}>帖子</div> },
-    { key: 'shudong', title: <div style={{fontWeight:'bold' ,fontSize:15}}>树洞</div> },
-    { key: 'ershoujiaoyi', title: <div style={{fontWeight:'bold' ,fontSize:15}}>照片墙</div> },
+    { key: 'tiezi', title: <div className='tabItem'>帖子</div> },
+    { key: 'shudong', title: <div className='tabItem'>树洞</div> },
+    { key: 'ershoujiaoyi', title: <div className='tabItem'>照片墙</div> },
 ]
 
 export default function RootLayout({ post,anPost,ins }) {

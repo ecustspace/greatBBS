@@ -17,10 +17,9 @@ import {
 } from "antd-mobile";
 import {
     ArrowDownCircleOutline,
-    CloseShieldOutline, FaceRecognitionOutline,
+    CloseShieldOutline, EditSOutline, FaceRecognitionOutline,
     LeftOutline,
     RightOutline, SearchOutline,
-    TagOutline,
     TeamOutline,
     TextOutline
 } from "antd-mobile-icons";
@@ -215,7 +214,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
             />
             <div className='userData'>
                 <div className='ava'>
-                    <Image src={userData.avatar} alt='这是一个头像' width={75} height={75} style={{ borderRadius: 60, display: 'inline-block' }} />
+                    <Image src={userData.avatar} alt='这是一个头像' width={64} height={64} style={{ borderRadius: 60, display: 'inline-block' }} />
                     <h3>{userData.name}</h3>
                 </div>
             </div>
@@ -244,7 +243,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
             </div>
             <div className="choiceList">
                 <List header="" style={{fontWeight:'bold'}}>
-                    <List.Item prefix={<TagOutline fontSize={24}/>}
+                    <List.Item prefix={<EditSOutline fontSize={24}/>}
                                onClick={() => {
                                    setVisibleData(true)
                                }}

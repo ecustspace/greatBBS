@@ -1,4 +1,3 @@
-import '@/app/(app)/@user/user.css'
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
 import {Button, Image, InfiniteScroll, NavBar, Popup, Steps} from "antd-mobile";
 import {ContactTa, getUserPost} from "@/app/api/serverAction";
@@ -80,9 +79,9 @@ const UserDetails = forwardRef(({user},ref) => {
        >
            <NavBar onBack={() => {setIsVisible(false)}} />
                <div style={{display:'flex',flexDirection:"column",width:'100%',height:'100%'}}>
-       <div className='ava'>
-           <Image src={user.avatar} alt='这是一个头像' width={75} height={75} style={{ borderRadius: 60, display: 'inline-block' }} />
-           <h3>{user.name}</h3>
+       <div style={{textAlign:"center",marginTop:'15px',marginBottom:'10px'}}>
+           <Image src={user.avatar} alt='这是一个头像' width={64} height={64} style={{ borderRadius: 60, display: 'inline-block' }} />
+           <div style={{textAlign:"center",padding:'8px',fontSize:"large",fontWeight:'bold'}}>{user.name}</div>
            <Button
                color={"default"}
                shape={"rounded"}

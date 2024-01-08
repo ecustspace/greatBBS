@@ -45,7 +45,7 @@ const SendPost = forwardRef((props, ref) => {
     const sendPostRight = (
         <div style={{ fontSize: 24 }}>
             <Space style={{ '--gap': '16px' }}>
-                <Button color='primary' fill='solid' size='small' onClick={onSubmit} disabled={btnDisable || (Text.length === 0 && activePart !== 2)}>
+                <Button shape={"rounded"} color='primary' fill='solid' size='small' onClick={onSubmit} disabled={btnDisable || (Text.length === 0 && activePart !== 2)}>
                     发布
                 </Button>
             </Space>
@@ -53,7 +53,6 @@ const SendPost = forwardRef((props, ref) => {
     )
 
     function onSubmit() {
-        setBtnDisable(true)
         let data = {
             images: fileList,
             text: Text,
@@ -68,6 +67,7 @@ const SendPost = forwardRef((props, ref) => {
                 return
         }}
         captchaRef.current.executeAsync().then(token => {
+            setBtnDisable(true)
             data.recaptchaToken = token
             const xhr = new XMLHttpRequest();
             if (activePart === 0) {

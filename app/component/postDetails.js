@@ -259,7 +259,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                 <div style={{display: 'flex'}}>
                                     <Avatar
                                         src={post.Avatar}
-                                        style={{'--size': '54px', marginRight: 18}}
+                                        style={{'--size': '46px', marginRight: 18}}
                                         onClick={() => {
                                             showUserPopup({
                                                 name: post.PK,

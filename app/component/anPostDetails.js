@@ -350,7 +350,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='anPostDetails'>
                         <div className='postDetail'>
                             <div style={{display: 'flex'}}>
-                                <Avatar src={post.Avatar} style={{'--size': '54px', marginRight: 18}}></Avatar>
+                                <Avatar src={post.Avatar} style={{'--size': '46px', marginRight: 18}}></Avatar>
                                 <div style={{flexGrow: 1, position: "relative"}}>
                                     <div style={{
                                         fontWeight: 'bold',

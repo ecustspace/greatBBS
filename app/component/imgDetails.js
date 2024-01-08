@@ -261,7 +261,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
                             <div style={{display: 'flex'}}>
                                 <Avatar
                                     src={post.Avatar}
-                                    style={{'--size': '54px', marginRight: 18}}
+                                    style={{'--size': '46px', marginRight: 18}}
                                     onClick={() => {
                                         if (post.PostType === 'AnPost') {
                                             Toast.show({

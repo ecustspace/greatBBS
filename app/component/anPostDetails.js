@@ -350,18 +350,18 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='anPostDetails'>
                         <div className='postDetail'>
                             <div style={{display: 'flex'}}>
-                                <Avatar src={post.Avatar} style={{'--size': '46px', marginRight: 18}}></Avatar>
+                                <Avatar src={post.Avatar} style={{'--size': '48px', marginRight: 18}}></Avatar>
                                 <div style={{flexGrow: 1, position: "relative"}}>
                                     <div style={{
                                         fontWeight: 'bold',
                                         fontSize: "medium",
-                                        top: 4,
+                                        top: 2,
                                         position: "absolute"
                                     }}>{'树洞#' + post.PostID}</div>
                                     <div style={{
                                         fontSize: 'small', color: "gray",
                                         position: "absolute",
-                                        bottom: 5
+                                        bottom: 3
                                     }}>{timeConclude(post.SK)}
                                     </div>
                                 </div>

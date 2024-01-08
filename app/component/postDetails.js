@@ -259,7 +259,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                 <div style={{display: 'flex'}}>
                                     <Avatar
                                         src={post.Avatar}
-                                        style={{'--size': '46px', marginRight: 18}}
+                                        style={{'--size': '48px', marginRight: 18}}
                                         onClick={() => {
                                             showUserPopup({
                                                 name: post.PK,
@@ -271,7 +271,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                         <div style={{
                                             fontWeight: 'bold',
                                             fontSize: "medium",
-                                            top: 4,
+                                            top: 2,
                                             position: "absolute"
                                         }}>{post.PK}<span style={{
                                             fontSize: "small",
@@ -281,7 +281,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                         <div style={{
                                             fontSize: 'small', color: "gray",
                                             position: "absolute",
-                                            bottom: 5
+                                            bottom: 3
                                         }}>{timeConclude(post.SK)}
                                         </div>
                                     </div>

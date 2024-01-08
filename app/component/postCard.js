@@ -48,7 +48,7 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
     return(
             <div className='card' onClick={onClick}>
                 <div className='cardAvatar' onClick={(e) => {e.stopPropagation()}}>
-                    <Avatar src={post.Avatar} style={{ '--size': '46px' }} onClick={avatarClick}/>
+                    <Avatar src={post.Avatar} style={{ '--size': '48px' }} onClick={avatarClick}/>
                 </div>
                 <div className='cardContent'>
                         <div style={{display:"flex"}} id={'card' + post.PostID}>

@@ -1,6 +1,6 @@
 'use client'
 
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Button, CenterPopup, Form, Input} from "antd-mobile";
 import './loginModal.css'
 import ReCAPTCHA from "react-google-recaptcha";
@@ -8,8 +8,10 @@ import {emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 
 // eslint-disable-next-line react/display-name
 export default function LoginModal({onSubmit,loginSuccess,root}){
-    const [isVisible,setVisible] = useState(true)
+    const [isVisible,setVisible] = useState(false)
     const captchaRef = useRef(null)
+    const [isLoading,setLoading] = useState(false)
+    useEffect(() => {setVisible(true)},[])
     return(
         <CenterPopup
             visible={isVisible}
@@ -35,8 +37,10 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                 onFinish={(values) => {
                     captchaRef.current.executeAsync().then(token => {
                         captchaRef.current.reset()
+                        setLoading(true)
                         values.recaptchaToken = token
                         onSubmit(values).then(res => {
+                            setLoading(false)
                             if (res.status === 200) {
                                 if(loginSuccess) {
                                     loginSuccess()
@@ -58,6 +62,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             color={"primary"}
                             shape={"rounded"}
                             size='middle'
+                            loading={isLoading}
                             type="submit"
                             >
                             <div style={{ fontWeight: 'bolder', fontSize: "small" }}>登 录</div>

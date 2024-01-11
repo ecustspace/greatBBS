@@ -9,9 +9,6 @@ export default async function Home ({params}){
     const token = decodeURIComponent(params.token)
     const data_ = decodeURIComponent(params.data)
     if (sha256(data_ + process.env.JWT_SECRET) !== token) {
-        console.log(token)
-        console.log(data_)
-        console.log(params.props)
         return (
             <TheResult props={{
                 status:'error',

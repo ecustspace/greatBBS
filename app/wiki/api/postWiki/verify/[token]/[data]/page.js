@@ -6,8 +6,8 @@ import {v4} from "uuid";
 import {revalidateTag} from "next/cache";
 
 export default async function Home ({params}){
-    const token = decodeURIComponent(params.props[0])
-    const data_ = decodeURIComponent(params.props[1])
+    const token = decodeURIComponent(params.token)
+    const data_ = decodeURIComponent(params.data)
     if (sha256(data_ + process.env.JWT_SECRET) !== token) {
         console.log(token)
         console.log(data_)

@@ -11,6 +11,7 @@ export default async function Home ({params}){
     if (sha256(data_ + process.env.JWT_SECRET) !== token) {
         console.log(token)
         console.log(data_)
+        console.log(params.props)
         return (
             <TheResult props={{
                 status:'error',

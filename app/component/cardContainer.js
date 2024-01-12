@@ -59,6 +59,7 @@ export default function CardContainer({type}) {
             })
         }
         fetchData(type).then(data => {
+            console.log(data)
             Toast.clear()
             if (data.lastKey) {
                 setKey(data.lastKey)

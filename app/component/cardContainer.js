@@ -64,18 +64,19 @@ export default function CardContainer({type}) {
                 setKey(data.lastKey)
             }
             if (data.posts.length > 0) {
-                getPostLikeList(document.cookie,data.posts[0].PostID,data.posts[data.posts.length - 1].PostID).then(
-                    res => {
-                        addLike(res.map(item => {
-                            return item.SK
-                        }))
-                    }
-                )
+                    getPostLikeList(document.cookie,data.posts[0].PostID,data.posts[data.posts.length - 1].PostID).then(
+                        res => {
+                            addLike(res.map(item => {
+                                return item.SK
+                            }))
+                        }
+                    )
                 setPostList(data.posts)
                 setLoadPostList([])
                 setHasMore(true)
             } else {setHasMore(false)}
-        }).catch(() => {
+        }).catch((err) => {
+            console.log(err)
             Toast.show({
                 icon:'fail',
                 content:'刷新失败'

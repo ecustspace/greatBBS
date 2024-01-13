@@ -7,6 +7,7 @@ import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext} from "@/app/(app)/layout";
 import {lock, unlock} from "tua-body-scroll-lock";
 import Hammer from "hammerjs";
+import parser from "ua-parser-js";
 
 const { Step } = Steps
 
@@ -21,6 +22,10 @@ const UserDetails = forwardRef(({user},ref) => {
     const {showPostPopup,showImgPopup,hideAllPostPopup} = useContext(detailsContext)
 
     useEffect(() => {
+        const ua = parser()
+        if (ua.browser == null || ua.browser.name !== 'Safari') {
+            return
+        }
         if (!isVisible) {
             unlock(document.getElementById('userDetails'))
         } else {

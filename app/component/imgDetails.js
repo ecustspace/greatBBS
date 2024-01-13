@@ -35,6 +35,7 @@ import EmojiPicker from "emoji-picker-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import Hammer from "hammerjs";
+import parser from "ua-parser-js";
 
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post,like},ref) => {
@@ -70,6 +71,10 @@ const PostDetails = forwardRef(({post,like},ref) => {
     },[]);
 
     useEffect(() => {
+        const ua = parser()
+        if (ua.browser == null || ua.browser.name !== 'Safari') {
+            return
+        }
         if (!isPopupVisible) {
             unlock(document.getElementById('imgDetails'))
         } else {

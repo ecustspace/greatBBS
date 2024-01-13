@@ -38,6 +38,7 @@ import {CopyToClipboard} from "react-copy-to-clipboard";
 import EmojiPicker from "emoji-picker-react";
 import Hammer from "hammerjs";
 import ReCAPTCHA from "react-google-recaptcha";
+import parser from "ua-parser-js";
 
 // eslint-disable-next-line react/display-name
 const AnPostDetails = forwardRef(({post,like},ref) => {
@@ -71,6 +72,10 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     },[]);
 
     useEffect(() => {
+        const ua = parser()
+        if (ua.browser == null || ua.browser.name !== 'Safari') {
+            return
+        }
         if (!isPopupVisible) {
             unlock(document.getElementById('anPostDetails'))
         } else {

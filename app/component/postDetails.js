@@ -34,6 +34,8 @@ import EmojiPicker from 'emoji-picker-react';
 import Hammer from 'hammerjs'
 import ReCAPTCHA from "react-google-recaptcha";
 import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import parser from "ua-parser-js";
+
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post},ref) => {
     const [isPopupVisible, setIsVisible] = useState(false)
@@ -68,6 +70,10 @@ const PostDetails = forwardRef(({post},ref) => {
     },[]);
 
     useEffect(() => {
+        const ua = parser()
+        if (ua.browser == null || ua.browser.name !== 'Safari') {
+            return
+        }
         if (!isPopupVisible) {
             unlock(document.getElementById('postDetails'))
         } else {

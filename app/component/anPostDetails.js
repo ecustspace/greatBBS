@@ -422,7 +422,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                   setMaskVisible(false)
                               }}
                               afterClose={() => {
-                                  lock(document.getElementById('anPostDetails'))
                                   if (replyTo.reply_name) {
                                       setReplyTo({})
                                       setTextContent('')
@@ -461,7 +460,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                             width='100%'
                             previewConfig={{showPreview: false}}
                             onEmojiClick={value => {
-                                lock(document.getElementById('postDetails'))
                                 setPickerVisible(false)
                                 setTextContent(text => text + value.emoji)
                             }}/></div> : ''}
@@ -471,7 +469,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                                     Toast.show('树洞不可以发送图片')
                                 }}/>
                                 <SmileOutline style={{fontSize: 22}} onClick={() => {
-                                    unlock(document.getElementById('anPostDetails'))
                                     setPickerVisible(value => !value)
                                     setMaskVisible(true)
                                 }}/>

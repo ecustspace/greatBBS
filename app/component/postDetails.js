@@ -356,7 +356,6 @@ const PostDetails = forwardRef(({post},ref) => {
                                       setMaskVisible(false)
                                   }}
                                   afterClose={() => {
-                                      lock(document.getElementById('postDetails'))
                                       if (replyTo.reply_name) {
                                           setReplyTo({})
                                           setTextContent('')
@@ -423,7 +422,6 @@ const PostDetails = forwardRef(({post},ref) => {
                                 width='100%'
                                 previewConfig={{showPreview: false}}
                                 onEmojiClick={value => {
-                                    lock(document.getElementById('postDetails'))
                                     setPickerVisible(false)
                                     setTextContent(text => text + value.emoji)
                                 }}/></div> : ''}
@@ -439,7 +437,6 @@ const PostDetails = forwardRef(({post},ref) => {
                                         setUploadImage(true)
                                     }}/>
                                     <SmileOutline style={{fontSize: 22}} onClick={() => {
-                                        unlock(document.getElementById('postDetails'))
                                         setPickerVisible(value => !value)
                                         setMaskVisible(true)
                                     }}/>

@@ -1,5 +1,4 @@
 .tabs {
-    width: 100vw;
     background-color: white;
 }
 
@@ -19,8 +18,6 @@
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    width: 100%;
-    left: 0;
 }
 
 .tabItem {

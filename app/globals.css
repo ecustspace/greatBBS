@@ -6,6 +6,11 @@
   white-space: pre-wrap;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+}
+
 html {
   touch-action: pan-x pan-y;
   min-height: 100%;

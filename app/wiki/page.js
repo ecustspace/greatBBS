@@ -320,7 +320,7 @@ export default function Home() {
                 window.location.replace('/')
             }} alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
-            <div style={{margin:'5px',marginBottom:'10px'}}>
+            <div style={{margin:'8px',marginBottom:'10px',marginTop:'4px'}}>
                 <SearchBar
                 onChange={setSearch}
                 value={search}

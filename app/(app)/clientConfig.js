@@ -1,4 +1,4 @@
-export const imageUrl = 'https://d2ekmn0x4fiphu.cloudfront.net'
+export const imageUrl = 'https://raw.gitmirror.com/ecustspace/image/main'
 export const Url = 'https://ecust.space'
 
 export const admin = '方昆亮'

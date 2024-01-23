@@ -35,8 +35,8 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                 mode='card' className='fm'
                 style={{ '--prefix-width': '3.5em' }}
                 onFinish={(values) => {
+                    captchaRef.current.reset()
                     captchaRef.current.executeAsync().then(token => {
-                        captchaRef.current.reset()
                         setLoading(true)
                         values.recaptchaToken = token
                         onSubmit(values).then(res => {
@@ -50,7 +50,6 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             alert(res.tip)
                         })
                     }).catch(() => {
-                        captchaRef.current.reset()
                         alert('未通过人机验证')
                     })
                 }}

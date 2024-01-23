@@ -130,6 +130,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
     },[post])
 
     function submitReply() {
+        captchaRef.current.reset()
         captchaRef.current.executeAsync().then(token => {
             setDisable(true)
             const data = {
@@ -163,7 +164,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
             }).then(res => {
                 return res.json()})
                 .then(data => {
-                    captchaRef.current.reset()
                     setDisable(false)
                     if (data.tip === '匿名密钥错误') {
                         localStorage.setItem('Anid','')
@@ -176,7 +176,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
                     }
                     responseHandle(data)
                 }).catch(() => {
-                captchaRef.current.reset()
                 setDisable(false)
                 Toast.show({
                     icon:"fail",

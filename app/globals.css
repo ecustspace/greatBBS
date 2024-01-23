@@ -107,6 +107,4 @@ body {
   border: solid 6px var(--adm-color-primary);
 }
 
-.grecaptcha-badge {
-  visibility: hidden;
-}
+

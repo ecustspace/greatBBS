@@ -146,6 +146,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
         setReplyTo({})
     },[post])
     function submitReply() {
+        captchaRef.current.reset()
         captchaRef.current.executeAsync().then(token => {
             setDisable(true)
             const data = {
@@ -178,7 +179,6 @@ const PostDetails = forwardRef(({post,like},ref) => {
             }).then(res => {
                 return res.json()})
                 .then(data => {
-                    captchaRef.current.reset()
                     setDisable(false)
                     responseHandle(data)
                     if (data.status === 200) {
@@ -189,7 +189,6 @@ const PostDetails = forwardRef(({post,like},ref) => {
                         setReplyTo({})
                     }
                 }).catch(() => {
-                captchaRef.current.reset()
                 setDisable(false)
                 Toast.show({
                     icon:"fail",

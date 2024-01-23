@@ -66,6 +66,7 @@ const SendPost = forwardRef((props, ref) => {
                 setBtnDisable(false)
                 return
         }}
+        captchaRef.current.reset()
         captchaRef.current.executeAsync().then(token => {
             setBtnDisable(true)
             data.recaptchaToken = token
@@ -101,7 +102,6 @@ const SendPost = forwardRef((props, ref) => {
                 setBtnDisable(false)
                 Toast.clear()
                 if (xhr.readyState === 4) {
-                    captchaRef.current.reset()
                     responseHandle(xhr.response)
                     if (xhr.response.status === 200) {
                         setText('')

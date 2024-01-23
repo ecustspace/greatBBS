@@ -46,7 +46,7 @@ export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
 export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
 
     return(
-            <div className='card' onClick={onClick}>
+            <div className='card' onClick={onClick} style={{borderBottom: '0.5px solid lightgrey'}}>
                 <div className='cardAvatar' onClick={(e) => {e.stopPropagation()}}>
                     <Avatar src={post.Avatar} style={{ '--size': '48px' }} onClick={avatarClick}/>
                 </div>

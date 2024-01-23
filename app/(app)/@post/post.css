@@ -15,9 +15,8 @@
 }
 
 .navigation {
-    position: -webkit-sticky;
     position: sticky;
-    z-index: 900;
+    transform: translateZ(0);
     top: 0;
 }
 

@@ -17,8 +17,6 @@ export default function Home() {
     const [psw, setPsw] = useState('');
     const [psw2, setPsw2] = useState('');
     const [visible, setVisible] = useState(false)
-    const [disable, setDisable] = useState(false)
-    const [time, setTime] = useState("获取验证码");
     const [userCount,setCount] = useState(0)
     const [form] = Form.useForm()
     const captchaRef = useRef(null)
@@ -48,8 +46,6 @@ export default function Home() {
             alert("请正确输入邮箱后获取验证码！")
             return
         }
-        let last = window.localStorage.getItem("time") ? window.localStorage.getItem("time") : 0
-        if (last <= 0 || (window.localStorage.getItem("time") && (Date.parse(new Date()) - window.localStorage.getItem("time") >= 120000))) {
             captchaRef.current.executeAsync().then(token => {
                 let values = form.getFieldsValue(true)
                 values.recaptchaToken = token
@@ -69,7 +65,6 @@ export default function Home() {
                 }).then(
                     (data) => {
                         document.cookie = `SignUpToken=${data.sign_up_token}`
-                        window.localStorage.setItem("time", Date.parse(new Date()))
                         if (data.status === 200) {
                             Toast.clear()
                             Dialog.show({
@@ -95,20 +90,6 @@ export default function Home() {
                         } else {
                             responseHandle(data)
                         }
-                        setDisable(true)
-                        last = window.localStorage.getItem("time")
-                        let now = Date.parse(new Date())
-                        let res = now - last
-                        setTime(((60000 - res) / 1000).toString() + "s")
-                        let djs = setInterval(() => {
-                            res += 1000
-                            setTime(((60000 - res) / 1000).toString() + "s")
-                            if (res == 60000) {
-                                setTime("获取验证码")
-                                setDisable(false)
-                                clearInterval(djs)
-                            }
-                        }, 1000);
                     }
                 ).catch(() => {
                     Toast.show('error')
@@ -117,23 +98,6 @@ export default function Home() {
                 captchaRef.current.reset()
                 Toast.show('未通过人机验证')
             })
-        }
-        else {
-            setDisable(true)
-            last = window.localStorage.getItem("time")
-            let now = Date.parse(new Date())
-            let res = now - last
-            setTime(((60000 - res) / 1000).toString() + "s")
-            let djs = setInterval(() => {
-                res += 1000
-                setTime(((60000 - res) / 1000).toString() + "s")
-                if (res == 60000) {
-                    setTime("获取验证码")
-                    setDisable(false)
-                    clearInterval(djs)
-                }
-            }, 1000);
-        }
     }
     const onSubmit1 = () => {
         captchaRef.current.executeAsync().then(token => {
@@ -326,7 +290,7 @@ export default function Home() {
                     name='verification'
                     label='验证码'
                     extra={
-                        <Button color='primary' size='small' fill='none' disabled={disable} onClick={onSubmit}>{time}</Button>
+                        <Button color='primary' size='small' fill='none' onClick={onSubmit}>获取验证码</Button>
                     }
                 >
                     <Input placeholder='请输入验证码' />

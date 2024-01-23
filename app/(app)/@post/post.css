@@ -16,7 +16,8 @@
 
 .navigation {
     position: sticky;
-    transform: translate3d(0,0,0);
+    transform: translateZ(0);
+    z-index: 800;
     top: 0;
 }
 

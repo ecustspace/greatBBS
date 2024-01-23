@@ -36,7 +36,7 @@ body {
 .card {
   display: flex;
   padding-left: 10px;
-  margin-right: 8px;
+  padding-right: 8px;
   margin-top: 10px;
   padding-bottom: 8px;
 }

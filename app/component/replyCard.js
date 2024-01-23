@@ -32,7 +32,7 @@ export default function ReplyCard({name,reply,onClickReply,replyToName,operate,o
                     <div>{name}<span style={{fontSize:"smaller",color:"gray"}}>{(typeof reply.UserScore == 'number' ? ` ${level(reply.UserScore)}` : '')}</span>{replyToName !== undefined ? ' ⇒ ' + replyToName : ''}</div>
                     <div style={{color:'darkgrey',flexGrow:1}}>{reply.ReplyToID? ' #' + reply.ReplyToID : ''}</div>
                 #{!operate ? reply.ReplyID : reply.PostType.split('o')[1]}</div>
-                <Ellipsis content={reply.Content} style={{marginTop:'6px',marginBottom:'4px'}} />
+                <Ellipsis content={reply.Content} style={{marginTop:'6px',marginBottom:'4px',fontSize:'medium'}} />
                 {reply.ImageList !== undefined?
                     <ImageContainer
                         list={reply.ImageList}

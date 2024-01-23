@@ -20,7 +20,7 @@ export default function ReplyCard({name,reply,onClickReply,replyToName,operate,o
     }
     return (
         <div
-            className='card'
+            className='replyCard'
             style={{marginLeft:'16px',marginRight:'16px',marginTop:'13px'}}
             onClick={onClickJustify}
         >

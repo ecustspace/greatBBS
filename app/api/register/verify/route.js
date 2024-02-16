@@ -5,6 +5,7 @@ import {v4} from "uuid";
 import {avatarList} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
 import parser from "ua-parser-js";
+import {headers} from "next/headers";
 
 export function dataLengthVerify(min,max,data) {
     return !(data.length > max || data.length < min || typeof data != 'string');
@@ -19,7 +20,6 @@ export async function POST(request) {
         return NextResponse.json({tip:'数据格式不正确'})
     }
     const sign_up_token = data.sign_up_token
-    console.log(sign_up_token)
     const getCaptchaCommand = new GetCommand(
         {
             TableName: 'User',

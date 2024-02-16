@@ -248,7 +248,7 @@ export default function Home() {
             <NavBar backArrow={false} left={<Image
                 alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
-            <div style={{margin: '8px', marginBottom: '10px', marginTop: '4px'}}>
+            <div style={{width:'100vw', margin: '8px', marginBottom: '10px', marginTop: '4px'}}>
                 <SearchBar
                     value={searchContent}
                     onChange={setSearchContent}

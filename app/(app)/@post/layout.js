@@ -8,6 +8,7 @@ import Image from 'next/image'
 import {AddOutline} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
 import {showLoginModal} from "@/app/component/function";
+import {useRouter} from "next/navigation";
 
 
 const tabItems = [
@@ -21,6 +22,7 @@ export default function Layout({ post,anPost,ins }) {
     const [activeIndex, setActiveIndex] = useState(0)
     const popup = useRef(null)
     const login = useContext(loginState)
+    const router = useRouter()
     const right = (
         <Button
             block
@@ -69,6 +71,10 @@ export default function Layout({ post,anPost,ins }) {
                     <Tabs
                         activeKey={tabItems[activeIndex].key}
                         onChange={key => {
+                            if (login.isLogin === false) {
+                                router.replace('/login')
+                                return
+                            }
                             const index = tabItems.findIndex(item => item.key === key)
                             setActiveIndex(index)
                         }}

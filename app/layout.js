@@ -51,12 +51,12 @@ export default function RootLayout({ children }) {
         <html>
         <head>
             <link rel='manifest' href='/manifest.json'></link>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
         </head>
         <loginState.Provider value={login}>
             <body>
-                <div id='loginRoot'></div>
-                {children}
+            <div id='loginRoot'></div>
+            {children}
             </body>
         </loginState.Provider>
         </html>

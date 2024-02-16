@@ -241,10 +241,16 @@ export default function Home() {
 
     return (
         <div>
-            {search[0] === '#' && search.length > 1 ? <div className='float' onClick={showPopup} style={{bottom: '65px'}}>
-                <Button shape='rounded' color='primary'><div style={{textAlign:"center",alignItems:'center',display:"flex"}}><BsFeather /> 加入讨论</div></Button>
-            </div> : ''}
-            <SendPost topic={topic} ref={popup} />
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+            {search[0] === '#' && search.length > 1 ?
+                <div className='float' onClick={showPopup} style={{bottom: '65px'}}>
+                    <Button shape='rounded' color='primary'>
+                        <div style={{textAlign: "center", alignItems: 'center', display: "flex"}}><BsFeather/> 加入讨论
+                        </div>
+                    </Button>
+                </div> : ''}
+            <SendPost topic={topic} ref={popup}/>
             <NavBar backArrow={false} left={<Image
                 alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
@@ -291,13 +297,13 @@ export default function Home() {
                             avatarClick={() => {
                                 if (post.PostType === 'AnPost') {
                                     Toast.show({
-                                        content:'树洞不能打开主页'
+                                        content: '树洞不能打开主页'
                                     })
                                     return
                                 }
                                 showUserPopup({
                                     name: post.PK,
-                                    avatar:post.Avatar
+                                    avatar: post.Avatar
                                 })
                             }}
                             onClick={() => {

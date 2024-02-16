@@ -325,287 +325,43 @@ export default function Home() {
 
     return (
         <>
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
             <Turnstile
                 sitekey={turnstile_key}
                 onVerify={() => {
-                    setCaptchaDisable(false)}}
+                    setCaptchaDisable(false)
+                }}
                 onError={() => {
-                    setCaptchaDisable(true)}}
+                    setCaptchaDisable(true)
+                }}
                 onExpire={() => {
-                    setCaptchaDisable(true)}}
-                onLoad={() =>{
-                    setCaptchaDisable(true)}}
+                    setCaptchaDisable(true)
+                }}
+                onLoad={() => {
+                    setCaptchaDisable(true)
+                }}
             />
             <captchaContext.Provider value={captchaContextContent}>
-            <NavBar right={right} backArrow={false} left={<Image onClick={() => {
-                router.replace('/')
-            }} alt='logo' src='/logo.png' width={100} height={25}/>}>
-            </NavBar>
-            <div style={{margin:'8px',marginBottom:'10px',marginTop:'4px'}}>
-                <SearchBar
-                onChange={setSearch}
-                value={search}
-                onSearch={() => {
-                    if (login.isLogin === false) {
-                        showLoginModal(login.toLogin,function(){
-                            if (search.length > 0) {
-                                setSearchVisible(true)
-                            }
-                        })
-                        return
-                    }
-                    if (search.length > 0) {
-                        setSearchVisible(true)
-                    }
-                }}
-                style={{
-                    '--border-radius': '100px',
-                    '--height': '32px',
-                    '--padding-left': '12px',
-                }}
-                placeholder='请输入词条的关键字' /></div>
-            <Space style={{margin:'8px'}} block justify='end'>
-                <Button size='small' shape='rounded' onClick={() => {
-                    if (login.isLogin === false) {
-                        showLoginModal(login.toLogin, function () {
-                            setInstituteSelectVisible(true)
-                        })
-                        return
-                    }
-                    setInstituteSelectVisible(true)
-                }}>{part}</Button>
-                <Button size='small' shape='rounded'
-                        onClick={() => {
-                            if (sortMethod === 0) {
-                                setSortMethod(1)
-                            } else {
-                                setSortMethod(0)
-                            }
-                        }}>{part === '全部'? '换一批' : sort[sortMethod].name}</Button>
-            </Space>
-            <div className='FloatBubble' style={{bottom: '130px'}} onClick={() => refresh(true)}>
-                <UndoOutline fontSize={32} color='#fff'/>
-            </div>
-            <div className='FloatBubble' style={{bottom: '65px'}} onClick={() => {
-                if (login.isLogin === false) {
-                    showLoginModal(login.toLogin, function () {
-                        setEvaluateVisible(true)
-                    })
-                    return
-                }
-                setEvaluateVisible(true)
-            }}>
-                <AddOutline fontSize={32} color='#fff'/>
-            </div>
-            <div id='wiki'>
-                {wikiList.map(post =>
-                    <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)} />
-                )}
-                {part !== '全部'? <InfiniteScroll loadMore={loadMoreWiki} hasMore={wikiHasMore} /> : ''}
-            </div>
-            <CenterPopup
-                visible={evaluateVisible}
-                onMaskClick={() => {
-                    setEvaluateVisible(false)
-                }}
-                style={{
-                    '--max-width': '100vw',
-                    '--min-width': '90vw',
-                    '--z-index': 1000,
-                    '--border-radius': '16px'
-                }}>
-                <AutoCenter>
-                    <div style={{padding: 12, fontWeight: "bold"}}>创建词条</div>
-                </AutoCenter>
-                <div style={{display: "flex", paddingLeft: 12}}>
-                    <Avatar
-                        src={typeof addWiki.evaluate == 'number' ? 'evaluate/' + addWiki.evaluate + '.png' : 'evaluate/4.png'}
-                        style={{borderRadius: 4}}
-                        fit='cover'
-                        width={40}
-                        height={40}/>
-                    <div style={{
-                        paddingLeft: 12,
-                        fontWeight: "bold",
-                        fontSize: 'medium'
-                    }}><Input maxLength={20} placeholder='输入词条' onChange={value => {
-                        setAddWiki({...addWiki, name: value})
-                    }}/><span onClick={() => setInstituteSelectVisible(true)} style={{
-                        fontSize: "small",
-                        color: "gray"
-                    }}>{typeof addWiki.institute == 'string' ? addWiki.institute : '请选择学院'}</span></div>
-                </div>
-                <div style={{padding: 12}}>
-                    <Rate defaultValue={0} count={7} onChange={value => {
-                        setAddWiki({...addWiki, evaluate: value})
-                    }} allowClear={false}/>
-                    <div style={{marginTop: 8}}><TextArea
-                        onChange={val => setAddWiki({...addWiki, content: val})}
-                        style={{'--font-size': 'medium'}} placeholder='输入评价' rows={5} maxLength={200}
-                        showCount></TextArea></div>
-                </div>
-                <div style={{marginRight: 12, paddingBottom: 12}}><Space block justify='end'>
-                    <Button size='small' shape='rounded' onClick={() => {
-                        setEvaluateVisible(false)
-                    }}>取消</Button>
-                    <Button onClick={submitAddWiki} size='small' shape='rounded' color='primary'>提交</Button></Space></div>
-            </CenterPopup>
-            <Picker visible={instituteSelectVisible} title='选择学院' columns={evaluateVisible === true ? [institute
-                .map(item => {
-                    return {label:item,value:item}
-                })] : [[
-                ...[{label: '全部', value: '全部'}],...institute
-                    .map(item => {
-                        return {label:item,value:item}
-                    })
-            ]]}
-                    onConfirm={value => {
-                        evaluateVisible === true ? setAddWiki({
-                            ...addWiki,
-                            institute: value[0]
-                        }) : setPart(value[0])
-                        setInstituteSelectVisible(false)
-                    }}
-                    onCancel={() => {
-                        setInstituteSelectVisible(false)
-                    }}/>
-            <Popup
-                forceRender
-                mask={false}
-                visible={wikiDetailsVisible}
-                bodyStyle={{height: '100%'}}
-                style={{'--z-index': 901}}
-            >
-                <div
-                    style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                    height: '100%',
-                    position: 'relative'
-                }}>
-                    <NavBar back='返回' onBack={() => setWikiDetailsVisible(false)}>
-                        {focusWiki.SK}
-                    </NavBar>
-                    <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='wikiDetails'>
-                        <div style={{marginLeft: '12px', marginRight: '12px'}}>
-                            <div style={{display: 'flex'}}>
-                                <Avatar
-                                    src={focusWiki.SK ? 'evaluate/' + evaluateScore(focusWiki.Evaluate) + '.png' : 'evaluate/7.png'}
-                                    style={{'--size': '54px', marginRight: 18,"--border-radius":'4px'}}
-                                ></Avatar>
-                                <div style={{flexGrow: 1, position: "relative"}}>
-                                    <div style={{
-                                        fontWeight: 'bold',
-                                        fontSize: "medium",
-                                        top: 4,
-                                        position: "absolute"
-                                    }}>{focusWiki.SK}<span style={{
-                                        fontSize: "small",
-                                        color: "gray"
-                                    }}>{' '+focusWiki.PK}</span>
-                                    </div>
-                                    <div style={{
-                                        fontSize: 'small', color: "gray",
-                                        position: "absolute",
-                                        bottom: 5
-                                    }}>{focusWiki.EvaluateCount + '条评价'}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {focusWiki.SK ? <div style={{marginTop: '12px', marginLeft: '12px'}}>
-                            <ProgressBar percent={focusWiki.Evaluate[6] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={7}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[5] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={6}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[4] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={5}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[3] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={4}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[2] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={3}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[1] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={2}/>}/>
-                            <ProgressBar percent={focusWiki.Evaluate[0] / focusWiki.EvaluateCount * 100}
-                                         style={{"--text-width": '40%'}}
-                                         text={<Rate style={{"--star-size": '14px'}} count={7} value={1}/>}/>
-                        </div> : ''}
-                        <div style={{marginTop: '8px', borderBottom: '0.5px solid lightgrey'}}>
-                            <Space style={{marginBottom: '8px', '--gap': '18px', flexGrow: 1}}>
-                                <LoopOutline style={{fontSize: 20, marginLeft: 12}}
-                                             onClick={refreshEvaluate}/>
-                                <TagOutline style={{fontSize: 20}} onClick={() => {
-                                    const isLike = myLikeList.some(like =>
-                                        like.name === focusWiki.SK && like.institute === focusWiki.PK)
-                                    if (isLike === false) {
-                                        const newLikeList = [...myLikeList, {
-                                            name: focusWiki.SK,
-                                            institute: focusWiki.PK
-                                        }]
-                                        setMyLikeList(newLikeList)
-                                        localStorage.setItem('MyLike', JSON.stringify(newLikeList))
-                                        Toast.show('已收藏')
-                                    } else {
-                                        Toast.show('已经收藏过了')
-                                    }
-                                }}/>
-                            </Space>
-                        </div>
-                        {evaluateList.map(evaluate => <EvaluateCard key={evaluate.id} evaluate={evaluate}/>)}
-                        <InfiniteScroll loadMore={getEvaluate} hasMore={hasMore}/>
-                        <br/>
-                        <br/>
-                        <br/>
-                        <br/>
-                    </div>
-                    <div style={{
-                        position: 'fixed',
-                        bottom: 0,
-                        width: '100%',
-                        zIndex: 906,
-                        backgroundColor: 'white',
-                        borderTop: '0.5px solid lightgrey'
-                    }}>
-                        <EditEvaluateCard
-                            myEvaluate={myEvaluate}
-                            focusWiki={focusWiki}
-                            refresh={refreshEvaluate}
-                            onDelete={() => {
-                                deleteEvaluate(focusWiki.PK+'#'+focusWiki.SK,myEvaluate.Evaluate)
-                                    .then(res => {
-                                        if (res.status === 200) {
-                                            setMyEvaluate({tip: 'noEvaluate'})
-                                            refreshEvaluate()
-                                        } else {
-                                            responseHandle(res)
-                                        }
-                                    })
-                            }}/>
-                    </div>
-                </div>
-            </Popup>
-            <Popup
-                mask={false}
-                forceRender
-                visible={searchVisible}
-                bodyStyle={{height: '100%'}}
-                style={{'--z-index': 900}}
-            >
-                <NavBar back='返回' onBack={() => setSearchVisible(false)}></NavBar>
-                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
-                    <div style={{margin:'8px'}}><SearchBar
+                <NavBar right={right} backArrow={false} left={<Image onClick={() => {
+                    router.replace('/')
+                }} alt='logo' src='/logo.png' width={100} height={25}/>}>
+                </NavBar>
+                <div style={{margin: '8px', marginBottom: '10px', marginTop: '4px'}}>
+                    <SearchBar
                         onChange={setSearch}
                         value={search}
                         onSearch={() => {
+                            if (login.isLogin === false) {
+                                showLoginModal(login.toLogin, function () {
+                                    if (search.length > 0) {
+                                        setSearchVisible(true)
+                                    }
+                                })
+                                return
+                            }
                             if (search.length > 0) {
-                                search_()
+                                setSearchVisible(true)
                             }
                         }}
                         style={{
@@ -614,90 +370,346 @@ export default function Home() {
                             '--padding-left': '12px',
                         }}
                         placeholder='请输入词条的关键字'/></div>
-                    <div id='search' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
-                        {searchResult.map(post =>
-                            <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)} />
-                        )}
-                        <InfiniteScroll loadMore={loadMoreResult} hasMore={hasResultMore}>
-                            {hasResultMore ? (
-                                <>
-                                    <span>Loading</span>
-                                    <DotLoading />
-                                </>
-                            ) : (
-                                <span>没有想要的词条？<a onClick={() => setEvaluateVisible(true)}>自己创建一个</a></span>
+                <Space style={{margin: '8px'}} block justify='end'>
+                    <Button size='small' shape='rounded' onClick={() => {
+                        if (login.isLogin === false) {
+                            showLoginModal(login.toLogin, function () {
+                                setInstituteSelectVisible(true)
+                            })
+                            return
+                        }
+                        setInstituteSelectVisible(true)
+                    }}>{part}</Button>
+                    <Button size='small' shape='rounded'
+                            onClick={() => {
+                                if (sortMethod === 0) {
+                                    setSortMethod(1)
+                                } else {
+                                    setSortMethod(0)
+                                }
+                            }}>{part === '全部' ? '换一批' : sort[sortMethod].name}</Button>
+                </Space>
+                <div className='FloatBubble' style={{bottom: '130px'}} onClick={() => refresh(true)}>
+                    <UndoOutline fontSize={32} color='#fff'/>
+                </div>
+                <div className='FloatBubble' style={{bottom: '65px'}} onClick={() => {
+                    if (login.isLogin === false) {
+                        showLoginModal(login.toLogin, function () {
+                            setEvaluateVisible(true)
+                        })
+                        return
+                    }
+                    setEvaluateVisible(true)
+                }}>
+                    <AddOutline fontSize={32} color='#fff'/>
+                </div>
+                <div id='wiki'>
+                    {wikiList.map(post =>
+                        <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)}/>
+                    )}
+                    {part !== '全部' ? <InfiniteScroll loadMore={loadMoreWiki} hasMore={wikiHasMore}/> : ''}
+                </div>
+                <CenterPopup
+                    visible={evaluateVisible}
+                    onMaskClick={() => {
+                        setEvaluateVisible(false)
+                    }}
+                    style={{
+                        '--max-width': '100vw',
+                        '--min-width': '90vw',
+                        '--z-index': 1000,
+                        '--border-radius': '16px'
+                    }}>
+                    <AutoCenter>
+                        <div style={{padding: 12, fontWeight: "bold"}}>创建词条</div>
+                    </AutoCenter>
+                    <div style={{display: "flex", paddingLeft: 12}}>
+                        <Avatar
+                            src={typeof addWiki.evaluate == 'number' ? 'evaluate/' + addWiki.evaluate + '.png' : 'evaluate/4.png'}
+                            style={{borderRadius: 4}}
+                            fit='cover'
+                            width={40}
+                            height={40}/>
+                        <div style={{
+                            paddingLeft: 12,
+                            fontWeight: "bold",
+                            fontSize: 'medium'
+                        }}><Input maxLength={20} placeholder='输入词条' onChange={value => {
+                            setAddWiki({...addWiki, name: value})
+                        }}/><span onClick={() => setInstituteSelectVisible(true)} style={{
+                            fontSize: "small",
+                            color: "gray"
+                        }}>{typeof addWiki.institute == 'string' ? addWiki.institute : '请选择学院'}</span></div>
+                    </div>
+                    <div style={{padding: 12}}>
+                        <Rate defaultValue={0} count={7} onChange={value => {
+                            setAddWiki({...addWiki, evaluate: value})
+                        }} allowClear={false}/>
+                        <div style={{marginTop: 8}}><TextArea
+                            onChange={val => setAddWiki({...addWiki, content: val})}
+                            style={{'--font-size': 'medium'}} placeholder='输入评价' rows={5} maxLength={200}
+                            showCount></TextArea></div>
+                    </div>
+                    <div style={{marginRight: 12, paddingBottom: 12}}><Space block justify='end'>
+                        <Button size='small' shape='rounded' onClick={() => {
+                            setEvaluateVisible(false)
+                        }}>取消</Button>
+                        <Button onClick={submitAddWiki} size='small' shape='rounded'
+                                color='primary'>提交</Button></Space></div>
+                </CenterPopup>
+                <Picker visible={instituteSelectVisible} title='选择学院' columns={evaluateVisible === true ? [institute
+                    .map(item => {
+                        return {label: item, value: item}
+                    })] : [[
+                    ...[{label: '全部', value: '全部'}], ...institute
+                        .map(item => {
+                            return {label: item, value: item}
+                        })
+                ]]}
+                        onConfirm={value => {
+                            evaluateVisible === true ? setAddWiki({
+                                ...addWiki,
+                                institute: value[0]
+                            }) : setPart(value[0])
+                            setInstituteSelectVisible(false)
+                        }}
+                        onCancel={() => {
+                            setInstituteSelectVisible(false)
+                        }}/>
+                <Popup
+                    forceRender
+                    mask={false}
+                    visible={wikiDetailsVisible}
+                    bodyStyle={{height: '100%'}}
+                    style={{'--z-index': 901}}
+                >
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            width: '100%',
+                            height: '100%',
+                            position: 'relative'
+                        }}>
+                        <NavBar back='返回' onBack={() => setWikiDetailsVisible(false)}>
+                            {focusWiki.SK}
+                        </NavBar>
+                        <div style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}} id='wikiDetails'>
+                            <div style={{marginLeft: '12px', marginRight: '12px'}}>
+                                <div style={{display: 'flex'}}>
+                                    <Avatar
+                                        src={focusWiki.SK ? 'evaluate/' + evaluateScore(focusWiki.Evaluate) + '.png' : 'evaluate/7.png'}
+                                        style={{'--size': '54px', marginRight: 18, "--border-radius": '4px'}}
+                                    ></Avatar>
+                                    <div style={{flexGrow: 1, position: "relative"}}>
+                                        <div style={{
+                                            fontWeight: 'bold',
+                                            fontSize: "medium",
+                                            top: 4,
+                                            position: "absolute"
+                                        }}>{focusWiki.SK}<span style={{
+                                            fontSize: "small",
+                                            color: "gray"
+                                        }}>{' ' + focusWiki.PK}</span>
+                                        </div>
+                                        <div style={{
+                                            fontSize: 'small', color: "gray",
+                                            position: "absolute",
+                                            bottom: 5
+                                        }}>{focusWiki.EvaluateCount + '条评价'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {focusWiki.SK ? <div style={{marginTop: '12px', marginLeft: '12px'}}>
+                                <ProgressBar percent={focusWiki.Evaluate[6] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={7}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[5] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={6}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[4] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={5}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[3] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={4}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[2] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={3}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[1] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={2}/>}/>
+                                <ProgressBar percent={focusWiki.Evaluate[0] / focusWiki.EvaluateCount * 100}
+                                             style={{"--text-width": '40%'}}
+                                             text={<Rate style={{"--star-size": '14px'}} count={7} value={1}/>}/>
+                            </div> : ''}
+                            <div style={{marginTop: '8px', borderBottom: '0.5px solid lightgrey'}}>
+                                <Space style={{marginBottom: '8px', '--gap': '18px', flexGrow: 1}}>
+                                    <LoopOutline style={{fontSize: 20, marginLeft: 12}}
+                                                 onClick={refreshEvaluate}/>
+                                    <TagOutline style={{fontSize: 20}} onClick={() => {
+                                        const isLike = myLikeList.some(like =>
+                                            like.name === focusWiki.SK && like.institute === focusWiki.PK)
+                                        if (isLike === false) {
+                                            const newLikeList = [...myLikeList, {
+                                                name: focusWiki.SK,
+                                                institute: focusWiki.PK
+                                            }]
+                                            setMyLikeList(newLikeList)
+                                            localStorage.setItem('MyLike', JSON.stringify(newLikeList))
+                                            Toast.show('已收藏')
+                                        } else {
+                                            Toast.show('已经收藏过了')
+                                        }
+                                    }}/>
+                                </Space>
+                            </div>
+                            {evaluateList.map(evaluate => <EvaluateCard key={evaluate.id} evaluate={evaluate}/>)}
+                            <InfiniteScroll loadMore={getEvaluate} hasMore={hasMore}/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                        </div>
+                        <div style={{
+                            position: 'fixed',
+                            bottom: 0,
+                            width: '100%',
+                            zIndex: 906,
+                            backgroundColor: 'white',
+                            borderTop: '0.5px solid lightgrey'
+                        }}>
+                            <EditEvaluateCard
+                                myEvaluate={myEvaluate}
+                                focusWiki={focusWiki}
+                                refresh={refreshEvaluate}
+                                onDelete={() => {
+                                    deleteEvaluate(focusWiki.PK + '#' + focusWiki.SK, myEvaluate.Evaluate)
+                                        .then(res => {
+                                            if (res.status === 200) {
+                                                setMyEvaluate({tip: 'noEvaluate'})
+                                                refreshEvaluate()
+                                            } else {
+                                                responseHandle(res)
+                                            }
+                                        })
+                                }}/>
+                        </div>
+                    </div>
+                </Popup>
+                <Popup
+                    mask={false}
+                    forceRender
+                    visible={searchVisible}
+                    bodyStyle={{height: '100%'}}
+                    style={{'--z-index': 900}}
+                >
+                    <NavBar back='返回' onBack={() => setSearchVisible(false)}></NavBar>
+                    <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                        <div style={{margin: '8px'}}><SearchBar
+                            onChange={setSearch}
+                            value={search}
+                            onSearch={() => {
+                                if (search.length > 0) {
+                                    search_()
+                                }
+                            }}
+                            style={{
+                                '--border-radius': '100px',
+                                '--height': '32px',
+                                '--padding-left': '12px',
+                            }}
+                            placeholder='请输入词条的关键字'/></div>
+                        <div id='search' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                            {searchResult.map(post =>
+                                <WikiCard key={post.id} wiki={post} onClick={() => showDetails(post)}/>
                             )}
-                        </InfiniteScroll>
+                            <InfiniteScroll loadMore={loadMoreResult} hasMore={hasResultMore}>
+                                {hasResultMore ? (
+                                    <>
+                                        <span>Loading</span>
+                                        <DotLoading/>
+                                    </>
+                                ) : (
+                                    <span>没有想要的词条？<a
+                                        onClick={() => setEvaluateVisible(true)}>自己创建一个</a></span>
+                                )}
+                            </InfiniteScroll>
 
+                        </div>
                     </div>
-                </div>
-            </Popup>
-            <Popup
-                mask={false}
-                forceRender
-                visible={myEvaluateVisible}
-                bodyStyle={{height: '100%'}}
-                style={{'--z-index': 897}}
-            >
-                <NavBar back='返回' onBack={() => {setMyEvaluateVisible(false)}} />
-                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
-                    <div id='myEvaluate' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
-                        {myEvaluateList.map(post =>
-                            <MyEvaluateCard evaluate={post} key={post.id}
-                                            onClick={() => {
-                                                Toast.show({icon:'loading'})
-                                                getMyEvaluateWiki(post.SK).then(res => {
-                                                    if (res) {
-                                                        Toast.clear()
-                                                        setFocusWiki(res)
-                                                        setWikiDetailsVisible(true)
-                                                    } else {
-                                                        Toast.show('error')
-                                                    }
-                                                }).catch(() => Toast.show('error'))
-                                            }}/>
-                        )}
-                        <InfiniteScroll loadMore={loadMoreMyEvaluate} hasMore={myEvaluateHasMore} />
-                    </div>
-                </div>
-            </Popup>
-            <Popup
-                mask={false}
-                forceRender
-                visible={myLikeVisible}
-                bodyStyle={{height: '100%'}}
-                style={{'--z-index': 899}}
-            >
-                <NavBar back='返回' onBack={() => {setMyLikeVisible(false)}} />
-                <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
-                    <div id='myLike' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
-                        <List>
-                            {myLikeLoadList.map(post =>
-                                <List.Item title={post.institute} key={post.id}
-                                           onClick={() => {
-                                               Toast.show({icon:'loading'})
-                                               getMyEvaluateWiki(post.institute + '#' + post.name).then(res => {
-                                                   if (res) {
-                                                       Toast.clear()
-                                                       setFocusWiki(res)
-                                                       setWikiDetailsVisible(true)
-                                                   } else {
-                                                       Toast.show('error')
-                                                   }
-                                               }).catch(() => Toast.show('error'))
-                                           }}>{post.name}</List.Item>
+                </Popup>
+                <Popup
+                    mask={false}
+                    forceRender
+                    visible={myEvaluateVisible}
+                    bodyStyle={{height: '100%'}}
+                    style={{'--z-index': 897}}
+                >
+                    <NavBar back='返回' onBack={() => {
+                        setMyEvaluateVisible(false)
+                    }}/>
+                    <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                        <div id='myEvaluate' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                            {myEvaluateList.map(post =>
+                                <MyEvaluateCard evaluate={post} key={post.id}
+                                                onClick={() => {
+                                                    Toast.show({icon: 'loading'})
+                                                    getMyEvaluateWiki(post.SK).then(res => {
+                                                        if (res) {
+                                                            Toast.clear()
+                                                            setFocusWiki(res)
+                                                            setWikiDetailsVisible(true)
+                                                        } else {
+                                                            Toast.show('error')
+                                                        }
+                                                    }).catch(() => Toast.show('error'))
+                                                }}/>
                             )}
-                        </List>
-                        <InfiniteScroll loadMore={async () => {
-                            if (myLikeLoadList.length < myLikeList.length) {
-                                setMyLikeLoadList([...myLikeLoadList,...myLikeList.slice(myLikeLoadList.length,myLikeLoadList.length+15)])
-                            } else {
-                                setMyLikeHasMore(false)
-                            }
-                        }} hasMore={myLikeHasMore} />
+                            <InfiniteScroll loadMore={loadMoreMyEvaluate} hasMore={myEvaluateHasMore}/>
+                        </div>
                     </div>
-                </div>
-            </Popup>
+                </Popup>
+                <Popup
+                    mask={false}
+                    forceRender
+                    visible={myLikeVisible}
+                    bodyStyle={{height: '100%'}}
+                    style={{'--z-index': 899}}
+                >
+                    <NavBar back='返回' onBack={() => {
+                        setMyLikeVisible(false)
+                    }}/>
+                    <div style={{display: 'flex', flexDirection: "column", width: '100%', height: '100%'}}>
+                        <div id='myLike' style={{overflowX: "scroll", flexGrow: 1, position: 'sticky'}}>
+                            <List>
+                                {myLikeLoadList.map(post =>
+                                    <List.Item title={post.institute} key={post.id}
+                                               onClick={() => {
+                                                   Toast.show({icon: 'loading'})
+                                                   getMyEvaluateWiki(post.institute + '#' + post.name).then(res => {
+                                                       if (res) {
+                                                           Toast.clear()
+                                                           setFocusWiki(res)
+                                                           setWikiDetailsVisible(true)
+                                                       } else {
+                                                           Toast.show('error')
+                                                       }
+                                                   }).catch(() => Toast.show('error'))
+                                               }}>{post.name}</List.Item>
+                                )}
+                            </List>
+                            <InfiniteScroll loadMore={async () => {
+                                if (myLikeLoadList.length < myLikeList.length) {
+                                    setMyLikeLoadList([...myLikeLoadList, ...myLikeList.slice(myLikeLoadList.length, myLikeLoadList.length + 15)])
+                                } else {
+                                    setMyLikeHasMore(false)
+                                }
+                            }} hasMore={myLikeHasMore}/>
+                        </div>
+                    </div>
+                </Popup>
             </captchaContext.Provider>
         </>
     )

@@ -46,7 +46,7 @@ export default function Layout({ post,anPost,ins }) {
     useEffect(() => {
         const loadHammer = async () => {
             const Hammer = await import('hammerjs');
-            const hammertime = new Hammer.default(document.getElementById("imgDetails"));
+            const hammertime = new Hammer.default(document.getElementById("post"));
             hammertime.on("swiperight", function () {
                 setActiveIndex(value => (value === 0 ? value : value - 1))
             });

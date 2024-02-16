@@ -295,15 +295,15 @@ export default function Home() {
                             post={item}
                             key={item.postID}
                             avatarClick={() => {
-                                if (post.PostType === 'AnPost') {
+                                if (item.PostType === 'AnPost') {
                                     Toast.show({
                                         content: '树洞不能打开主页'
                                     })
                                     return
                                 }
                                 showUserPopup({
-                                    name: post.PK,
-                                    avatar: post.Avatar
+                                    name: item.PK,
+                                    avatar: item.Avatar
                                 })
                             }}
                             onClick={() => {

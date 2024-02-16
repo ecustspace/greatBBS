@@ -56,7 +56,8 @@ function ReplyCard({reply}) {
             }}
         >
             <div className='cardAvatar'>
-                <Avatar src={reply.Avatar} style={{ '--size': '42px' }} onClick={() => {
+                <Avatar src={reply.Avatar} style={{ '--size': '42px' }} onClick={(e) => {
+                    e.stopPropagation()
                     if (reply.PK.length > 20) {
                         Toast.show('匿名评论无法打开主页')
                     } else {
@@ -293,7 +294,6 @@ export default function Home() {
                         return <PostCard
                             post={item}
                             key={item.postID}
-                            operateClick={() => operateClick(item)}
                             avatarClick={() => {
                                 if (post.PostType === 'AnPost') {
                                     Toast.show({

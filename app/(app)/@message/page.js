@@ -19,14 +19,14 @@ export default function Home() {
     const login = useContext(loginState)
     useEffect(() => {
         if (login.isLogin === false) {
-            window.location.replace('/login')
+            location.replace('/login')
         }
         localStorage.setItem('messageCount','0')
         setMessageCount(0)
-        upDateUserInquireTime(document.cookie,Date.now())
+        upDateUserInquireTime(Date.now())
     },[])
     function deletePost(post) {
-        deleteOperation(document.cookie,post.SK,'Notify#')
+        deleteOperation(post.SK,'Notify#')
         setList(
             list.filter(t => t !== post)
         )
@@ -37,12 +37,12 @@ export default function Home() {
             icon: 'loading',
             duration: 0
         })
-        getPostData(document.cookie, where).then(res => {
+        getPostData(where).then(res => {
             Toast.clear()
-            if (res.PostType === 'Post') {
-                showPostPopup(res)
-            } else {
+            if (res.PostType === 'Image') {
                 showImgPopup(res)
+            } else {
+                showPostPopup(res)
             }
         })
     }
@@ -54,7 +54,7 @@ export default function Home() {
     }
 
     async function loadMore() {
-        await getUserOperations(document.cookie, lastKey !== null ? lastKey : null, 'Notify#').then(res => {
+        await getUserOperations(lastKey !== null ? lastKey : null, 'Notify#').then(res => {
             if (res === 500) {
                 setHasMore(false)
             }

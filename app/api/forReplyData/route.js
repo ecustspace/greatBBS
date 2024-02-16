@@ -23,10 +23,13 @@ export async function GET(request) {
     const data = await docClient.send(new QueryCommand(
         lastEvaluatedKey === 'undefined' ? {
         TableName:'BBS',
-        IndexName:'PostType-SK-index',
-        KeyConditionExpression: 'PostType = :post_type',
+        IndexName:'Type-SK-index',
+        KeyConditionExpression: '#type = :post_type',
         ExpressionAttributeValues: {
             ':post_type' : 'ReplyTo' + postID
+        },
+        ExpressionAttributeNames: {
+            '#type': 'Type'
         },
         ScanIndexForward:sortMethod === 'true',
         Limit:15
@@ -34,9 +37,12 @@ export async function GET(request) {
             {
                 TableName:'BBS',
                 IndexName:'PostType-SK-index',
-                KeyConditionExpression: 'PostType = :post_type',
+                KeyConditionExpression: '#type = :post_type',
                 ExpressionAttributeValues: {
                     ':post_type' : 'ReplyTo' + postID
+                },
+                ExpressionAttributeNames: {
+                    '#type': 'Type'
                 },
                 ScanIndexForward:sortMethod === 'true',
                 Limit:15,

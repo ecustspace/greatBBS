@@ -1,3 +1,5 @@
+'use client'
+
 import {
     ActionSheet,
     Avatar,
@@ -17,24 +19,19 @@ import {
     ExclamationCircleOutline,
     LoopOutline,
     MoreOutline,
-    PictureOutline,
+    PictureOutline, SendOutline,
     SmileOutline,
-    UploadOutline,
-    UserAddOutline
 } from "antd-mobile-icons";
 import ReplyCard from "@/app/component/replyCard";
-import {SwitchLike} from "@/app/component/postCard";
+import {SwitchFavourite, SwitchLike} from "@/app/component/postCard";
 import {level, mockUpload, responseHandle, share, timeConclude} from "@/app/component/function";
 import {ImageContainer} from "@/app/component/imageContainer";
-import {detailsContext, likeListContext} from "@/app/(app)/layout";
+import {captchaContext, detailsContext, likeListContext, TopicContext} from "@/app/(app)/layout";
 import {ContactTa, getPostLikeList, Report} from "@/app/api/serverAction";
 import {lock, unlock} from "tua-body-scroll-lock";
-import {CopyToClipboard} from "react-copy-to-clipboard";
 import EmojiPicker from 'emoji-picker-react';
-import Hammer from 'hammerjs'
-import ReCAPTCHA from "react-google-recaptcha";
-import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
 import parser from "ua-parser-js";
+import {CopyToClipboard} from "react-copy-to-clipboard";
 
 // eslint-disable-next-line react/display-name
 const PostDetails = forwardRef(({post},ref) => {
@@ -52,10 +49,11 @@ const PostDetails = forwardRef(({post},ref) => {
     const [sortMethod,setMethod] = useState(true)
     const [lastKey,setLastKey] = useState({})
     const myText = useRef(null)
-    const captchaRef = useRef(null)
     const actionSheet = useRef()
     const {replyLikeList, setReplyLikeList} = useContext(likeListContext)
     const {showUserPopup} = useContext(detailsContext)
+    const {captchaDisable,turnstile} = useContext(captchaContext)
+    const {setTopic} = useContext(TopicContext)
     useImperativeHandle(ref, () => {
         return {
             showPopup(){
@@ -70,6 +68,18 @@ const PostDetails = forwardRef(({post},ref) => {
     },[]);
 
     useEffect(() => {
+        const loadHammer = async () => {
+            const Hammer = await import('hammerjs');
+            const hammertime = new Hammer.default(document.getElementById("postDetails"));
+            hammertime.on("swiperight", () => {
+                setIsVisible(false);
+            });
+        };
+
+        loadHammer();
+    }, []);
+
+    useEffect(() => {
         const ua = parser()
         if (ua.browser == null || ua.browser.name !== 'Safari') {
             return
@@ -81,12 +91,6 @@ const PostDetails = forwardRef(({post},ref) => {
         }
     },[isPopupVisible])
 
-    useEffect(() => {
-        let hammertime = new Hammer(document.getElementById("postDetails"));
-        hammertime.on("swiperight", function () {
-            setIsVisible(false)
-        });
-    },[])
 
     function operateClick(post) {
         actionSheet.current = ActionSheet.show({
@@ -94,7 +98,7 @@ const PostDetails = forwardRef(({post},ref) => {
             actions:[
                 { text: '联系ta', key: 'copy' ,
                 onClick: () => {
-                    ContactTa(document.cookie,post.PK).then(res => {
+                    ContactTa(post.PK).then(res => {
                         if (res.status !== 200) {
                             responseHandle(res)
                         } else {
@@ -115,7 +119,7 @@ const PostDetails = forwardRef(({post},ref) => {
                         Dialog.confirm({
                             content: '确认要举报该帖子吗',
                             onConfirm: () => {
-                                Report(document.cookie,post.PK,post.SK).then(
+                                Report(post.PK,post.SK).then(
                                     res => {
                                         if (res === 200) {
                                             alert('举报成功')
@@ -145,57 +149,54 @@ const PostDetails = forwardRef(({post},ref) => {
         setReplyTo({})
     },[post])
     function submitReply() {
-        captchaRef.current.reset()
-        captchaRef.current.executeAsync().then(token => {
-            setDisable(true)
-            const data = {
-                post_name: post.PK,
-                post_time: post.SK,
-                content: textContent,
-                images: [],
-                recaptchaToken: token
+        setDisable(true)
+        let data = new FormData()
+        data.append('post_name',post.PK)
+        data.append('post_time',post.SK)
+        data.append('content',textContent)
+        data.append('captchaToken',turnstile.getResponse())
+
+        if (replyTo.reply_name !== undefined) {
+            data.append('reply_name',replyTo.reply_name)
+            data.append('reply_time',replyTo.reply_time)
+        }
+        data.append('showLevel',typeof localStorage.getItem('ShowLevel') == 'string' ?
+            JSON.parse(localStorage.getItem('ShowLevel')) : true)
+        if (uploadImage === true && fileList.length > 0) {
+            for (let i = 0 ; i < fileList.length; i++) {
+                data.append(`file[${i}]`,fileList[i].data)
             }
-            if (replyTo.reply_name !== undefined) {
-                data['reply_name'] = replyTo.reply_name
-                data['reply_time'] = replyTo.reply_time
-            }
-            data.showLevel = typeof localStorage.getItem('ShowLevel') == 'string' ? JSON.parse(localStorage.getItem('ShowLevel')) : true
-            if (uploadImage === true && fileList.length > 0) {
-                data['images'] = fileList
-            }
-            Toast.show({
-                icon:"loading",
-                content:'正在发布...',
-                duration:0
-            })
-            fetch(window.location.origin + '/api/reply',{
-                method:'POST',
-                body: JSON.stringify(data),
-                credentials: "include",
-                headers: {
-                    'Content-Type': 'application/json'
+            data.append('fileLength', fileList.length.toString())
+        }
+        Toast.show({
+            icon:"loading",
+            content:'正在发布...',
+            duration:0
+        })
+        fetch(window.location.origin + '/api/reply',{
+            method:'POST',
+            body: data,
+            credentials: "include"
+        }).then(res => {
+            return res.json()})
+            .then(data => {
+                turnstile.reset()
+                setDisable(false)
+                if (data.status === 200) {
+                    setPickerVisible(false)
+                    setUploadImage(false)
+                    setMaskVisible(false)
+                    setTextContent('')
+                    setReplyTo({})
                 }
-            }).then(res => {
-                return res.json()})
-                .then(data => {
-                    setDisable(false)
-                    if (data.status === 200) {
-                        setPickerVisible(false)
-                        setUploadImage(false)
-                        setMaskVisible(false)
-                        setTextContent('')
-                        setReplyTo({})
-                    }
-                    responseHandle(data)
-                }).catch(() => {
-                    setDisable(false)
-                    Toast.show({
-                        icon:"fail",
-                        content:'error'
-                    })
-            })
-        }).catch(() => {
-            Toast.show('人机验证失败')
+                responseHandle(data)
+            }).catch(() => {
+                turnstile.reset()
+                setDisable(false)
+                Toast.show({
+                    icon:"fail",
+                    content:'error'
+                })
         })
     }
 
@@ -219,7 +220,6 @@ const PostDetails = forwardRef(({post},ref) => {
         }
         if (data.data.length !== 0) {
             getPostLikeList(
-                document.cookie,
                 data.data[0].ReplyID,
                 data.data[data.data.length - 1].ReplyID,
                 post.PostID).then(res => {
@@ -231,14 +231,6 @@ const PostDetails = forwardRef(({post},ref) => {
     }
         return (
             <>
-                <script>
-                    window.recaptchaOptions = useRecaptchaNet: true
-                </script>
-                <ReCAPTCHA
-                    sitekey={recaptcha_site_key_v2}
-                    ref={captchaRef}
-                    size="invisible"
-                />
                 <Popup
                     onMaskClick={() => {
                         setIsVisible(false)
@@ -296,45 +288,36 @@ const PostDetails = forwardRef(({post},ref) => {
                                     marginTop: '14px',
                                     fontSize: 'medium',
                                     wordBreak: 'break-word'
-                                }}>{post.Content}</div>
-                                <ImageContainer list={post.ImageList ? post.ImageList : []}
-                                                from={'/post/' + post.PostID} style={{marginTop: 10}}/>
+                                }}>{post.Content}{typeof post.Topic == 'string' ? <a onClick={e => {
+                                    e.stopPropagation()
+                                    setIsVisible(false)
+                                    setTopic(post.Topic)
+                                }}>#{post.Topic}</a> : ''}</div>
+                                {post.ImagesList !== undefined? <ImageContainer h_w={post.PostType !== 'Image' ? post.H_W : null} list={post.ImagesList} style={{marginTop:'10px'}} /> : (
+                                    typeof post.VideoLink == 'string' ? <div style={{marginTop:'10px'}} onClick={e => e.stopPropagation()}>
+                                        <video width='100%' controls>
+                                            <source src={post.VideoLink}/>
+                                        </video>
+                                    </div> : ''
+                                )}
                             </div>
                             <div style={{display: 'flex', borderBottom: '0.5px solid lightgrey'}}>
                                 <Space style={{margin: 8, '--gap': '16px', flexGrow: 1}}>
                                     <LoopOutline style={{fontSize: 20, marginLeft: 6}}
                                                  onClick={() => setMethod(sortMethod => !sortMethod)}/>
-                                    <SwitchLike size={20} postID={post.PostID} PK={post.PK} SK={post.SK}/>
-                                    <CopyToClipboard text={typeof post.PostType == 'string' ? share(post) : ''}
-                                                     onCopy={() => Toast.show('分享链接已复制到剪切板')}>
-                                        <UploadOutline style={{fontSize: 20}}/>
-                                    </CopyToClipboard>
+                                    <SwitchLike size={20} postID={post.PostID} PK={post.PK} SK={post.SK} />
+                                    <SwitchFavourite size={18} postID={post.PostID} PK={post.PK} SK={post.SK} />
                                 </Space>
                                 <Space style={{'--gap': '16px', margin: 8}}>
-                                    <UserAddOutline style={{fontSize: 20}} onClick={() => {
-                                        Toast.show({icon:"loading"})
-                                        ContactTa(document.cookie, post.PK).then(res => {
-                                            Toast.clear()
-                                            if (res.status !== 200) {
-                                                responseHandle(res)
-                                            } else {
-                                                Dialog.confirm({
-                                                    content: res.tip,
-                                                    onConfirm: () => {
-                                                        Dialog.clear()
-                                                    },
-                                                    onCancel: () => {
-                                                        Dialog.clear()
-                                                    }
-                                                })
-                                            }
-                                        })
-                                    }}/>
+                                    <CopyToClipboard text={typeof post.Content == 'string'?share(post):''}
+                                                     onCopy={() => Toast.show('分享链接已复制到剪切板')}>
+                                        <SendOutline style={{fontSize:20}} />
+                                    </CopyToClipboard>
                                     <ExclamationCircleOutline style={{fontSize: 20, marginRight: 6}} onClick={() => {
                                         Dialog.confirm({
                                             content: '确认要举报该帖子吗',
                                             onConfirm: () => {
-                                                Report(document.cookie, post.PK, post.SK).then(
+                                                Report(post.PK, post.SK).then(
                                                     res => {
                                                         if (res === 200) {
                                                             alert('举报成功')
@@ -447,7 +430,7 @@ const PostDetails = forwardRef(({post},ref) => {
                                     }}/>
                                 </Space>
                                 <Button
-                                    disabled={btnDisable || (textContent.length === 0 && ((fileList.length === 0 && uploadImage) || !uploadImage))}
+                                    disabled={captchaDisable || btnDisable || (textContent.length === 0 && ((fileList.length === 0 && uploadImage) || !uploadImage))}
                                     size='mini' shape='rounded' color='primary' onClick={submitReply}>评论</Button>
                             </div>
                             {uploadImage ? <ImageUploader
@@ -455,6 +438,9 @@ const PostDetails = forwardRef(({post},ref) => {
                                 style={{"--cell-size": "100px", marginLeft: '12px', marginBottom: '10px'}}
                                 value={fileList}
                                 onChange={setFileList}
+                                onDelete={() => {
+                                    alert(fileList)
+                                }}
                                 upload={mockUpload}
                                 preview={false}
                             ></ImageUploader> : ''}

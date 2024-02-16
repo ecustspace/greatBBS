@@ -2,49 +2,84 @@
 
 import {Avatar, Toast} from "antd-mobile";
 import Ellipsis from "@/app/component/ellipsis"
-import {HeartFill, HeartOutline, MessageOutline, MoreOutline, UploadOutline} from "antd-mobile-icons";
+import {
+    HeartFill,
+    HeartOutline,
+    MessageOutline,
+    MoreOutline,
+    SendOutline,
+    TagOutline,
+} from "antd-mobile-icons";
+import {BsBookmark, BsBookmarkFill} from "react-icons/bs";
 import {useContext, useEffect, useState} from "react";
-import {likeListContext} from "@/app/(app)/layout";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {level, share, timeConclude} from "@/app/component/function";
-import {like} from "@/app/api/serverAction";
+import {favourite, getIsFavourite, getIsLike, like} from "@/app/api/serverAction";
 import {CopyToClipboard} from "react-copy-to-clipboard";
+import {TopicContext} from "@/app/(app)/layout";
 
-export function SwitchLike({postID,initialLikeCount,size,PK,SK,reply}) {
-    const {likeList,addLike,replyLikeList,setReplyLikeList} = useContext(likeListContext)
-    const [likeCount,setLikeCount] = useState()
-    useEffect(()=>{
-            if (typeof initialLikeCount === "number") {
-                setLikeCount(initialLikeCount)
-            }
-    },[])
-    if(!(reply ? replyLikeList[reply].includes(postID) : likeList.includes(postID))) {
+export function SwitchLike({size,postID,PK,SK}) {
+    const [isLike, setLike] = useState(false)
+    useEffect(() => {
+        if (isNaN(postID)) {
+            return
+        }
+        setLike(false)
+        getIsLike(postID).then(res => {
+            setLike(res === true)
+        })
+    },[postID])
+    if(!isLike) {
         return(
-        <div style={{display:"flex",alignItems:"center",justifyContent:"center"}} onClick={(event) => event.stopPropagation()}>
-            <HeartOutline onClick={
+        <div onClick={(event) => event.stopPropagation()}>
+            <HeartOutline
+                onClick={
                 () => {
-                    reply ? setReplyLikeList[reply]([...replyLikeList[reply],postID]) : addLike([postID])
-                    like(document.cookie,PK,SK,localStorage.getItem('Avatar')).then(res => {
-                        if (res === 200) {
-                            if (typeof initialLikeCount === "number") {
-                                setLikeCount(likeCount => likeCount+1)
-                            }
-                        }
-                    })
+                    like(PK,SK,localStorage.getItem('Avatar'))
+                    setLike(true)
                 }}
-            fontSize={size}/>
-            <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{likeCount}</div>
+                fontSize={size}/>
         </div>
         )
     } else {
-    return <div style={{display:"flex",alignItems:"center",justifyContent:"center"}} onClick={(event) => event.stopPropagation()}>
+    return <div onClick={(event) => event.stopPropagation()}>
         <HeartFill color='red' fontSize={size} />
-        <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{likeCount}</div>
-    </div>}
+    </div>
+    }
 }
 
-export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
+export function SwitchFavourite({size,postID,PK,SK}) {
+    const [isFavourite, setFavourite] = useState(false)
+    useEffect(() => {
+        if (isNaN(postID)) {
+            return
+        }
+        setFavourite(false)
+        getIsFavourite(postID).then(res => {
+            setFavourite(res === true)
+        })
+    },[postID])
+    if(!isFavourite) {
+        return(
+            <div onClick={(event) => event.stopPropagation()}>
+                <BsBookmark
+                    onClick={
+                    () => {
+                        favourite(PK,SK)
+                        setFavourite(true)
+                    }}
+                    fontSize={size}/>
+            </div>
+        )
+    } else {
+        return <div onClick={(event) => event.stopPropagation()}>
+            <BsBookmarkFill color='#EFAF27' fontSize={size} />
+        </div>
+    }
+}
 
+export function PostCard({post,onClick,operateClick,avatarClick}) {
+    const {setTopic} = useContext(TopicContext)
     return(
             <div className='card' onClick={onClick} style={{borderBottom: '0.5px solid lightgrey'}}>
                 <div className='cardAvatar' onClick={(e) => {e.stopPropagation()}}>
@@ -61,22 +96,36 @@ export function PostCard({post,onClick,operateClick,operate,avatarClick}) {
                                     e.stopPropagation()
                                 }} />
                         </div>
-                        <Ellipsis content={post.Content} style={{marginTop:'6px',marginBottom:'4px'}} />
-                    {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/post/' + post.PostID} style={{marginTop:'10px'}} /> : ''}
+                    <Ellipsis content={post.Content} style={{marginTop:'6px',marginBottom:'4px'}}>{typeof post.Topic == 'string' ? <a onClick={e => {
+                        e.stopPropagation()
+                        setTopic(post.Topic)
+                    }}>#{post.Topic}</a> : ''}</Ellipsis>
+                    {post.ImagesList !== undefined? <ImageContainer
+                        h_w={(post.PostType === 'Image' && post.ImagesList.length === 1) ||
+                        (post.PostType !== 'Image' && typeof post.H_W == 'number') ? post.H_W : null}
+                        list={post.ImagesList} style={{marginTop:'10px'}} /> : (
+                        typeof post.VideoLink == 'string' ? <div onClick={e => e.stopPropagation()}>
+                            <video width='100%' controls>
+                                <source src={post.VideoLink} />
+                            </video></div> : ''
+                    )}
                     <div className='cardFooter'>
-                        {operate ?
-                                <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
-                                    <HeartOutline />
-                                    <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{post.LikeCount}</div>
-                                </div> : <SwitchLike postID={post.PostID} PK={post.PK} SK={post.SK} initialLikeCount={post.LikeCount} /> }
-                                <div style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
-                                    <MessageOutline />
-                                    <div style={{fontSize:14,color:"gray",marginLeft:'1px'}}>{post.ReplyCount}</div>
-                                </div>
+                        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                            <HeartOutline style={{color: '#696969'}}/>
+                            <div style={{fontSize: 14, color: "gray", marginLeft: '1px'}}>{post.LikeCount}</div>
+                        </div>
+                        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                            <MessageOutline style={{color: '#696969'}}/>
+                            <div style={{fontSize: 14, color: "gray", marginLeft: '1px'}}>{post.ReplyCount}</div>
+                        </div>
+                        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                            <TagOutline style={{color: '#696969'}}/>
+                            <div style={{fontSize: 14, color: "gray", marginLeft: '1px'}}>{post.FavouriteCount}</div>
+                        </div>
                         <div onClick={e => e.stopPropagation()}>
                             <CopyToClipboard text={share(post)}
                                              onCopy={() => Toast.show('分享链接已复制到剪切板')}>
-                                <UploadOutline />
+                                <SendOutline style={{color: '#696969'}} />
                             </CopyToClipboard>
                         </div>
                     </div>

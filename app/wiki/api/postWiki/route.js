@@ -1,4 +1,4 @@
-import {recaptchaVerify_v2, transporter} from "@/app/api/server";
+import {captchaVerify, transporter} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {Url} from "@/app/(app)/clientConfig";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
@@ -8,7 +8,7 @@ import {institute} from "@/app/wiki/config";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const isHuman = await captchaVerify(data.captchaToken)
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }

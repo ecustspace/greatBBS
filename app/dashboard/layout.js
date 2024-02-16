@@ -36,7 +36,7 @@ export function Ban({username}) {
                         icon:'loading',
                         duration: 10000
                     })
-                    ban_(document.cookie,username,reason,banHour*3600 + banMin*60)
+                    ban_(username,reason,banHour*3600 + banMin*60)
                         .then(res => {
                             res === 200 ? Toast.show({icon:"success"})
                                 : Toast.show({icon:'fail'})
@@ -48,7 +48,7 @@ export function Ban({username}) {
     )
 }
 
-export default function RootLayout({ Report, Post, BlackList }) {
+export default function Layout({ Report, Post, BlackList }) {
     const childrenList = [<>{Post}</>, <>{Report}</>, <>{BlackList}</>]
     const [activeIndex, setActiveIndex] = useState(0)
     useEffect(() => {

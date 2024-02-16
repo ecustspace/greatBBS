@@ -19,22 +19,23 @@ import {
     ArrowDownCircleOutline,
     CloseShieldOutline, EditSOutline, FaceRecognitionOutline,
     LeftOutline,
-    RightOutline, SearchOutline,
+    RightOutline, SearchOutline, TagOutline,
     TeamOutline,
     TextOutline
 } from "antd-mobile-icons";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {loginState} from "@/app/layout";
-import {AboutUs, avatarList, recaptcha_site_key_v2, Url} from "@/app/(app)/clientConfig";
+import {AboutUs, avatarList, Url} from "@/app/(app)/clientConfig";
 import {getCookie, level, responseHandle} from "@/app/component/function";
 import {feedBack, getUserData} from "@/app/api/serverAction";
-import ReCAPTCHA from "react-google-recaptcha";
 import {sha256} from "js-sha256";
 import {CopyToClipboard} from "react-copy-to-clipboard";
 import Counter from "@/app/component/counter";
+import {captchaContext} from "@/app/(app)/layout";
+import {useRouter} from "next/navigation";
 
-export default function RootLayout({userReply,userLike,userPost}) {
-    const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>]
+export default function Layout({userReply,userLike,userPost,userFavourite,children}) {
+    const userOperationPage = [<>{userPost}</>,<>{userReply}</>,<>{userLike}</>,<>{userFavourite}</>]
     const [userData,setData] = useState({
         avatar:'dog.jpg',
         name:'user',
@@ -50,15 +51,11 @@ export default function RootLayout({userReply,userLike,userPost}) {
     const [visibleData, setVisibleData] = useState(false)
     const [avatar,setAvatar] = useState(userData.avatar)
     const [showLevel,setShowLevel] = useState(true)
-    const ref = useRef(null);
-    const captchaRef = useRef(null)
+    const ref = useRef(null)
+    const {captchaDisable,turnstile} = useContext(captchaContext)
+    const router = useRouter()
 
     useEffect(() => {
-        const handle = (e) => {
-            history.pushState(null, null, document.URL);
-            setPopupVisible(false)
-        }
-        window.addEventListener('popstate',handle)
         const data = userData
         data.avatar = localStorage.getItem('Avatar')
         data.name = decodeURI(getCookie('UserName'))
@@ -70,12 +67,12 @@ export default function RootLayout({userReply,userLike,userPost}) {
         }
 
         if (isLogin === false) {
-            window.location.replace('/login')
+            router.replace('/login')
         } else {
             form.setFieldValue('contact_information',localStorage.getItem('ContactInformation') !== null? localStorage.getItem('ContactInformation') : '')
             form.setFieldValue('anid',localStorage.getItem('Anid') !== null ?localStorage.getItem('Anid'):'')
             form.setFieldValue('email',localStorage.getItem('NotifyEmail') !== null ? localStorage.getItem('NotifyEmail') : '')
-            getUserData(document.cookie).then(res => {
+            getUserData().then(res => {
                 form.setFieldValue('level',typeof res[3] == 'number' ? `${level(res[3])} ` + res[3] : '大学牲 0')
                 setData({
                     ...data,
@@ -121,9 +118,6 @@ export default function RootLayout({userReply,userLike,userPost}) {
                 ],
             })
         }
-        return () => {
-            removeEventListener('popstate',handle)
-        }
     },[isLogin])
     function submitInformation(values) {
         Toast.show({
@@ -133,7 +127,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
         values.avatar = avatar
         values.shaAnid = (typeof values.anid == 'string' && values.anid.length > 0) ? sha256(values.anid) : ''
         values.email = typeof values.email == 'string' ? values.email : ''
-        fetch(window.location.origin + '/api/changeInformation',{
+        fetch(location.origin + '/api/changeInformation',{
             method:'POST',
             credentials:'include',
             body: JSON.stringify(values),
@@ -170,23 +164,23 @@ export default function RootLayout({userReply,userLike,userPost}) {
             icon:'loading',
             duration:0
         })
-        captchaRef.current.executeAsync().then(token => {
-            let values = form.getFieldsValue(['email'])
-            values.recaptchaToken = token
-            fetch(window.location.origin + '/api/changeNotifyEmail/change',{
-                method:'POST',
-                credentials:'include',
-                body: JSON.stringify(values),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(res => res.json()).then(
-                data => {
-                    responseHandle(data)
-                }
-            )
+        let values = form.getFieldsValue(['email'])
+        values.captchaToken = turnstile.getResponse()
+        fetch(location.origin + '/api/changeNotifyEmail/change',{
+            method:'POST',
+            credentials:'include',
+            body: JSON.stringify(values),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json()).then(
+            data => {
+                turnstile.reset()
+                responseHandle(data)
+            }
+        ).catch(() => {
+            turnstile.reset()
         })
-
     }
 
     function isEmail(str) {
@@ -204,14 +198,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
 
     return (
         <div>
-            <script>
-                window.recaptchaOptions = useRecaptchaNet: true
-            </script>
-            <ReCAPTCHA
-                sitekey={recaptcha_site_key_v2}
-                ref={captchaRef}
-                size="invisible"
-            />
+            {children}
             <div className='userData'>
                 <div className='ava'>
                     <Image src={userData.avatar} alt='这是一个头像' width={64} height={64} style={{ borderRadius: 60, display: 'inline-block' }} />
@@ -243,6 +230,12 @@ export default function RootLayout({userReply,userLike,userPost}) {
             </div>
             <div className="choiceList">
                 <List header="" style={{fontWeight:'bold'}}>
+                    <List.Item prefix={<TagOutline fontSize={22} />} onClick={() => {
+                        setIndex(3)
+                        setPopupVisible(true)
+                    }}>
+                        收藏夹
+                    </List.Item>
                     <List.Item prefix={<EditSOutline fontSize={24}/>}
                                onClick={() => {
                                    setVisibleData(true)
@@ -251,9 +244,9 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         修改资料
                     </List.Item>
                     <List.Item prefix={<SearchOutline fontSize={24} />} onClick={() => {
-                        window.location.replace(window.location.origin + '/wiki')
+                        router.replace('/wiki')
                     }}>
-                        EcustSpace Wiki(公测版)
+                        EcustSpace Wiki
                     </List.Item>
                     <List.Item prefix={<TeamOutline fontSize={24}/>} onClick={() => {
                         Dialog.alert({
@@ -283,7 +276,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         邀请好友
                     </List.Item>
                     <List.Item prefix={<ArrowDownCircleOutline fontSize={24} />} onClick={() => {
-                        window.open('https://ecustspace.github.io', '_blank');
+                        open('https://ecustspace.github.io', '_blank');
                     }}>
                         下载app
                     </List.Item>
@@ -296,7 +289,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                                     for (let i = keys.length; i--;)
                                         document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
                                 }
-                                window.location.replace('/login')
+                                router.replace('/login')
                             },
                             onCancel: () => {
                                 Dialog.clear()
@@ -327,7 +320,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         Toast.show({
                             icon:'loading',
                             duration:10000})
-                        feedBack(document.cookie,content.content).then(res => {
+                        feedBack(content.content).then(res => {
                             if (res.status === 200) {
                                 setVisibleFeedBack(false)
                             }
@@ -454,7 +447,7 @@ export default function RootLayout({userReply,userLike,userPost}) {
                         name='email'
                         label='通知邮箱'
                         extra={<Button
-                            disabled={!isEmail(notifyEmail) || !form.isFieldTouched(['email'])}
+                            disabled={captchaDisable || !isEmail(notifyEmail) || !form.isFieldTouched(['email'])}
                             size='small'
                             block
                             color='primary'

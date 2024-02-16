@@ -1,3 +1,5 @@
+'use client'
+
 import {useEffect, useState} from 'react';
 
 const Counter = ({counts, time = 500}) => {  //counts：传入的数字，time: 默认500毫秒之内整个动画完成

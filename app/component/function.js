@@ -1,10 +1,10 @@
+'use client'
+
 import Compressor from "compressorjs";
 import {Toast} from "antd-mobile";
-import React from "react";
 import './loginModal.css'
 import {createRoot} from "react-dom";
 import LoginModal from "@/app/component/loginModal";
-import {recaptcha_site_key_v3} from "@/app/(app)/clientConfig";
 
 export function timeConclude(time) {
     const recent = Date.now() - time
@@ -35,22 +35,19 @@ export async function mockUpload(file) {
                 maxHeight:1080,
                 maxWidth:1080,
                 success(result) {
-                    let res = {}
                     let reader = new FileReader();
                     reader.readAsDataURL(result);
                     reader.onload = function () {
                         let image = new Image()
-                        image.onload = function () {
-                            res['height'] = image.height
-                            res['width'] = image.width
-                        }
                         image.src = reader.result
-                        res['base64'] = reader.result
+                        image.onload = function () {
+                            resolve({
+                                url: URL.createObjectURL(result),
+                                h_w: image.height/image.width,
+                                data: result
+                            })
+                        }
                     }
-                    resolve({
-                        url:URL.createObjectURL(file),
-                        extra:res
-                    })
                 },
                 error(error) {
                     reject(error)
@@ -114,21 +111,6 @@ ${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.S
             `${post.Content.length > 10 ? post.Content.slice(0, 10) + '...' : post.Content}
 ${window.location.origin + '?where=' + encodeURIComponent(post.PK + '#' + post.SK)}`)
     }
-}
-
-export function recaptchaExecute() {
-    return new Promise((resolve, reject) => {
-        grecaptcha.ready(() => {
-            grecaptcha
-                .execute(recaptcha_site_key_v3, { action: 'submit' })
-                .then((token) => {
-                    resolve(token);
-                })
-                .catch((error) => {
-                    reject(error);
-                })
-        });
-    });
 }
 
 export function level(score) {

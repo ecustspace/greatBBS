@@ -1,4 +1,4 @@
-import {recaptchaVerify_v2} from "@/app/api/server";
+import {captchaVerify} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {appName, emailAddress, Url} from "@/app/(app)/clientConfig";
 import {transporter} from "@/app/api/server";
@@ -12,7 +12,7 @@ export async function POST(request) {
         !data.useremail) {
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const isHuman = await captchaVerify(data.captchaToken,true)
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }

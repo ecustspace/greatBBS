@@ -12,7 +12,7 @@ export default function Home() {
     const actionSheet = useRef()
     const now = Date.now()
     function deletePost(post) {
-        deleteBan(document.cookie,post.SK).then((res) => {
+        deleteBan(post.SK).then((res) => {
             if (res === 200) {
                 setList(
                     list.filter(t => t !== post)
@@ -47,7 +47,7 @@ export default function Home() {
         })
     }
     async function loadMore() {
-        await getBlackList(document.cookie,lastKey? lastKey : null).then(res => {
+        await getBlackList(lastKey? lastKey : null).then(res => {
             if (res === 500) {
                 setHasMore(false)
             }

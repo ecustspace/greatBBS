@@ -1,20 +1,23 @@
 'use client'
 
 import './login.css'
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {AutoCenter, Button, Form, Input, NavBar, Toast} from "antd-mobile";
 import {EyeInvisibleOutline, EyeOutline} from "antd-mobile-icons";
 import {loginState} from "@/app/layout";
-import {avatarList, emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {avatarList, emailAddress} from "@/app/(app)/clientConfig";
 import {responseHandle} from "@/app/component/function";
-import ReCAPTCHA from "react-google-recaptcha";
+import Turnstile, {useTurnstile} from "react-turnstile";
+import {useRouter} from "next/navigation";
 
 export default function Home() {
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
-    const captchaRef = useRef(null)
     const [activeIndex,setIndex] = useState(0)
+    const [captchaDisable,setCaptchaDisable] = useState(true)
+    const router = useRouter()
     const toLogin = useContext(loginState).toLogin
+    const turnstile = useTurnstile()
 
     function nextImg() {
         setIndex(activeIndex => (activeIndex + 1) % avatarList.length)
@@ -28,9 +31,8 @@ export default function Home() {
     },[])
 
     const onSubmit = () => {
-        captchaRef.current.executeAsync().then(token => {
             const values = form.getFieldsValue(true)
-            values.recaptchaToken = token
+            values.captchaToken = turnstile.getResponse()
             Toast.show({
                 icon:"loading",
                 duration:0
@@ -38,39 +40,26 @@ export default function Home() {
             toLogin(values).then(res => {
                 if (res.status === 200) {
                     window.location.replace('/')
-                    captchaRef.current.reset()
                 } else {
-                    captchaRef.current.reset()
+                    turnstile.reset()
                     responseHandle(res)
                 }
             })
-        }).catch(() => {
-            captchaRef.current.reset()
-            Toast.show('未通过人机验证')
-        })
     }
     const back = () => {
-        window.location.replace('/')
+        router.replace('/')
     }
     return (
         <div>
-            <script>
-                window.recaptchaOptions = useRecaptchaNet: true
-            </script>
-            <ReCAPTCHA
-                sitekey={recaptcha_site_key_v2}
-                ref={captchaRef}
-                size="invisible"
-            />
             <NavBar onBack={back}></NavBar>
             <AutoCenter>
-                <div style={{width:'96px',height:'96px',position:"relative"}}>
+                <div style={{width:'80px',height:'80px',position:"relative"}}>
                     {avatarList.map(
                         (avatar,index) =>
                             <img key={avatar.id}
                                  src={avatar}
                                  alt={index}
-                                 style={{borderRadius: 16,position:"absolute",left:0,top:0,width:'96px',height:'96px'}}
+                                 style={{borderRadius: 16,position:"absolute",left:0,top:0,width:'80px',height:'80px'}}
                                  className={index === activeIndex ? 'fade-in' : 'fade-out'} />)}
                 </div>
                 <h1>登录账号</h1>
@@ -83,19 +72,19 @@ export default function Home() {
                 style={{ '--prefix-width': '4.5em' }}
                 requiredMarkStyle='none'
                 footer={<>
-                <Button block color={"primary"} shape={"rounded"} size='large' type="submit">
+                <Button disabled={captchaDisable} block color={"primary"} shape={"rounded"} size='large' type="submit">
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>登 录</div>
                 </Button><br />
                 <Button block
                         color={"default"}
                         shape={"rounded"}
                         size='large'
-                        onClick={()=>{window.location.replace('/signup')}}
+                        onClick={()=>{router.replace('/signup')}}
                         >
                     <div style={{fontWeight:'bolder' ,fontSize:18}}>注 册</div>
                 </Button>
                     <br/>
-                    <a onClick={() => {window.location.replace('/forgetPassword')}}>忘记密码？</a>
+                    <a onClick={() => {router.replace('/forgetPassword')}}>忘记密码？</a>
                 </>}
                 >
 
@@ -130,6 +119,18 @@ export default function Home() {
                         type={visible ? 'text' : 'password'}
                     />
                 </Form.Item>
+                <Turnstile
+                    id='login'
+                    sitekey="0x4AAAAAAAQnuDfjzIJ9N6QP"
+                    onVerify={() => {
+                        setCaptchaDisable(false)}}
+                    onError={() => {
+                        setCaptchaDisable(true)}}
+                    onExpire={() => {
+                        setCaptchaDisable(true)}}
+                    onLoad={() =>{
+                        setCaptchaDisable(true)}}
+                />
             </Form>
         </div>
     )

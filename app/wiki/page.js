@@ -14,7 +14,7 @@ import {
     Rate, SearchBar, Space, TextArea,
     Toast
 } from "antd-mobile";
-import {useContext, useEffect, useRef, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {
     deleteEvaluate,
     fetchData,
@@ -36,10 +36,12 @@ import {
     UndoOutline,
     UserOutline
 } from "antd-mobile-icons";
-import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
-import ReCAPTCHA from "react-google-recaptcha";
+import {turnstile_key} from "@/app/(app)/clientConfig";
 import {EditEvaluateCard, EvaluateCard, MyEvaluateCard, WikiCard} from "@/app/wiki/component/evaluateCard";
-import Hammer from "hammerjs";
+import {useRouter, useSearchParams} from "next/navigation";
+import Turnstile, {useTurnstile} from "react-turnstile";
+
+export const captchaContext = createContext(null)
 
 export default function Home() {
     const [hasMore, setHasMore] = useState(true)
@@ -51,6 +53,7 @@ export default function Home() {
     const [search,setSearch] = useState('')
     const [searchResult,setSearchResult] = useState([])
     const [hasResultMore, setHasResultMore] = useState(false)
+    const [captchaDisable,setCaptchaDisable] = useState(true)
     const [searchVisible, setSearchVisible] = useState(false)
     const [searchLastKey, setSearchLastKey] = useState(null)
     const [myEvaluateVisible,setMyEvaluateVisible] = useState(false)
@@ -68,27 +71,38 @@ export default function Home() {
     const [myLikeVisible,setMyLikeVisible] = useState(false)
     const [myLikeHasMore,setMyLikeHasMore] = useState(true)
     const [myLikeLoadList,setMyLikeLoadList] = useState([])
-    const captchaRef = useRef(null)
+    const router = useRouter()
+    const turnstile = useTurnstile()
+    const data = useSearchParams().get('data')
     const login = useContext(loginState)
 
     useEffect(() => {
         setMyLikeList(JSON.parse(typeof localStorage.getItem('MyLike') == 'string' ? localStorage.getItem('MyLike') : '[]'))
-        let hammerWikiDetails = new Hammer(document.getElementById("wikiDetails"));
-        hammerWikiDetails.on("swiperight", function () {
-            setWikiDetailsVisible(false)
-        });
-        let hammerMyEvaluate = new Hammer(document.getElementById("myEvaluate"));
-        hammerMyEvaluate.on("swiperight", function () {
-            setMyEvaluateVisible(false)
-        });
-        let hammerSearch = new Hammer(document.getElementById("search"));
-        hammerSearch.on("swiperight", function () {
-            setSearchVisible(false)
-        });
-        let hammerMyLike = new Hammer(document.getElementById("myLike"));
-        hammerMyLike.on("swiperight", function () {
-            setMyLikeVisible(false)
-        });
+
+        const loadHammer = async () => {
+            const Hammer = await import('hammerjs');
+            let hammerWikiDetails = new Hammer.default(document.getElementById("wikiDetails"));
+            hammerWikiDetails.on("swiperight", function () {
+                setWikiDetailsVisible(false)
+            });
+            let hammerMyEvaluate = new Hammer.default(document.getElementById("myEvaluate"));
+            hammerMyEvaluate.on("swiperight", function () {
+                setMyEvaluateVisible(false)
+            });
+            let hammerSearch = new Hammer.default(document.getElementById("search"));
+            hammerSearch.on("swiperight", function () {
+                setSearchVisible(false)
+            });
+            let hammerMyLike = new Hammer.default(document.getElementById("myLike"));
+            hammerMyLike.on("swiperight", function () {
+                setMyLikeVisible(false)
+            });
+        };
+
+        loadHammer();
+        if (data) {
+            showDetails(JSON.parse(data))
+        }
     },[])
 
     const right = (
@@ -111,7 +125,7 @@ export default function Home() {
                 } else if (node.key === 'like') {
                     setMyLikeVisible(true)
                 } else {
-                    window.location.replace('/')
+                    router.replace('/')
                 }
             }}
             trigger='click'
@@ -135,7 +149,7 @@ export default function Home() {
             })
         } else {
             setWikiHasMore(true)
-            getInstituteWiki(document.cookie,part,sortMethod,lastKey != null? lastKey : null)
+            getInstituteWiki(part,sortMethod,lastKey != null? lastKey : null)
                 .then(res => {
                     if (res.lastKey == null) {
                         setHasMore(false)
@@ -147,8 +161,13 @@ export default function Home() {
         }
     }
 
+    const captchaContextContent = {
+        captchaDisable,
+        turnstile
+    }
+
     async function loadMoreWiki() {
-        const data = await getInstituteWiki(document.cookie,part,sortMethod,lastKey != null? lastKey : null)
+        const data = await getInstituteWiki(part,sortMethod,lastKey != null? lastKey : null)
         if (!data.lastKey) {
             setWikiHasMore(false)
         }
@@ -156,7 +175,7 @@ export default function Home() {
     }
 
     async function loadMoreResult() {
-        const data = await searchWiki(document.cookie,search,searchLastKey != null? searchLastKey : null)
+        const data = await searchWiki(search,searchLastKey != null? searchLastKey : null)
         if (!data.lastKey) {
             setHasResultMore(false)
         }
@@ -164,7 +183,7 @@ export default function Home() {
     }
 
     async function loadMoreMyEvaluate() {
-        await getMyEvaluateList(document.cookie,myEvaluateLastKey !== null ? myEvaluateLastKey : null).then(res => {
+        await getMyEvaluateList(myEvaluateLastKey !== null ? myEvaluateLastKey : null).then(res => {
             if (res === 500) {
                 setMyEvaluateHasMore(false)
                 throw new Error('err')
@@ -179,7 +198,7 @@ export default function Home() {
     }
 
     async function getEvaluate() {
-        const data = await getEvaluateList(document.cookie,focusWiki.PK,focusWiki.SK,lastKey !== null ? lastKey : null).then(data => {
+        const data = await getEvaluateList(focusWiki.PK,focusWiki.SK,lastKey !== null ? lastKey : null).then(data => {
             return data
         })
         if (data['lastKey']) {
@@ -207,26 +226,24 @@ export default function Home() {
             alert('请评分')
             return
         }
-        captchaRef.current.executeAsync().then(token => {
-            Toast.show({icon:'loading'})
-            const data = {
-                ...addWiki,
-                recaptchaToken: token
+        Toast.show({icon:'loading'})
+        const data = {
+            ...addWiki,
+            captchaToken: turnstile.getResponse()
+        }
+        fetch(window.location.origin + '/wiki/api/postWiki', {
+            method: 'post',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
             }
-            fetch(window.location.origin + '/wiki/api/postWiki', {
-                method: 'post',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(res => {
-                captchaRef.current.reset()
-                return res.json()
-            }).then(data => {
-                responseHandle(data)
-            }).catch(() => {
-                Toast.show({icon:'fail',content:'error'})
-            })
+        }).then(res => {
+            turnstile.reset()
+            return res.json()
+        }).then(data => {
+            responseHandle(data)
+        }).catch(() => {
+            Toast.show({icon:'fail',content:'error'})
         })
     }
 
@@ -234,7 +251,7 @@ export default function Home() {
         setEvaluateList([])
         setHasMore(true)
         setLastKey(null)
-        getMyEvaluate(document.cookie,focusWiki.PK,focusWiki.SK).then(res => {
+        getMyEvaluate(focusWiki.PK,focusWiki.SK).then(res => {
             if (res) {
                 setMyEvaluate(res)
             } else {
@@ -251,7 +268,7 @@ export default function Home() {
         setEvaluateList([])
         setHasMore(true)
         setMyEvaluate(null)
-        getMyEvaluate(document.cookie,focusWiki.PK,focusWiki.SK).then(res => {
+        getMyEvaluate(focusWiki.PK,focusWiki.SK).then(res => {
             if (res) {
                 setMyEvaluate(res)
             } else {
@@ -284,7 +301,7 @@ export default function Home() {
         if (searchVisible === true) {
             setSearchResult([])
             setHasResultMore(true)
-            searchWiki(document.cookie,search).then(data => {
+            searchWiki(search).then(data => {
                 if (data['lastKey']) {
                     setSearchLastKey(data['lastKey'])
                 } else {
@@ -308,16 +325,20 @@ export default function Home() {
 
     return (
         <>
-            <script>
-                window.recaptchaOptions = useRecaptchaNet: true
-            </script>
-            <ReCAPTCHA
-                sitekey={recaptcha_site_key_v2}
-                ref={captchaRef}
-                size="invisible"
+            <Turnstile
+                sitekey={turnstile_key}
+                onVerify={() => {
+                    setCaptchaDisable(false)}}
+                onError={() => {
+                    setCaptchaDisable(true)}}
+                onExpire={() => {
+                    setCaptchaDisable(true)}}
+                onLoad={() =>{
+                    setCaptchaDisable(true)}}
             />
+            <captchaContext.Provider value={captchaContextContent}>
             <NavBar right={right} backArrow={false} left={<Image onClick={() => {
-                window.location.replace('/')
+                router.replace('/')
             }} alt='logo' src='/logo.png' width={100} height={25}/>}>
             </NavBar>
             <div style={{margin:'8px',marginBottom:'10px',marginTop:'4px'}}>
@@ -557,7 +578,7 @@ export default function Home() {
                             focusWiki={focusWiki}
                             refresh={refreshEvaluate}
                             onDelete={() => {
-                                deleteEvaluate(document.cookie,focusWiki.PK+'#'+focusWiki.SK,myEvaluate.Evaluate)
+                                deleteEvaluate(focusWiki.PK+'#'+focusWiki.SK,myEvaluate.Evaluate)
                                     .then(res => {
                                         if (res.status === 200) {
                                             setMyEvaluate({tip: 'noEvaluate'})
@@ -625,7 +646,7 @@ export default function Home() {
                             <MyEvaluateCard evaluate={post} key={post.id}
                                             onClick={() => {
                                                 Toast.show({icon:'loading'})
-                                                getMyEvaluateWiki(document.cookie,post.SK).then(res => {
+                                                getMyEvaluateWiki(post.SK).then(res => {
                                                     if (res) {
                                                         Toast.clear()
                                                         setFocusWiki(res)
@@ -655,7 +676,7 @@ export default function Home() {
                                 <List.Item title={post.institute} key={post.id}
                                            onClick={() => {
                                                Toast.show({icon:'loading'})
-                                               getMyEvaluateWiki(document.cookie,post.institute + '#' + post.name).then(res => {
+                                               getMyEvaluateWiki(post.institute + '#' + post.name).then(res => {
                                                    if (res) {
                                                        Toast.clear()
                                                        setFocusWiki(res)
@@ -677,6 +698,7 @@ export default function Home() {
                     </div>
                 </div>
             </Popup>
+            </captchaContext.Provider>
         </>
     )
 }

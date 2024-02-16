@@ -1,16 +1,17 @@
 'use server'
 
-import {getCookie} from "@/app/component/function";
 import {ban, docClient} from "@/app/api/server";
 import {BatchGetCommand, DeleteCommand, PutCommand, QueryCommand, ScanCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 import {sha256} from "js-sha256";
 import {admin} from "@/app/(app)/clientConfig";
+import {cookies} from "next/headers";
 
-export async function getTrends(cookie,lastKey,from) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getTrends(lastKey,from) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -23,11 +24,14 @@ export async function getTrends(cookie,lastKey,from) {
     }
     const scanInput = {
         TableName:'BBS',
-        IndexName:'PostType-SK-index',
-        FilterExpression: 'SK BETWEEN :startKey AND :endKey',
+        IndexName:'Type-SK-index',
+        FilterExpression: 'SK BETWEEN :startKey AND :endKey AND #type <> Report',
         ExpressionAttributeValues: {
             ':startKey': from,
             ':endKey': from + 1000*60*60*24
+        },
+        ExpressionAttributeNames: {
+            '#type': 'Type'
         },
         Limit:30,
     }
@@ -46,10 +50,11 @@ export async function getTrends(cookie,lastKey,from) {
         })
 }
 
-export async function ban_(cookie,username,reason,time) {
-    const jwt = getCookie('JWT',cookie)
-    const user = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function ban_(username,reason,time) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const user = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -80,10 +85,11 @@ export async function ban_(cookie,username,reason,time) {
         })
 }
 
-export async function deleteTrends(cookie,post) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function deleteTrends(post) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -110,10 +116,11 @@ export async function deleteTrends(cookie,post) {
     })
 }
 
-export async function getReportList(cookie,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getReportList(lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -126,10 +133,13 @@ export async function getReportList(cookie,lastKey) {
     }
     const queryInput = {
         TableName:'BBS',
-        IndexName:'PostType-SK-index',
-        KeyConditionExpression: 'PostType = :post_type',
+        IndexName:'Type-SK-index',
+        KeyConditionExpression: '#type = :post_type',
         ExpressionAttributeValues: {
             ':post_type' : 'Report'
+        },
+        ExpressionAttributeNames: {
+            '#type': 'Type'
         },
         ScanIndexForward:false,
         Limit:30
@@ -172,10 +182,11 @@ export async function getReportList(cookie,lastKey) {
     })
 }
 
-export async function deleteBan(cookie,username) {
-    const jwt = getCookie('JWT',cookie)
-    const user = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function deleteBan(username) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const user = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -199,10 +210,11 @@ export async function deleteBan(cookie,username) {
     })
 }
 
-export async function getBlackList(cookie,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getBlackList(lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -235,7 +247,7 @@ export async function getBlackList(cookie,lastKey) {
         })
 }
 
-export async function deleteReport(cookie,PK,SK) {
+export async function deleteReport(PK,SK) {
     return await docClient.send(new DeleteCommand({
         TableName: 'BBS',
         Key: {

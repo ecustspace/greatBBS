@@ -1,5 +1,6 @@
-export const imageUrl = 'https://raw.gitmirror.com/ecustspace/image/main'
-export const Url = 'https://ecust.space'
+export const imageUrl = 'https://pic.ecust.space/i/'
+
+export const Url = 'http://localhost:3000'
 
 export const admin = '方昆亮'
 
@@ -9,8 +10,8 @@ export const emailAddress = '@mail.ecust.edu.cn'
 
 export const emailWebsite = 'https://stu.mail.ecust.edu.cn/'
 
-export const recaptcha_site_key_v3 = '6Lf7p7YoAAAAADIPFm9mPFwRCD7-Po147XP5bQKO'
-export const recaptcha_site_key_v2 = '6LdFP0AlAAAAAHCFWFdhftLrUsVIvK-ezlwVAlcS'
+export const turnstile_key = '0x4AAAAAAAQjjYm3XqYT1sRB'
+export const turnstile_key_visible = '0x4AAAAAAAQnuDfjzIJ9N6QP'
 
 export const avatarList = ['dog.jpg','mice.jpg','panda.jpg','cat.jpg']
 export const names = [
@@ -21,6 +22,8 @@ export const names = [
     'Nathan', 'Oliver', 'Penelope', 'Quentin', 'Rachel', 'Samuel', 'Taylor', 'Ursula', 'Vincent',
     'Wyatt', 'Xander', 'Yolanda', 'Zachary'
 ];
+
+export const topics = ['日常', '求助','时事','交易','招领']
 
 export const AboutUs = () =>
     <>

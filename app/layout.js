@@ -1,13 +1,15 @@
 'use client'
 
 import './globals.css'
-import React, {createContext, useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 import {getCookie} from "@/app/component/function";
+import {useRouter} from "next/navigation";
 
 export const loginState = createContext(null)
 
 export default function RootLayout({ children }) {
     const [isLogin,setLogin] = useState(true)
+    const router = useRouter()
     const toLogin = (values) => {
         return fetch(window.location.origin + '/api/login', {
             method: 'POST',
@@ -38,10 +40,7 @@ export default function RootLayout({ children }) {
         isLogin
     }
     useEffect(() => {
-        if (typeof window !== undefined)
-            window.recaptchaOptions = {
-                useRecaptchaNet: true
-            }
+        router.prefetch('/wiki')
         if (getCookie('Token') && getCookie('UserName')) {
             if (parseInt(getCookie('Token').split('#')[0]) < Date.now()){
                 setLogin(false)
@@ -52,12 +51,12 @@ export default function RootLayout({ children }) {
         <html>
         <head>
             <link rel='manifest' href='/manifest.json'></link>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no' />
+            <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'/>
         </head>
         <loginState.Provider value={login}>
-            <div id='loginRoot'></div>
             <body>
-            {children}
+                <div id='loginRoot'></div>
+                {children}
             </body>
         </loginState.Provider>
         </html>

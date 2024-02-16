@@ -16,9 +16,8 @@
 
 .navigation {
     position: sticky;
-    transform: translateZ(0);
-    z-index: 800;
     top: 0;
+    z-index: 800;
 }
 
 .tabItem {

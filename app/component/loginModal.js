@@ -1,17 +1,22 @@
 'use client'
 
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Button, CenterPopup, Form, Input} from "antd-mobile";
 import './loginModal.css'
-import ReCAPTCHA from "react-google-recaptcha";
-import {emailAddress, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {emailAddress} from "@/app/(app)/clientConfig";
+import Turnstile, {useTurnstile} from "react-turnstile";
+import {createRoot} from "react-dom";
 
 // eslint-disable-next-line react/display-name
 export default function LoginModal({onSubmit,loginSuccess,root}){
     const [isVisible,setVisible] = useState(false)
-    const captchaRef = useRef(null)
+    const [captchaDisable,setCaptchaDisable] = useState(true)
     const [isLoading,setLoading] = useState(false)
-    useEffect(() => {setVisible(true)},[])
+    const turnstile = useTurnstile()
+    useEffect(() => {
+        setVisible(true)
+            }
+        ,[])
     return(
         <CenterPopup
             visible={isVisible}
@@ -22,11 +27,6 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
             style={{'--max-width':'100vw',
                 '--min-width':'90vw',
                 '--border-radius':'16px'}}>
-            <ReCAPTCHA
-                sitekey={recaptcha_site_key_v2}
-                ref={captchaRef}
-                size="invisible"
-            />
             <div style={{padding:'5px'}}>
             <div>
                 <h1>登录账号</h1>
@@ -35,10 +35,8 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                 mode='card' className='fm'
                 style={{ '--prefix-width': '3.5em' }}
                 onFinish={(values) => {
-                    captchaRef.current.reset()
-                    captchaRef.current.executeAsync().then(token => {
                         setLoading(true)
-                        values.recaptchaToken = token
+                        values.captchaToken = turnstile.getResponse()
                         onSubmit(values).then(res => {
                             setLoading(false)
                             if (res.status === 200) {
@@ -46,18 +44,19 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                                     loginSuccess()
                                 }
                                 setVisible(false)
+                            } else {
+                                const loginRoot = createRoot(document.getElementById('loginRoot'))
+                                loginRoot.render(<LoginModal onSubmit={onSubmit} loginSuccess={loginSuccess} root={loginRoot} />)
                             }
                             alert(res.tip)
                         })
-                    }).catch(() => {
-                        alert('未通过人机验证')
-                    })
                 }}
                 requiredMarkStyle='none'
                 footer={
                     <>
                         <Button
                             block
+                            disabled={captchaDisable}
                             color={"primary"}
                             shape={"rounded"}
                             size='middle'
@@ -67,7 +66,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                             <div style={{ fontWeight: 'bolder', fontSize: "small" }}>登 录</div>
                         </Button>
                         <Button onClick={
-                            () => {window.location.replace('/signup')}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
+                            () => {location.replace('/signup')}} block color={"default"} shape={"rounded"} size='middle' style={{ marginTop: '10px' }}>
                             <div style={{ fontWeight: 'bolder', fontSize: "small" }}>注 册</div>
                         </Button>
                     </>
@@ -91,9 +90,20 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                         type='password'
                     />
                 </Form.Item>
+                <Turnstile
+                    sitekey="0x4AAAAAAAQnuDfjzIJ9N6QP"
+                    onVerify={() => {
+                        setCaptchaDisable(false)}}
+                    onError={() => {
+                        setCaptchaDisable(true)}}
+                    onExpire={() => {
+                        setCaptchaDisable(true)}}
+                    onLoad={() =>{
+                        setCaptchaDisable(true)}}
+                />
             </Form>
             <div className='forget'>
-                <a style={{fontSize:"small"}} onClick={() => {window.location.replace('/forgetPassword')}}>
+                <a style={{fontSize:"small"}} onClick={() => {location.replace('/forgetPassword')}}>
                     忘记密码？
                 </a>
             </div>

@@ -1,5 +1,5 @@
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
-import {DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
+import {DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import nodemailer from "nodemailer";
 
 const client = new DynamoDBClient({});
@@ -60,33 +60,28 @@ export async function getUserItem(name,expect){
     })
 }
 
-export async function uploadImage(image,path,id) {
-    const imageDate = image.extra.base64.split(",")
-    let type
-    if (imageDate[0] === 'data:image/png;base64') {
-        type = 'png'
-    } else if (imageDate[0] === 'data:image/jpg;base64'){
-        type = 'jpg'
-    } else if (imageDate[0] === 'data:image/jpeg;base64'){
-        type = 'jpeg'
-    } else if (imageDate[0] === 'data:image/gif;base64'){
-        type = 'gif'
-    } else if (imageDate[0] === 'data:image/webp;base64'){
-        type = 'webp'
+export async function uploadImage(image) {
+    const form = new FormData()
+    form.append('file', image)
+    return await fetch('https://pic.ecust.space/api/v1/upload',{
+        method:'POST',
+        headers: {
+            'Authorization': 'Bearer ' + process.env.PIC_TOKEN
+        },
+        body: form
+    }).then(res => res.json()).then(res => {
+        return {
+            path:res.data.pathname,
+            key:res.data.key
+        }
     }
-
-    return await fetch(`https://api.github.com/repos/ecustspace/image/contents${path}/${id}.${type}`,
-        {
-            method: 'PUT',
-            body: JSON.stringify({
-                'message': 'pic',
-                'content': imageDate[1]
-            }),
-            headers: {
-                "authorization": "Token " + process.env.GITHUB_TOKEN,
-            }
-        }).then(res => {return type})
-        .catch(error => {return 'err'})
+    ).catch(err => {
+        console.log(err)
+        return {
+            path: 'err',
+            key: 'err'
+        }
+    })
 }
 
 export async function recaptchaVerify_v2(token) {
@@ -102,21 +97,16 @@ export async function recaptchaVerify_v2(token) {
     return data.success;
 }
 
-export async function recaptchaVerify_v3(token) {
-    const response = await fetch('https://recaptcha.net/recaptcha/api/siteverify', {
+export async function captchaVerify(token,visible) {
+    let formData = new FormData();
+    formData.append('secret', visible ? process.env.TURNSTILE_KEY_VISIBLE : process.env.TURNSTILE_KEY_INVISIBLE);
+    formData.append('response', token);
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `secret=${process.env.RECAPTCHA_KEY_V3}&response=${token}`
+        body: formData
     });
-
     const data = await response.json();
-    if (data.score) {
-        return data.score
-    } else {
-        return false
-    }
+    return data.success;
 }
 
 export async function ban(username,time) {
@@ -243,6 +233,144 @@ export async function decreaseUserScore(username,type,time) {
         await docClient.send(new UpdateCommand(update)).catch(err => {
             console.log(err)
         })
+    }
+}
+
+export async function loadMoreRandomPost(keys,type) {
+    let posts = []
+    let batchQueryInput = []
+    let limit = 0
+    for (let i = 0; i < 20 ; i++) {
+        if (i === 0) {
+            if (keys[0].lastKey_up !== 'null') {
+                limit += 1
+            }
+            if (keys[0].lastKey_down !== 'null') {
+                limit += 1
+            }
+        } else {
+            if (keys[i].lastKey !== 'null') {
+                limit += 1
+            }
+        }
+    }
+    if (limit === 0) {
+        return null
+    }
+    limit = Math.round(20/limit)
+    for (let i = 0; i < 20 ; i++) {
+        if (i === 0) {
+            if (keys[0].lastKey_up !== 'null') {
+                batchQueryInput.push(docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey < :start',
+                    ExpressionAttributeValues: {
+                        ':start': keys[0].key,
+                        ':postType': type
+                    },
+                    ExclusiveStartKey: keys[0].lastKey_up,
+                    Limit: limit,
+                    ScanIndexForward: false
+                })).then(res => {
+                    if (res.Items.length > 0) {
+                        posts = [...posts,...res.Items]
+                        if (res.LastEvaluatedKey) {
+                            keys[0].lastKey_up = res.LastEvaluatedKey
+                        } else {
+                            keys[0].lastKey_up = 'null'
+                        }
+                    } else {
+                        keys[0].lastKey_up = 'null'
+                    }
+                    }
+                ))
+            }
+            if (keys[0].lastKey_down !== 'null') {
+                docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey BETWEEN :start AND :end',
+                    ExpressionAttributeValues: {
+                        ':start': keys[0].key,
+                        ':end': keys[1].key,
+                        ':postType': type
+                    },
+                    ExclusiveStartKey: keys[0].lastKey_down,
+                    Limit: limit
+                })).then(res => {
+                        if (res.Items.length > 0) {
+                            posts = [...posts,...res.Items]
+                            if (res.LastEvaluatedKey) {
+                                keys[0].lastKey_down = res.LastEvaluatedKey
+                            } else {
+                                keys[0].lastKey_down = 'null'
+                            }
+                        } else {
+                            keys[0].lastKey_down = 'null'
+                        }
+                    }
+                )
+            }
+        } else if (i < 19) {
+            if (keys[i].lastKey !== 'null') {
+                batchQueryInput.push(docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey BETWEEN :start AND :end',
+                    ExpressionAttributeValues: {
+                        ':start': keys[i].key,
+                        ':end': keys[i+1].key,
+                        ':postType': type
+                    },
+                    Limit: limit,
+                    ExclusiveStartKey: keys[i].lastKey
+                })).then(res => {
+                    if (res.Items.length > 0) {
+                        posts = [...posts,...res.Items]
+                        if (res.LastEvaluatedKey) {
+                            keys[i].lastKey = res.LastEvaluatedKey
+                        } else {
+                            keys[i].lastKey = 'null'
+                        }
+                    } else {
+                        keys[i].lastKey = 'null'
+                    }
+                    }
+                ))
+            }
+        } else {
+            if (keys[19].lastKey !== 'null') {
+                batchQueryInput.push(docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey > :end',
+                    ExpressionAttributeValues: {
+                        ':end': keys[19].key,
+                        ':postType': type
+                    },
+                    Limit: limit,
+                    ExclusiveStartKey: keys[19].lastKey
+                })).then(res => {
+                    if (res.Items.length > 0) {
+                        posts = [...posts,...res.Items]
+                        if (res.LastEvaluatedKey) {
+                            keys[19].lastKey = res.LastEvaluatedKey
+                        } else {
+                            keys[19].lastKey = 'null'
+                        }
+                    } else {
+                        keys[19].lastKey = 'null'
+                    }
+                    }
+                ))
+            }
+        }
+    }
+    await Promise.all(batchQueryInput)
+    return {
+        keys: keys,
+        posts: posts
     }
 }
 

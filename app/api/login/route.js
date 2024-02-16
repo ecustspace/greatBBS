@@ -1,4 +1,4 @@
-import {docClient, getUserIDItem, recaptchaVerify_v2} from "@/app/api/server";
+import {captchaVerify, docClient, getUserIDItem} from "@/app/api/server";
 import {UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {NextResponse} from "next/server";
 import {v4} from "uuid";
@@ -6,7 +6,7 @@ import {sha256} from "js-sha256";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const isHuman = await captchaVerify(data.captchaToken,true)
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }

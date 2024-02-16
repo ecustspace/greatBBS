@@ -25,7 +25,7 @@
 .delayText {
     margin-top: 25px;
     opacity: 0; /* 初始状态为透明 */
-    animation: fade-in 0s 1500ms forwards; /* 动画名称、动画时长、延迟和结束后的状态 */
+    animation: fade-in 0s 4000ms forwards; /* 动画名称、动画时长、延迟和结束后的状态 */
 }
 
 @keyframes fade-in {

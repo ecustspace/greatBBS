@@ -1,8 +1,8 @@
 import {
+    captchaVerify,
     docClient,
     getUserItem,
     isBan,
-    recaptchaVerify_v2,
     updateUserScore,
     uploadImage
 } from "@/app/api/server";
@@ -15,12 +15,15 @@ import {Url} from "@/app/(app)/clientConfig";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
-    const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const data = await request.formData()
+    const isHuman = await captchaVerify(data.get('captchaToken'))
     if (isHuman !== true) {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
+        return NextResponse.json({tip:'未通过人机验证,请重试',status:500})
     }
-    if (data.images.length > 3 || !dataLengthVerify(0,500,data.content) || (!data.content && !data.images)){
+    const fileLength = data.get('fileLength')
+    const content = data.get('content')
+    if (data.get('fileLength') > 3 || !dataLengthVerify(0,500,content) ||
+        (typeof content !== 'string'&& (typeof fileLength != 'number' || parseInt(fileLength) > 3))){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()
@@ -41,34 +44,40 @@ export async function POST(request) {
     if (is_ban !== false) {
         return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
     }
-    const getPostDataCommand = data.reply_name ? [
+
+    const postName = data.get('post_name')
+    const postTime = parseInt(data.get('post_time'))
+    const replyName = data.get('reply_name')
+    const replyTime = parseInt(data.get('reply_time'))
+    const getPostDataCommand =
+        typeof replyName == 'string' ? [
         {
         TableName:'BBS',
         Key:{
-            PK:data.post_name,
-            SK:data.post_time
+            PK:postName,
+            SK:postTime
         },
     },{
             TableName:'BBS',
             Key:{
-                PK: 'Reply#' + data.reply_name,
-                SK: data.reply_time
+                PK: 'Reply#' + replyName,
+                SK: replyTime
             }
         }] : [{
         TableName:'BBS',
         Key:{
-            PK:data.post_name,
-            SK:data.post_time
+            PK:postName,
+            SK:postTime
         }
     }]
     let postData = []
-    for (const item of getPostDataCommand) {
+    for (let item of getPostDataCommand) {
         postData.push(await docClient.send(new GetCommand(item)).then(res => {
             return res.Item
         }).catch(() => {return 500}))
     }
        if (postData.length === 1) {
-           if (!postData[0].PostID) {
+           if (typeof postData[0].PostID !== 'number') {
                postData = 500
            }
        } else if (postData.length === 2) {
@@ -81,17 +90,17 @@ export async function POST(request) {
         return NextResponse.json({tip:'帖子不存在',status:500})
     }
     if (postData[0].PostType === 'AnPost') {
-        if (!data.isAnonymity) {
+        if (!data.get('anid')) {
             return NextResponse.json({tip:'匿名密钥错误',status:500})
-        } else if (sha256(data.isAnonymity) !== user_item.Anid) {
+        } else if (sha256(data.get('anid')) !== user_item.Anid) {
             return NextResponse.json({tip:'匿名密钥错误',status:500})
         }}
     let res
     const updateReplyID = new UpdateCommand({
         TableName:'BBS',
         Key:{
-            PK: data.post_name,
-            SK: data.post_time
+            PK: postName,
+            SK: postTime
         },
         UpdateExpression: "SET ReplyID = ReplyID + :incr",
         ExpressionAttributeValues: {
@@ -112,22 +121,22 @@ export async function POST(request) {
             TransactItems: [{
                 Put: {
                     TableName: 'BBS',
-                    Item: data.reply_name !== undefined ? {
-                        PK: 'Reply#' + sha256(data.isAnonymity+'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
+                    Item: typeof replyName == 'string'? {
+                        PK: 'Reply#' + sha256(data.get('anid') +'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
                         SK: now,
-                        PostType: 'ReplyTo'+postData[0].PostID,
-                        Content: data.content.replace(/(\n)+/g, "\n"),
+                        Type: 'ReplyTo'+postData[0].PostID,
+                        Content: content.replace(/(\n)+/g, "\n"),
                         LikeCount: 0,
                         Avatar: user_item.Avatar,
                         ReplyID: replyID,
                         ReplyToID: postData[1].ReplyID,
-                        ReplyToName: data.reply_name
+                        ReplyToName: replyName
                     } :
                         {
-                            PK: 'Reply#' + sha256(data.isAnonymity+'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
+                            PK: 'Reply#' + sha256(data.get('anid') +'#'+username+'#'+postData[0].PostID+process.env.JWT_SECRET),
                             SK: now,
-                            PostType: 'ReplyTo'+postData[0].PostID,
-                            Content: data.content.replace(/(\n)+/g, "\n"),
+                            Type: 'ReplyTo'+postData[0].PostID,
+                            Content: content.replace(/(\n)+/g, "\n"),
                             LikeCount: 0,
                             Avatar: user_item.Avatar,
                             ReplyID: replyID
@@ -137,8 +146,8 @@ export async function POST(request) {
                 Update: {
                     TableName:'BBS',
                     Key:{
-                        PK: data.post_name,
-                        SK: data.post_time
+                        PK: postName,
+                        SK: postTime
                     },
                     UpdateExpression: "SET ReplyCount = ReplyCount + :incr",
                     ExpressionAttributeValues: {
@@ -149,7 +158,7 @@ export async function POST(request) {
         })).then(() => {return 200})
             .catch(() => {return 500})
     }
-    else if (postData[0].PostType === 'Post' || postData[0].PostType === 'Image') {
+    else {
         replyID = await docClient.send(updateReplyID)
             .then(res => {return res.Attributes.ReplyID})
             .catch(err => {console.log(err);return 'err'})
@@ -160,17 +169,17 @@ export async function POST(request) {
             PK: 'Reply#' + username,
             SK: now,
             Avatar: user_item.Avatar,
-            PostType: 'ReplyTo'+postData[0].PostID,
-            InWhere: data.post_name + '#' + data.post_time,
-            Content: data.content,
+            Type: 'ReplyTo'+postData[0].PostID,
+            InWhere: postName + '#' + postTime,
+            Content: content,
             LikeCount: 0,
             ReplyID: replyID
         }
-        if (typeof data.reply_name === 'string') {
+        if (typeof replyName === 'string') {
             putInput.ReplyToID = postData[1].ReplyID
-            putInput.ReplyToName = data.reply_name
+            putInput.ReplyToName = replyName
         }
-        if (data.showLevel === true) {
+        if (data.get('showLevel') === true) {
             putInput.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
         }
         res = await docClient.send(new TransactWriteCommand({
@@ -183,8 +192,8 @@ export async function POST(request) {
                 Update: {
                     TableName:'BBS',
                         Key:{
-                        PK: data.post_name,
-                            SK: data.post_time
+                        PK: postName,
+                        SK: postTime
                     },
                     UpdateExpression: "SET ReplyCount = ReplyCount + :incr",
                         ExpressionAttributeValues: {
@@ -194,22 +203,22 @@ export async function POST(request) {
             },{
                 Put: {
                     TableName: 'BBS',
-                    Item: data.reply_name !== undefined? {
-                        PK: 'Notify#' + data.reply_name,
+                    Item: typeof replyName == "string" ? {
+                        PK: 'Notify#' + replyName,
                         SK: now,
                         Avatar: user_item.Avatar,
                         From: username,
-                        InWhere: data.post_name + '#' + data.post_time,
-                        Content:'评论了你：' + (data.content > 12 ? data.content.slice(0,12) + '...' : data.content),
+                        InWhere: postName + '#' + postTime,
+                        Content:'评论了你：' + (content.length > 12 ? content.slice(0,12) + '...' : content),
                         ttl: (now + 1000*60*60*24*7)/1000
 
                     } : {
-                        PK: 'Notify#' + data.post_name,
+                        PK: 'Notify#' + postName,
                         SK: now,
                         Avatar: user_item.Avatar,
                         From: username,
-                        InWhere: data.post_name + '#' + data.post_time,
-                        Content: '评论了你：' + (data.content > 12 ? data.content.slice(0,12) + '...' : data.content),
+                        InWhere: postName + '#' + postTime,
+                        Content: '评论了你：' + (content.length > 12 ? content.slice(0,12) + '...' : content),
                         ttl: (now + 1000*60*60*24*7)/1000
                     }
                 }
@@ -218,23 +227,26 @@ export async function POST(request) {
         })).then(() => {return 200})
             .catch((err) => {console.log(err); return 500})
     }
+    revalidateTag('Post')
     if (res === 200 && postData[0].PostType !== 'AnPost') {
-        if (data.post_name !== username || (typeof data.reply_name == 'string' && username !== data.reply_name)) {
+        if (postName !== username || (typeof replyName == 'string' && username !== replyName)) {
             await updateUserScore(username,'Reply')
             const data_ = encodeURIComponent(JSON.stringify({
-                username: typeof data.reply_name == 'string' ? data.reply_name : data.post_name,
+                username: typeof replyName == 'string' ? replyName : postName,
                 type: '评论',
                 from: username,
-                content: data.content,
-                inWhere: data.post_name + '#' + data.post_time
+                content: content,
+                inWhere: postName + '#' + postTime
             }))
             fetch(Url + '/api/notifyByEmail?token=' + sha256(process.env.JWT_SECRET) + '&data=' + data_,{cache:'no-cache'})
         }
         let image_list = []
-        for(let i = 0, len = data.images.length; i < len; i++) {
-            const type = await uploadImage(data.images[i],'/reply/'+postData[0].PostID,replyID + '-' + i.toString())
-            image_list.push(type)
+
+        for (let i = 0; i < fileLength; i++) {
+            const fileData = uploadImage(data.get(`file[${i}]`))
+            image_list.push(fileData)
         }
+        image_list = await Promise.all(image_list)
         if (image_list.length !== 0) {
             await docClient.send(new UpdateCommand({
                 TableName: 'BBS',
@@ -242,17 +254,15 @@ export async function POST(request) {
                     PK: 'Reply#' + username,
                     SK: now
                 },
-                UpdateExpression: "SET ImageList = :image_list",
+                UpdateExpression: "SET ImagesList = :image_list",
                 ExpressionAttributeValues: {
                     ":image_list" : image_list
                 }
             }))
         }
-        revalidateTag(postData[0].PostType)
         return NextResponse.json({tip:'评论成功',status:200})
     }
     else if (res === 200 && postData[0].PostType === 'AnPost') {
-        revalidateTag(postData[0].PostType)
         return NextResponse.json({tip:'评论成功',status:200})
     }
     else {

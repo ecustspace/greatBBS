@@ -1,24 +1,29 @@
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {
+    captchaVerify,
     docClient,
     getUserItem,
     isBan,
-    recaptchaVerify_v2,
     updateUserScore,
     uploadImage
 } from "@/app/api/server";
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {revalidateTag} from "next/cache";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
+import {v4} from "uuid";
 
 export async function POST(request) {
-    const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const data = await request.formData()
+    const isHuman = await captchaVerify(data.get('captchaToken'))
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
-    if (data.images.length > 6 || data.images.length === 0 || !dataLengthVerify(0,50,data.text)){
+    const fileLength = parseInt(data.get('fileLength'))
+    const text = data.get('text')
+    const topic = data.get('topic')
+    if (parseInt(fileLength) > 6 || parseInt(fileLength) < 1 || !dataLengthVerify(0,50,text) ||
+        !dataLengthVerify(0,20,topic)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()
@@ -55,34 +60,44 @@ export async function POST(request) {
     const post_id= await docClient.send(updatePostCountCommand)
         .then(res => {
             return res.Attributes.PostCount
-        }).catch(err => {return 'err'})
+        }).catch(() => {return 'err'})
+
     let image_list = []
-    for(let i = 0, len = data.images.length; i < len; i++) {
-        const type = await uploadImage(data.images[i],'/post',post_id + '-' + i.toString())
-        image_list.push(type)
+
+    for (let i = 0; i < fileLength; i++) {
+        const fileData = uploadImage(data.get(`file[${i}]`))
+        image_list.push(fileData)
     }
+    image_list = await Promise.all(image_list)
+
     let putInput = {
         TableName: 'BBS',
         Item: {
             PK: username,
             SK: now,
+            Type: 'Post',
             PostType: 'Image',
             PostID: post_id,
-            ImageList:image_list,
+            ImagesList:image_list,
             ReplyCount: 0,
             ReplyID: 0,
             LikeCount: 0,
-            H_W: data.images[0].extra.height/data.images[0].extra.width,
+            FavouriteCount:0,
+            RandomKey: v4(),
+            H_W: parseFloat(data.get('h_w')),
             Avatar: user_item.Avatar,
-            Content: data.text.replace(/(\n)+/g, "\n"),
+            Content: text.replace(/(\n)+/g, "\n"),
         }
     }
     if (data.showLevel === true) {
         putInput.Item.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
     }
+    if (topic.length > 0) {
+        putInput.Item.Topic = topic
+    }
     return await docClient.send(new PutCommand(putInput)).then(() => {
-        revalidateTag('Image')
         updateUserScore(username,'Post')
+        revalidateTag('Post')
         return NextResponse.json({tip:'发布成功',status:200})
     }).catch(() => {
         return NextResponse.json({tip:'发布失败',status:500})

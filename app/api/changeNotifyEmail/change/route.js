@@ -1,4 +1,4 @@
-import {getUserItem, recaptchaVerify_v2} from "@/app/api/server";
+import {captchaVerify, getUserItem} from "@/app/api/server";
 import {NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import nodemailer from "nodemailer";
@@ -7,7 +7,7 @@ import {sha256} from "js-sha256";
 
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const isHuman = await captchaVerify(data.captchaToken)
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }

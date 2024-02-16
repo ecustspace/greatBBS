@@ -1,7 +1,6 @@
 import {DeleteCommand, GetCommand, TransactWriteCommand,} from "@aws-sdk/lib-dynamodb";
-import {docClient, recaptchaVerify_v2, updateUserScore} from "@/app/api/server";
+import {docClient,updateUserScore} from "@/app/api/server";
 import {NextResponse} from "next/server";
-import {cookies, headers} from "next/headers";
 import {v4} from "uuid";
 import {avatarList} from "@/app/(app)/clientConfig";
 import {sha256} from "js-sha256";
@@ -12,25 +11,20 @@ export function dataLengthVerify(min,max,data) {
 }
 export async function POST(request) {
     const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
-    if (isHuman !== true) {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
-    }
     const jwtSecret = process.env.JWT_SECRET
     if ( data.username.includes('#') ||
     !dataLengthVerify(1,8,data.username) ||
     !dataLengthVerify(5,20,data.password) ||
-    !dataLengthVerify(6,6,data.verification) ||
     !data.useremail || !avatarList.includes(data.avatar)) {
         return NextResponse.json({tip:'数据格式不正确'})
     }
-    const cookieStore = cookies()
-    const sign_up_token = cookieStore.get('SignUpToken')
+    const sign_up_token = data.sign_up_token
+    console.log(sign_up_token)
     const getCaptchaCommand = new GetCommand(
         {
             TableName: 'User',
             Key: {
-                PK: sign_up_token.value,
+                PK: sign_up_token,
                 SK: data.useremail
             }
         }
@@ -40,10 +34,10 @@ export async function POST(request) {
     })
 
     if (!item) {
-        return NextResponse.json({tip:'请先获取验证码',status:500})
+        return NextResponse.json({tip:'请先获取链接',status:500})
     }
 
-    if (data.verification !== item.Captcha.toString()) {
+    if (data.sign_up_token !== item.PK) {
         return NextResponse.json({tip:'验证码错误',status:500})
     }
     else {
@@ -107,7 +101,7 @@ export async function POST(request) {
               docClient.send(new DeleteCommand({
                 TableName: 'User',
                 Key: {
-                    PK: sign_up_token.value,
+                    PK: data.sign_up_token,
                     SK: data.useremail
                 }
             }))

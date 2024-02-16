@@ -1,9 +1,11 @@
-import CardContainer from "@/app/component/cardContainer";
+'use client'
 
-export default async function Home() {
+import AnPostCardContainer from "@/app/component/anPostContainer";
+
+export default function Home() {
     return (
         <div>
-            <CardContainer type='AnPost' />
+            <AnPostCardContainer />
         </div>
     )
 }

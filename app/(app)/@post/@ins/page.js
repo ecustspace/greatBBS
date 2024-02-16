@@ -1,7 +1,8 @@
-import {Url} from "@/app/(app)/clientConfig";
+'use client'
+
 import InsContainer from "@/app/component/insContainer";
 
-export default async function Home() {
+export default function Home() {
     return (
         <div>
             <InsContainer />

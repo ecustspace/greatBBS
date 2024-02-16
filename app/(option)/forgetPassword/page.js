@@ -2,25 +2,26 @@
 /* eslint-disable @next/next/no-async-client-component */
 'use client'
 import './forgetPassword.css'
-import {useRef, useState} from 'react'
-import {Button, Dialog, Form, Input, NavBar, Popup, Toast} from 'antd-mobile'
+import {useState} from 'react'
+import {Button, Dialog, Form, Input, NavBar, Toast} from 'antd-mobile'
 import {EyeInvisibleOutline, EyeOutline} from 'antd-mobile-icons'
 import {responseHandle} from "@/app/component/function";
-import {emailAddress, emailWebsite, recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
-import ReCAPTCHA from "react-google-recaptcha";
+import {emailAddress, emailWebsite} from "@/app/(app)/clientConfig";
+import Turnstile, {useTurnstile} from "react-turnstile";
+import {useRouter} from "next/navigation";
 
 
 export default function Home() {
     const [form1] = Form.useForm()
     const [btnDisable,setDisable] = useState(true)
+    const [captchaDisable,setCaptchaDisable] = useState(true)
     const [visiblePW1, setVisiblePW1] = useState(false)
     const [visiblePW2, setVisiblePW2] = useState(false)
-    const captchaRef = useRef(null)
+    const turnstile = useTurnstile()
+    const router = useRouter()
     const onSubmit = () => {
-        captchaRef.current.executeAsync().then(token => {
-            captchaRef.current.reset()
             const values = form1.getFieldsValue(true)
-            values.recaptchaToken = token
+            values.recaptchaToken = turnstile.getResponse()
             Toast.show({
                 icon:"loading",
                 duration:0
@@ -32,11 +33,9 @@ export default function Home() {
                     'Content-Type': 'application/json'
                 }
             }).then(res => {
-                captchaRef.current.reset()
                 return res.json()
             }).then(
                 (data) => {
-                    document.cookie = `SignUpToken=${data.sign_up_token}`
                     if (data.status === 200) {
                         Toast.clear()
                         Dialog.show({
@@ -60,27 +59,19 @@ export default function Home() {
                             ],
                         })
                     } else {
+                        turnstile.reset()
                         responseHandle(data)
                     }
                 }
-            ).catch(() => {Toast.show('error')})
-        }).catch(() => {
-            captchaRef.current.reset()
-            Toast.show('未通过人机验证')})
+            ).catch(() => {
+                turnstile.reset()
+                Toast.show('error')})
     }
 
     return (
         <>
-            <script>
-                window.recaptchaOptions = useRecaptchaNet: true
-            </script>
-            <ReCAPTCHA
-                sitekey={recaptcha_site_key_v2}
-                ref={captchaRef}
-                size="invisible"
-            />
             <NavBar onBack={() => {
-                window.location.replace('/')
+                router.replace('/')
             }}></NavBar>
             <center><h2>重置密码</h2></center>
             <Form
@@ -91,7 +82,7 @@ export default function Home() {
                 footer={
                     <Button
                         block
-                        disabled={btnDisable}
+                        disabled={captchaDisable || btnDisable}
                         color={"primary"}
                         shape={"rounded"}
                         size='large'
@@ -128,7 +119,7 @@ export default function Home() {
                         </div>
                     }
                 >
-                    <Input placeholder='请输入新密码' />
+                    <Input type={visiblePW1 ? 'string' : 'password'} placeholder='请输入新密码' />
                 </Form.Item>
                 <Form.Item
                     rules={[{ required: true },
@@ -156,8 +147,19 @@ export default function Home() {
                         </div>
                     }
                 >
-                    <Input placeholder='请重新输入新密码' />
+                    <Input type={visiblePW2 ? 'string' : 'password'} placeholder='请重新输入新密码' />
                 </Form.Item>
+                <Turnstile
+                    sitekey="0x4AAAAAAAQnuDfjzIJ9N6QP"
+                    onVerify={() => {
+                        setCaptchaDisable(false)}}
+                    onError={() => {
+                        setCaptchaDisable(true)}}
+                    onExpire={() => {
+                        setCaptchaDisable(true)}}
+                    onLoad={() =>{
+                        setCaptchaDisable(true)}}
+                />
             </Form>
         </>
     )

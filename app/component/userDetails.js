@@ -1,3 +1,5 @@
+'use client'
+
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from "react";
 import {Button, Image, InfiniteScroll, NavBar, Popup, Steps} from "antd-mobile";
 import {ContactTa, getUserPost} from "@/app/api/serverAction";
@@ -6,7 +8,6 @@ import Ellipsis from "@/app/component/ellipsis";
 import {ImageContainer} from "@/app/component/imageContainer";
 import {detailsContext} from "@/app/(app)/layout";
 import {lock, unlock} from "tua-body-scroll-lock";
-import Hammer from "hammerjs";
 import parser from "ua-parser-js";
 
 const { Step } = Steps
@@ -34,14 +35,23 @@ const UserDetails = forwardRef(({user},ref) => {
     },[isVisible])
 
     useEffect(() => {
-        let hammertime = new Hammer(document.getElementById("userDetails"));
-        hammertime.on("swiperight", function () {
-            setIsVisible(false)
-        });
-    },[])
+        const loadHammer = async () => {
+            const Hammer = await import('hammerjs');
+            const hammertime = new Hammer.default(document.getElementById("userDetails"));
+
+            // Verify if hammertime is an instance of Hammer
+            console.log(typeof hammertime);
+
+            hammertime.on("swiperight", () => {
+                setIsVisible(false);
+            });
+        };
+
+        loadHammer();
+    }, []);
 
     async function loadMore() {
-        await getUserPost(document.cookie,user.name,lastKey).then(res => {
+        await getUserPost(user.name,lastKey).then(res => {
             if (res === 500) {
                 setHasMore(false)
             }
@@ -90,11 +100,11 @@ const UserDetails = forwardRef(({user},ref) => {
            <Button
                color={"default"}
                shape={"rounded"}
-               size={"small"}
+               size={"mini"}
                loading={btnLoading}
                fill='outline' onClick={() => {
                setBtnLoading(true)
-               ContactTa(document.cookie, user.name).then(res => {
+               ContactTa(user.name).then(res => {
                    setBtnLoading(false)
                    if (res.status !== 200) {
                        responseHandle(res)
@@ -112,22 +122,28 @@ const UserDetails = forwardRef(({user},ref) => {
         {list.map(post => <Step
             status='finish'
             key={post.id}
-            title={(post.PostType === 'Post' ? '发布了帖子·'  : '发布了照片墙·') + timeConclude(post.SK)}
+            title={(post.PostType !== 'Image' ? '发布了帖子·'  : '发布了照片墙·') + timeConclude(post.SK)}
             description={<div onClick={() => {
                 setIndex(999)
                 hideAllPostPopup()
-                if (post.PostType === 'Post') {
-                    showPostPopup(post)
-                } else if (post.PostType === 'Image') {
+                if (post.PostType === 'Image') {
                     showImgPopup(post)
+                } else {
+                    showPostPopup(post)
                 }
             }}>
                 <Ellipsis content={post.Content} style={{marginTop:'6px',marginBottom:'4px'}} />
-        {post.ImageList !== undefined? <ImageContainer list={post.ImageList} from={'/post/' + post.PostID} style={{marginTop:'10px'}} /> : ''}
+                {post.ImagesList !== undefined? <ImageContainer h_w={post.PostType !== 'Image' ? post.H_W : null} list={post.ImagesList} style={{marginTop:'10px'}} /> : (
+                    typeof post.VideoLink == 'string' ? <div style={{marginTop:'10px'}} onClick={e => e.stopPropagation()}>
+                        <video width='100%' controls>
+                            <source src={post.VideoLink}/>
+                        </video>
+                    </div> : ''
+                )}
             </div>}
-             />)}
+        />)}
         </Steps>
-        <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
+                <InfiniteScroll loadMore={loadMore} hasMore={hasMore} />
     </div>
         <br/>
         <br/>

@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-    transpilePackages: ['antd-mobile'],
-    experimental: {
-        serverActions: true,
-    }
+    transpilePackages: ['antd-mobile']
 }
 
 module.exports = nextConfig

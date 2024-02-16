@@ -1,11 +1,10 @@
 'use server'
 
 import {sha256} from "js-sha256";
-import {getCookie} from "@/app/component/function";
 import {
     decreaseUserScore,
     docClient,
-    getUserItem,
+    getUserItem, loadMoreRandomPost,
     setUserInquireTime,
     transporter
 } from "@/app/api/server";
@@ -20,19 +19,212 @@ import {
 import {avatarList, Url} from "@/app/(app)/clientConfig";
 import {revalidateTag} from "next/cache";
 import {v4} from "uuid";
+import {cookies} from "next/headers";
 
-export async function fetchData(type) {
-    if (!['Image','Post','AnPost'].includes(type)) {
-        return 500
-    }
-    const data = await fetch(Url + `/api/getPostData?postType=${type}&token=${sha256(process.env.JWT_SECRET)}`,{next:{tags:[type]}})
+export async function fetchData() {
+    const data = await fetch(Url + `/api/getPostData?token=${sha256(process.env.JWT_SECRET)}`,{
+        next:{tags:'Post'}
+    })
     return await data.json()
 }
 
-export async function getUserData(cookie) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function fetchDataWithPostType(type) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    let keys = []
+    for (let i = 0; i < 20 ; i++) {
+        keys.push(v4())
+    }
+    keys = keys.sort().map(key => {
+        return {
+            key: key
+        }
+    })
+    let batchQueryInput = []
+    let posts = []
+    for (let i = 0; i < 20 ; i++) {
+        if (i === 0) {
+            batchQueryInput = [
+                docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey < :start',
+                    ExpressionAttributeValues: {
+                        ':start': keys[0].key,
+                        ':postType': type
+                    },
+                    ScanIndexForward: false,
+                    Limit: 1
+                })).then(res => {
+                        if (res.Items.length > 0) {
+                            posts.push(res.Items[0])
+                            if (!res.LastEvaluatedKey) {
+                                keys[0].lastKey_up = 'null'
+                            } else {
+                                keys[0].lastKey_up = res.LastEvaluatedKey
+                            }
+                        } else {
+                            keys[0].lastKey_up = 'null'
+                        }
+                    }
+                )
+                ,docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey BETWEEN :start AND :end',
+                    ExpressionAttributeValues: {
+                        ':start': keys[0].key,
+                        ':end': keys[1].key,
+                        ':postType': type
+                    },
+                    Limit: 1
+                })).then(res => {
+                        if (res.Items.length > 0) {
+                            posts.push(res.Items[0])
+                            if (res.LastEvaluatedKey) {
+                                keys[0].lastKey_down = res.LastEvaluatedKey
+                            } else {
+                                keys[0].lastKey_down = 'null'
+                            }
+                        } else {
+                            keys[0].lastKey_down = 'null'
+                        }
+                    }
+                )
+            ]
+        } else if (i < 19) {
+            batchQueryInput.push(docClient.send(new QueryCommand({
+                TableName: 'BBS',
+                IndexName: 'PostType-RandomKey-index',
+                KeyConditionExpression: 'PostType = :postType AND RandomKey BETWEEN :start AND :end',
+                ExpressionAttributeValues: {
+                    ':start': keys[i].key,
+                    ':end': keys[i+1].key,
+                    ':postType': type
+                },
+                Limit:1
+            })).then(res => {
+                    if (res.Items.length > 0) {
+                        posts.push(res.Items[0])
+                        if (res.LastEvaluatedKey) {
+                            keys[i].lastKey = res.LastEvaluatedKey
+                        } else {
+                            keys[i].lastKey = 'null'
+                        }
+                    } else {
+                        keys[i].lastKey = 'null'
+                    }
+                }
+            ))
+        } else  {
+                batchQueryInput.push(docClient.send(new QueryCommand({
+                    TableName: 'BBS',
+                    IndexName: 'PostType-RandomKey-index',
+                    KeyConditionExpression: 'PostType = :postType AND RandomKey > :start',
+                    ExpressionAttributeValues: {
+                        ':start': keys[19].key,
+                        ':postType': type
+                    },
+                    Limit: 1
+                })).then(res => {
+                        if (res.Items.length > 0) {
+                            posts = [...posts,...res.Items]
+                            if (res.LastEvaluatedKey) {
+                                keys[19].lastKey = res.LastEvaluatedKey
+                            } else {
+                                keys[19].lastKey = 'null'
+                            }
+                        } else {
+                            keys[19].lastKey = 'null'
+                        }
+                    }
+                ))
+        }
+    }
+    await Promise.all(batchQueryInput)
+    while (posts.length < 15) {
+        const data_ = await loadMoreRandomPost(keys,type)
+        if (data_ == null) {
+            break
+        }
+        posts = [...posts, ...data_.posts]
+        keys = data_.keys
+    }
+    return await docClient.send(new BatchGetCommand({
+        RequestItems: {
+            'BBS': {
+                Keys: posts.map(item => {
+                    return {
+                        PK: item.PK,
+                        SK: item.SK
+                    }
+                })
+            }
+        }
+    })).then(res => {
+        posts = res.Responses['BBS']
+        return {
+            posts: posts,
+            lastKey: keys
+        }
+    })
+}
+
+export async function getPostListWithType(type,keys) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    let posts = []
+    while (posts.length < 15) {
+        const data_ = await loadMoreRandomPost(keys,type)
+        if (data_ == null) {
+            break
+        }
+        posts = [...posts, ...data_.posts]
+        keys = data_.keys
+    }
+    return await docClient.send(new BatchGetCommand({
+        RequestItems: {
+            'BBS': {
+                Keys: posts.map(item => {
+                    return {
+                        PK: item.PK,
+                        SK: item.SK
+                    }
+                })
+            }
+        }
+    })).then(res => {
+        posts = res.Responses['BBS']
+        return {
+            posts: posts,
+            lastKey: keys
+        }
+    })
+}
+
+export async function getUserData() {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -86,10 +278,11 @@ export async function getUserData(cookie) {
 
 }
 
-export async function getUserOperations(cookie,lastKey,string) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getUserOperations(lastKey,string) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -120,10 +313,11 @@ export async function getUserOperations(cookie,lastKey,string) {
     })
 }
 
-export async function getUserLikePost(cookie,lastKey){
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getUserLikePost(lastKey){
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -179,10 +373,117 @@ export async function getUserLikePost(cookie,lastKey){
     })
 }
 
-export async function getPostData(cookie,where) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getUserFavouritePost(lastKey){
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    const queryInput = {
+        TableName:'BBS',
+        KeyConditionExpression: 'PK = :pk',
+        ExpressionAttributeValues: {
+            ':pk' : 'Favourite#' + username,
+        },
+        Limit: 20,
+        ScanIndexForward:false,
+    }
+    if (lastKey) {
+        queryInput.ExclusiveStartKey = lastKey
+    }
+    const like = await docClient.send(new QueryCommand(queryInput)).then(res => {
+        return {
+            lastKey: res.LastEvaluatedKey,
+            items: res.Items
+        }
+    }).catch(err => {
+        console.log(err)
+        return 500
+    })
+    if (like === 500) {
+        return 500
+    }
+    if (like.items.length === 0) {
+        return like
+    }
+    const batchCommand = like.items.map(item =>  {
+        return  {
+            PK: item.InWhere.split('#')[0],
+            SK: parseInt(item.InWhere.split('#')[1])
+        }
+    })
+    return await docClient.send(new BatchGetCommand({
+        RequestItems: {
+            'BBS' : {
+                Keys : batchCommand
+            }
+        }
+    })).then(res => {
+        like.items = res.Responses['BBS']
+        return like
+    }).catch(err => {
+        console.log(err)
+        return 500
+    })
+}
+
+export async function getIsLike(postID) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    return await docClient.send(new GetCommand({
+        TableName:'BBS',
+        Key: {
+            PK: 'Like#' + username,
+            SK: parseInt(postID)
+        }
+    })).then(res => {
+        return !!res.Item
+    })
+}
+
+export async function getIsFavourite(postID) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    return await docClient.send(new GetCommand({
+        TableName:'BBS',
+        Key: {
+            PK: 'Favourite#' + username,
+            SK: parseInt(postID)
+        }
+    })).then(res => {
+        return !!res.Item
+    })
+}
+
+export async function getPostData(where) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -202,10 +503,11 @@ export async function getPostData(cookie,where) {
     }).catch((err) => {console.log(err) ;return 500})
 }
 
-export async function like(cookie,PK,SK,avatar) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function like(PK,SK,avatar) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -233,59 +535,7 @@ export async function like(cookie,PK,SK,avatar) {
         return 500
     }
     const now = Date.now()
-    if (post_data.PostType.includes('ReplyTo')) {
-        let input =[{
-            Put: {
-                TableName: 'BBS',
-                Item : {
-                    PK: 'Like#' + username + '#' + post_data.PostType.split('o')[1],
-                    SK: post_data.ReplyID,
-                    ttl: now/1000 + 60*60*24*365
-                },
-                ConditionExpression: "attribute_not_exists(SK)"
-            }
-        },{
-            Update : {
-                TableName: 'BBS',
-                Key: {
-                    PK:PK,
-                    SK:SK
-                },
-                ConditionExpression: "attribute_exists(SK)",
-                UpdateExpression: "SET LikeCount = LikeCount + :incr",
-                ExpressionAttributeValues: {
-                    ":incr": 1
-                }
-            }
-        }]
-        if (post_data.InWhere) {
-            input.push({
-                Put: {
-                    TableName: 'BBS',
-                    Item : {
-                        PK: 'Notify#' + PK.split('#')[1],
-                        SK: now,
-                        Avatar: avatar,
-                        ttl: now/1000 + 60*60*24*7,
-                        From: username,
-                        Content: '点赞了你的评论：' + (post_data.Content.length > 12 ? post_data.Content.slice(0,12) + '...' : post_data.Content),
-                        InWhere: post_data.InWhere
-                    }
-                }
-            })
-        }
-        return await docClient.send(new TransactWriteCommand({
-            TransactItems: input
-        })).then(() => {
-            return 200
-        }).catch((err) => {
-            if (err.toString() === 'TransactionCanceledException: Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed, None]'){
-                return '已经喜欢过了'
-            } else {return '错误'}
-        })
-    } else if (post_data.PostType === 'Post'
-        || post_data.PostType === 'Image'
-        || post_data.PostType === 'AnPost') {
+    if (post_data.Type === 'Post') {
         let input = [{
             Put: {
                 TableName: 'BBS',
@@ -321,9 +571,9 @@ export async function like(cookie,PK,SK,avatar) {
                         ttl: now/1000 + 60*60*24*7,
                         From: username,
                         Content: '点赞了你的帖子：' +
-                            (post_data.PostType === 'Post' ?
+                            (post_data.Type === 'Post' ?
                             (post_data.Content.length > 12 ? post_data.Content.slice(0,12) + '...' : post_data.Content) :
-                            post_data.ImageList.map(() => {
+                            post_data.ImagesList.map(() => {
                                 return '[图片]'
                             }).toString()),
                         InWhere: post_data.PK + '#' + post_data.SK
@@ -334,7 +584,7 @@ export async function like(cookie,PK,SK,avatar) {
         return await docClient.send(new TransactWriteCommand({
             TransactItems: input
         })).then(() => {
-            revalidateTag(post_data.PostType)
+            revalidateTag('Post')
             return 200
         }).catch((err) => {
             if (err.toString() === 'TransactionCanceledException: Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed, None]'){
@@ -344,10 +594,76 @@ export async function like(cookie,PK,SK,avatar) {
     }
 }
 
-export async function getPostLikeList(cookie,from,to,reply){
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function favourite(PK,SK) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    const post_data = await docClient.send(new GetCommand({
+        TableName: 'BBS',
+        Key:{
+            PK:PK,
+            SK:SK
+        }
+    })).then(res => {
+        return res.Item
+    }).catch(err => {
+        console.log(err)
+        return 500
+    })
+    if (post_data === 500) {
+        return 500
+    }
+    if (post_data.Type === 'Post') {
+        let input = [{
+            Put: {
+                TableName: 'BBS',
+                Item : {
+                    PK: 'Favourite#' + username,
+                    SK: post_data.PostID,
+                    InWhere: PK + '#' + SK
+                },
+                ConditionExpression: "attribute_not_exists(SK)"
+            }
+        },{
+            Update : {
+                TableName: 'BBS',
+                Key: {
+                    PK:PK,
+                    SK:SK,
+                },
+                ConditionExpression: "attribute_exists(SK)",
+                UpdateExpression: "SET FavouriteCount = FavouriteCount + :incr",
+                ExpressionAttributeValues: {
+                    ":incr": 1
+                }
+            }
+        }]
+        return await docClient.send(new TransactWriteCommand({
+            TransactItems: input
+        })).then(() => {
+            revalidateTag('Post')
+            return 200
+        }).catch((err) => {
+            if (err.toString() === 'TransactionCanceledException: Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed, None]'){
+                return '已经收藏过了'
+            } else {return '错误'}
+        })
+    }
+}
+
+export async function getPostLikeList(from,to,reply){
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -371,10 +687,11 @@ export async function getPostLikeList(cookie,from,to,reply){
     }).catch(err => {console.log(err)})
 }
 
-export async function deleteOperation(cookie,SK,string,where,type) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function deleteOperation(SK,string,where) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -388,7 +705,8 @@ export async function deleteOperation(cookie,SK,string,where,type) {
             Key:{
                 PK: (string ? string : '') + username,
                 SK: SK
-            }
+            },
+            ReturnValues: 'ALL_OLD'
         }
     if (string === 'Reply#') {
         deleteType = 'Reply'
@@ -397,17 +715,25 @@ export async function deleteOperation(cookie,SK,string,where,type) {
         }
         input.ConditionExpression = 'InWhere = :where'
     }
-    if (string === 'Like#') {
+    if (string === 'Like#' || string === 'Favourite#') {
         input.ExpressionAttributeValues = {
             ':where': where
         }
         input.ConditionExpression = 'InWhere = :where'
     }
-    if (['AnPost','Post','Image'].includes(type)) {
-        deleteType = 'Post'
-        revalidateTag(type)
-    }
-    return await docClient.send(new DeleteCommand(input)).then(() => {
+
+    return await docClient.send(new DeleteCommand(input)).then((res) => {
+        if (res.Attributes['ImagesList'] !== undefined) {
+            console.log(res.Attributes)
+            res.Attributes['ImagesList'].map(item => {
+                fetch('https://pic.ecust.space/api/v1/images/' + item['key'],{
+                    method:'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + process.env.PIC_TOKEN
+                    }
+                })
+            })
+        }
         if (typeof deleteType == 'string') {
             decreaseUserScore(username,deleteType,SK).catch(err => {
                 console.log(err)
@@ -426,6 +752,19 @@ export async function deleteOperation(cookie,SK,string,where,type) {
                 }
             })).then(() => {return 200}).catch(() => {return 200})
         }
+        if (string === 'Favourite#') {
+            return docClient.send(new UpdateCommand({
+                TableName: 'BBS',
+                Key: {
+                    PK:where.split('#')[0],
+                    SK:parseInt(where.split('#')[1]),
+                },
+                UpdateExpression: "SET FavouriteCount = FavouriteCount - :incr",
+                ExpressionAttributeValues: {
+                    ":incr": 1
+                }
+            })).then(() => {return 200}).catch(() => {return 200})
+        }
         if (string === 'Reply#') {
             return docClient.send(new UpdateCommand({
                 TableName: 'BBS',
@@ -439,15 +778,17 @@ export async function deleteOperation(cookie,SK,string,where,type) {
                 }
             })).then(() => {return 200}).catch(() => {return 200})
         }
+        revalidateTag('Post')
         return 200
     })
         .catch((err) => {console.log(err) ; return 500})
 }
 
-export async function getUserPost(cookie,name,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getUserPost(name,lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -478,10 +819,11 @@ export async function getUserPost(cookie,name,lastKey) {
     })
 }
 
-export async function Report(cookie,PK,SK) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function Report(PK,SK) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -512,7 +854,7 @@ export async function Report(cookie,PK,SK) {
                 PK:'Report#' + PK,
                 SK: SK,
                 ttl: Date.now()/1000 + 60*60*24*7,
-                PostType: 'Report'
+                Type: 'Report'
             },
         })).then(() => {return 200})
             .catch(() => {return 500})
@@ -521,10 +863,11 @@ export async function Report(cookie,PK,SK) {
     }
 }
 
-export async function ContactTa(cookie,name) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function ContactTa(name) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return {
@@ -557,10 +900,11 @@ export async function ContactTa(cookie,name) {
     }}
 }
 
-export async function getPostList(cookie,postType,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getPostList(lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -570,10 +914,13 @@ export async function getPostList(cookie,postType,lastKey) {
     }
     const queryPost = {
         TableName:'BBS',
-        IndexName:'PostType-SK-index',
-        KeyConditionExpression: 'PostType = :post_type',
+        IndexName:'Type-SK-index',
+        KeyConditionExpression: '#type = :post_type',
         ExpressionAttributeValues: {
-            ':post_type' : postType
+            ':post_type' : 'Post'
+        },
+        ExpressionAttributeNames: {
+            '#type': 'Type'
         },
         ScanIndexForward:false,
         Limit:20
@@ -589,10 +936,11 @@ export async function getPostList(cookie,postType,lastKey) {
     }).catch((err) => {console.log(err);return 500})
 }
 
-export async function getMessageCount(cookie) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getMessageCount() {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 'err'
@@ -636,10 +984,11 @@ export async function getMessageCount(cookie) {
     })
 }
 
-export async function upDateUserInquireTime(cookie,time) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function upDateUserInquireTime(time) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 'err'
@@ -650,15 +999,16 @@ export async function upDateUserInquireTime(cookie,time) {
     await setUserInquireTime(username,time)
 }
 
-export async function updateUserToken(cookie) {
-    const username = decodeURI(getCookie('UserName',cookie))
+export async function updateUserToken() {
+    const cookie = cookies()
+    const username = decodeURI(cookie.get('UserName').value)
     const user_item = await getUserItem(username,'UserToken')
     if (user_item === 500 || !user_item){
         return 401
     }
 
     const now = Date.now()
-    if (user_item.UserToken !== getCookie('Token',cookie) || user_item.UserToken.split("#")[0] < now) {
+    if (user_item.UserToken !== cookie.get('Token').value || user_item.UserToken.split("#")[0] < now) {
         return 401
     }
     const token = (now + 1000*60*60*24*7) + '#' + v4()
@@ -683,13 +1033,14 @@ export async function updateUserToken(cookie) {
     })
 }
 
-export async function feedBack(cookie,content) {
+export async function feedBack(content) {
     if (content.length > 500) {
         return {tip:'error',status:500}
     }
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return {tip:'错误',status:500}

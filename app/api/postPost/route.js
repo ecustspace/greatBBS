@@ -2,10 +2,10 @@ import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
 import {
+    captchaVerify,
     docClient,
     getUserItem,
     isBan,
-    recaptchaVerify_v2,
     updateUserScore,
     uploadImage
 } from "@/app/api/server";
@@ -13,12 +13,27 @@ import {revalidateTag} from "next/cache";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
 
 export async function POST(request) {
-    const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const data = await request.formData()
+    const isHuman = await captchaVerify(data.get('captchaToken'))
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
-    if (data.images.length > 3 || !dataLengthVerify(1,500,data.text)){
+    const mediaType = data.get('mediaType')
+    let videoLink = data.get('videoLink')
+    let fileLength = parseInt(data.get('fileLength'))
+    if (typeof mediaType == 'string') {
+        if (mediaType === 'video' && !dataLengthVerify(1,500,videoLink)) {
+            return NextResponse.json({tip:'数据格式不正确',status:500})
+        } else if (mediaType === 'image' && fileLength > 6) {
+            return NextResponse.json({tip:'数据格式不正确',status:500})
+        }
+    }
+
+    const text = data.get('text')
+    const topic = data.get('topic')
+
+    if (!dataLengthVerify(1,500,text)
+    || !dataLengthVerify(0,20,topic)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()
@@ -65,17 +80,25 @@ export async function POST(request) {
             Item: {
                 PK: username,
                 SK: now,
-                PostType: data.isAnonymity ? 'AnPost' : 'Post',
+                Type: 'Post',
                 PostID: post_id,
                 ReplyCount: 0,
                 ReplyID: 0,
                 LikeCount: 0,
+                FavouriteCount:0,
                 Avatar: user_item.Avatar,
-                Content: data.text.replace(/(\n)+/g, "\n")
+                Content: text.replace(/(\n)+/g, "\n")
             }
         }
-        if (data.showLevel === true) {
+        if (data.get('showLevel') === true) {
             putInput.Item.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
+        }
+        if (data.get('h_w')) {
+            fileLength = 1
+            putInput.Item.H_W = parseFloat(data.get('h_w'))
+        }
+        if (topic.length > 0) {
+            putInput.Item.Topic = data.get('topic')
         }
         res = await docClient.send(new PutCommand(putInput))
             .catch(error => {
@@ -89,25 +112,40 @@ export async function POST(request) {
 
     await updateUserScore(username,'Post')
 
-    let image_list = []
-
-    for (let i = 0, len = data.images.length; i < len; i++) {
-        const type = await uploadImage(data.images[i],'/post',post_id + '-' + i.toString())
-        image_list.push(type)
-    }
-    if (image_list.length !== 0) {
+    if (mediaType === 'image') {
+        let image_list = []
+        for (let i = 0; i < fileLength; i++) {
+            const fileData = uploadImage(data.get(`file[${i}]`))
+            image_list.push(fileData)
+        }
+        image_list = await Promise.all(image_list)
+        if (image_list.length !== 0) {
+            await docClient.send(new UpdateCommand({
+                TableName: 'BBS',
+                Key: {
+                    PK: username,
+                    SK: now
+                },
+                UpdateExpression: "SET ImagesList = :image_list",
+                ExpressionAttributeValues: {
+                    ":image_list" : image_list
+                }
+            }))
+        }
+    } else if (mediaType === 'video') {
         await docClient.send(new UpdateCommand({
             TableName: 'BBS',
             Key: {
                 PK: username,
                 SK: now
             },
-            UpdateExpression: "SET ImageList = :image_list",
+            UpdateExpression: "SET VideoLink = :video_link",
             ExpressionAttributeValues: {
-                ":image_list" : image_list
+                ":video_link" : videoLink
             }
         }))
     }
+
     revalidateTag('Post')
     return NextResponse.json({tip:'发布成功',status:200})
 }

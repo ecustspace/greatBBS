@@ -1,3 +1,5 @@
+'use client'
+
 import {Avatar, Button, Dialog, Rate, Space, TextArea, Toast} from "antd-mobile";
 import {responseHandle, timeConclude} from "@/app/component/function";
 import Ellipsis from "@/app/component/ellipsis";
@@ -6,10 +8,9 @@ import {
     HeartOutline,
 } from "antd-mobile-icons";
 import {evaluateScore} from "@/app/wiki/component/function";
-import {useEffect, useRef, useState} from "react";
-import ReCAPTCHA from "react-google-recaptcha";
-import {recaptcha_site_key_v2} from "@/app/(app)/clientConfig";
+import {useContext, useEffect, useState} from "react";
 import {likeEvaluate, reportEvaluate} from "@/app/wiki/api/serverAction";
+import {captchaContext} from "@/app/wiki/page";
 
 export function EvaluateCard({evaluate,onClick,avatarClick}) {
     const [likeCount, setLikeCount] = useState(evaluate.LikeCount)
@@ -32,7 +33,7 @@ export function EvaluateCard({evaluate,onClick,avatarClick}) {
                         icon: 'loading',
                         duration:10000
                     })
-                    likeEvaluate(document.cookie,evaluate.SK,evaluate.PK).then((res) => {
+                    likeEvaluate(evaluate.SK,evaluate.PK).then((res) => {
                         if (res.status === 200) {
                             setLikeCount(likeCount => likeCount + 1)
                             Toast.show({
@@ -62,7 +63,7 @@ export function EvaluateCard({evaluate,onClick,avatarClick}) {
                     icon: 'loading',
                     duration:10000
                 })
-                reportEvaluate(document.cookie,evaluate.SK,evaluate.PK,evaluate.Content).then((res) => {
+                reportEvaluate(evaluate.SK,evaluate.PK,evaluate.Content).then((res) => {
                     if (res.status === 200) {
                         Toast.show({
                             icon: 'success',
@@ -160,7 +161,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
     const [evaluate, setEvaluate] = useState(4)
     const [isEdit, setEdit] = useState(false)
     const [loading,setLoading] = useState(false)
-    const captchaRef = useRef(null)
+    const {turnstile,captchaDisable} = useContext(captchaContext)
 
     function submitChange() {
         if (evaluate === 0) {
@@ -174,14 +175,13 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
         Dialog.confirm({
             content:'确认要提交修改吗（将清除所有赞同）',
             onConfirm: () => {
-                captchaRef.current.executeAsync().then(token => {
                     setLoading(true)
                     const data = {
                         institute: focusWiki.PK,
                         name: focusWiki.SK,
                         content: content,
                         evaluate: evaluate,
-                        recaptchaToken: token
+                        captchaToken: turnstile.getResponse()
                     }
                     Toast.show({
                         icon:"loading",
@@ -197,7 +197,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
                         }}).then(res => res.json()).then(data => {
                         responseHandle(data)
                         setLoading(false)
-                        captchaRef.current.reset()
+                        turnstile.reset()
                         if (data.status === 200) {
                             setEdit(false)
                             refresh()
@@ -205,13 +205,8 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
                     }).catch(() => {
                         responseHandle(data)
                         setLoading(false)
-                        captchaRef.current.reset()
+                        turnstile.reset()
                     })
-                }).catch(() => {
-                    setLoading(false)
-                    Toast.show('人机验证失败')
-                    captchaRef.current.reset()
-                })
             },
             onCancel: () => {
                 Dialog.clear()
@@ -230,14 +225,6 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
         className='card'
         style={{marginLeft: '16px', marginRight: '16px', marginTop: '13px'}}
     >
-        <script>
-            window.recaptchaOptions = useRecaptchaNet: true
-        </script>
-        <ReCAPTCHA
-            sitekey={recaptcha_site_key_v2}
-            ref={captchaRef}
-            size="invisible"
-        />
         <div className='cardAvatar'>
             <Avatar src={'evaluate/' + evaluate + '.png'} style={{'--size': '42px',"--border-radius":'4px'}}/>
         </div>
@@ -264,7 +251,7 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
                                 setEvaluate(myEvaluate.Evaluate ? myEvaluate.Evaluate : 4)
                                 setEdit(false)
                             }}>取消</Button>
-                        <Button loading={loading || !myEvaluate} onClick={submitChange} size='small' shape='rounded' color='primary'>提交</Button>
+                        <Button loading={captchaDisable || loading || !myEvaluate} onClick={submitChange} size='small' shape='rounded' color='primary'>提交</Button>
                     </>
                     :
                     <>
@@ -291,7 +278,6 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
 export function WikiCard({wiki,onClick}) {
     return <div style={{marginTop:'10px', borderTop: '0.5px solid lightgrey'}}><div
         className='card'
-        style={{marginLeft: '16px', marginRight: '16px', marginTop: '10px'}}
         onClick={onClick}
     >
         <div className='cardAvatar'>

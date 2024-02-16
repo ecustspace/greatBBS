@@ -1,18 +1,21 @@
 import {PutCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {cookies} from "next/headers";
 import {NextResponse} from "next/server";
-import { docClient, getUserItem, isBan, recaptchaVerify_v2 } from "@/app/api/server";
+import {captchaVerify, docClient, getUserItem, isBan} from "@/app/api/server";
 import {sha256} from "js-sha256";
 import {revalidateTag} from "next/cache";
 import {dataLengthVerify} from "@/app/api/register/verify/route";
+import {v4} from "uuid";
 
 export async function POST(request) {
-    const data = await request.json()
-    const isHuman = await recaptchaVerify_v2(data.recaptchaToken)
+    const data = await request.formData()
+    const isHuman = await captchaVerify(data.get('captchaToken'))
     if (isHuman !== true) {
         return NextResponse.json({tip:'未通过人机验证',status:500})
     }
-    if (!dataLengthVerify(1,500,data.text)){
+    const text = data.get('text')
+    const topic = data.get('topic')
+    if (!dataLengthVerify(1,500,text) || !dataLengthVerify(0,20,topic)){
         return NextResponse.json({tip:'数据格式不正确',status:500})
     }
     const cookieStore = cookies()
@@ -33,12 +36,9 @@ export async function POST(request) {
     if (is_ban !== false) {
         return NextResponse.json({tip:'你已被禁言，还有'+ ((is_ban - now/1000)/3600).toFixed(2) + '小时解除'})
     }
-    if (!data.isAnonymity) {
+    const anid = data.get('anid')
+    if (sha256(anid) !== user_item.Anid) {
         return NextResponse.json({tip:'匿名密钥错误',status:500})
-    } else {
-        if (sha256(data.isAnonymity) !== user_item.Anid) {
-            return NextResponse.json({tip:'匿名密钥错误',status:500})
-        }
     }
 
     const updatePostCountCommand = new UpdateCommand({
@@ -61,20 +61,27 @@ export async function POST(request) {
 
     let res
     if (typeof post_id == 'number') {
-        const putPostItem = new PutCommand({
+        const postInput = {
             TableName: 'BBS',
             Item: {
-                PK: sha256(data.isAnonymity + '#' + username + '#' + post_id + process.env.JWT_SECRET),
+                PK: sha256(anid + '#' + username + '#' + post_id + process.env.JWT_SECRET),
                 SK: now,
+                Type: 'Post',
                 PostType: 'AnPost',
                 PostID: post_id,
                 ReplyCount: 0,
                 ReplyID: 0,
                 LikeCount: 0,
+                FavouriteCount:0,
+                RandomKey: v4(),
                 Avatar: user_item.Avatar,
-                Content: data.text.replace(/(\n)+/g, "\n"),
+                Content: text.replace(/(\n)+/g, "\n"),
             }
-        })
+        }
+        if (topic.length > 0) {
+            postInput.Item.Topic = topic
+        }
+        const putPostItem = new PutCommand(postInput)
         res = await docClient.send(putPostItem)
             .catch(error => {
                 console.log(error)
@@ -84,6 +91,6 @@ export async function POST(request) {
     if (res === 500 || !res) {
         return NextResponse.json({tip:'err',status:500})
     }
-    revalidateTag('AnPost')
+    revalidateTag('Post')
     return NextResponse.json({tip:'发布成功',status:200})
 }

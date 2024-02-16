@@ -15,7 +15,7 @@ export default function Home() {
     const actionSheet = useRef()
 
     function deletePost(post) {
-        deleteOperation(document.cookie,post.PostID,'Like#',post.PK + '#' + post.SK).then((res) => {
+        deleteOperation(post.PostID,'Like#',post.PK + '#' + post.SK).then((res) => {
             if (res === 200) {
                 setList(
                     list.filter(t => t !== post)
@@ -53,7 +53,7 @@ export default function Home() {
         })
     }
     async function loadMore() {
-        await getUserLikePost(document.cookie,lastKey !== null ? lastKey : null).then(res => {
+        await getUserLikePost(lastKey !== null ? lastKey : null).then(res => {
             if (res === 500) {
                 setHasMore(false)
                 throw new Error('err')
@@ -69,17 +69,17 @@ export default function Home() {
 
     return (
         <div>
-            {list.map((post,index) => <PostCard
+            {list.map((post) => <PostCard
                 post={post}
                 key={post.id}
                 operateClick={() => operateClick(post)}
                 onClick={() => {
-                    if (post.PostType === 'Post') {
-                        showPostPopup(post)
-                    } else if (post.PostType === 'Image') {
+                    if (post.PostType === 'Image') {
                         showImgPopup(post)
-                    } else {
+                    } else if (post.PostType === 'AnPost') {
                         showAnPostPopup(post)
+                    } else {
+                        showPostPopup(post)
                     }
                     }
                 }

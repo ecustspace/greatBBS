@@ -8,7 +8,7 @@ import Image from 'next/image'
 import {AddOutline} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
 import {showLoginModal} from "@/app/component/function";
-import Hammer from "hammerjs";
+
 
 const tabItems = [
     { key: 'tiezi', title: <div className='tabItem'>帖子</div> },
@@ -16,7 +16,7 @@ const tabItems = [
     { key: 'ershoujiaoyi', title: <div className='tabItem'>照片墙</div> },
 ]
 
-export default function RootLayout({ post,anPost,ins }) {
+export default function Layout({ post,anPost,ins }) {
     const childrenList = [<>{post}</>,<>{anPost}</>,<>{ins}</>]
     const [activeIndex, setActiveIndex] = useState(0)
     const popup = useRef(null)
@@ -42,13 +42,17 @@ export default function RootLayout({ post,anPost,ins }) {
     }
 
     useEffect(() => {
-        let hammertime = new Hammer(document.getElementById("post"));
-        hammertime.on("swiperight", function () {
-            setActiveIndex(value => (value === 0 ? value : value - 1))
-        });
-        hammertime.on("swipeleft", function () {
-            setActiveIndex(value => (value === 2 ? value : value + 1))
-        });
+        const loadHammer = async () => {
+            const Hammer = await import('hammerjs');
+            const hammertime = new Hammer.default(document.getElementById("imgDetails"));
+            hammertime.on("swiperight", function () {
+                setActiveIndex(value => (value === 0 ? value : value - 1))
+            });
+            hammertime.on("swipeleft", function () {
+                setActiveIndex(value => (value === 2 ? value : value + 1))
+            });
+        };
+        loadHammer();
     },[])
 
     return (

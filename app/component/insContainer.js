@@ -3,8 +3,12 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {Image, InfiniteScroll, Skeleton, Toast,} from "antd-mobile";
 import {imageUrl} from "@/app/(app)/clientConfig";
-import {detailsContext, likeListContext, messageCountContext} from "@/app/(app)/layout";
-import {fetchData, getMessageCount, getPostLikeList, getPostList} from "@/app/api/serverAction";
+import {detailsContext,messageCountContext} from "@/app/(app)/layout";
+import {
+    fetchDataWithPostType,
+    getMessageCount,
+    getPostListWithType
+} from "@/app/api/serverAction";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
@@ -17,10 +21,9 @@ export default function InsContainer() {
     const [leftHeight,setLeftHeight] = useState(0)
     const [rightHeight,setRightHeight] = useState(0)
     const [loadRightList, setLoadRightList] = useState([])
-    const [lastKey,setKey] = useState()
+    const [lastKey,setKey] = useState([])
     const containerRef = useRef(null)
     const {showImgPopup} = useContext(detailsContext)
-    const {addLike} = useContext(likeListContext)
     const login = useContext(loginState)
     const {setMessageCount} = useContext(messageCountContext)
 
@@ -35,26 +38,36 @@ export default function InsContainer() {
                 icon:'loading'
             })
         }
-       fetchData('Image').then(data => {
-           Toast.clear()
+       fetchDataWithPostType('Image').then(data => {
+            Toast.clear()
             if (data.posts.length > 0) {
-                getPostLikeList(document.cookie,data.posts[0].PostID,data.posts[data.posts.length - 1].PostID).then(
-                    res => {
-                        addLike(res.map(item => {
-                            return item.SK
-                        }))
-                    }
-                )
                 setPostList(data.posts)
                 setLoadRightList([])
                 setLeftHeight(0)
                 setRightHeight(0)
                 setLoadLeftList([])
-                setHasMore(true)
-                if (data.lastKey) {
-                    setKey(data.lastKey)
+            }
+            let keysCount = 0
+            for (let i = 0; i < 20; i++) {
+                if (i === 0) {
+                    if (data.lastKey[0].lastKey_up !== 'null') {
+                        keysCount += 1
+                    }
+                    if (data.lastKey[0].lastKey_down !== 'null') {
+                        keysCount += 1
+                    }
+                } else {
+                    if (data.lastKey[i].lastKey !== 'null') {
+                        keysCount += 1
+                    }
                 }
-            } else {setHasMore(false)}
+            }
+            if (keysCount !== 0) {
+                setKey(data.lastKey)
+                setHasMore(true)
+            } else {
+                setHasMore(false)
+            }
         }).catch(() => {
            setPostList('err')
            Toast.show({
@@ -64,7 +77,7 @@ export default function InsContainer() {
            }
        )
         if (login.isLogin === true) {
-            getMessageCount(document.cookie).then(res => {
+            getMessageCount().then(res => {
                 setMessageCount(count => {
                     count = count + (res === 'err' ? 0 : res)
                     localStorage.setItem('messageCount',count)
@@ -96,7 +109,7 @@ export default function InsContainer() {
                     onClick={() => {
                         showImgPopup(item)
                     }}
-                    src={imageUrl + '/post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
+                    src={imageUrl + item.ImagesList[0].path}
                     fit='cover'
                     alt=''
                     width={width/2}
@@ -109,7 +122,7 @@ export default function InsContainer() {
                     onClick={() => {
                         showImgPopup(item)
                     }}
-                    src={imageUrl + '/post/' + item.PostID + '-0' + '.' + item.ImageList[0]}
+                    src={imageUrl + item.ImagesList[0].path}
                     fit='cover'
                     alt=''
                     width={width/2}
@@ -144,18 +157,26 @@ export default function InsContainer() {
                 setHasMore(false)
                 return
             }
-            await getPostList(document.cookie,'Image',lastKey).then(res => {
+            await getPostListWithType('Image',lastKey).then(res => {
                 if (res.posts) {
-                    getPostLikeList(document.cookie,res.posts[0].PostID,res.posts[res.posts.length - 1].PostID).then(
-                        res => {
-                            addLike(res.map(item => {
-                                return item.SK
-                            }))
-                        }
-                    )
                     loadImage(res.posts)
                 }
-                if (res.lastKey) {
+                let keysCount = 0
+                for (let i = 0; i < 20; i++) {
+                    if (i === 0) {
+                        if (res.lastKey[0].lastKey_up !== 'null') {
+                            keysCount += 1
+                        }
+                        if (res.lastKey[0].lastKey_down !== 'null') {
+                            keysCount += 1
+                        }
+                    } else {
+                        if (res.lastKey[i].lastKey !== 'null') {
+                            keysCount += 1
+                        }
+                    }
+                }
+                if (keysCount !== 0) {
                     setKey(res.lastKey)
                 } else {
                     setHasMore(false)
@@ -163,7 +184,7 @@ export default function InsContainer() {
             })
             return
         }
-        loadImage(postList.slice(hasLoad,hasLoad+15))
+        loadImage(postList)
     }
 
     return (

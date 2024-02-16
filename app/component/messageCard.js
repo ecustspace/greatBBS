@@ -1,13 +1,13 @@
+'use client'
+
 import {Avatar} from "antd-mobile";
 import {DeleteOutline} from "antd-mobile-icons";
 import {timeConclude} from "@/app/component/function";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef} from "react";
 
 
-export default function MessageCard({ reply, onClickReply, onClick,onDelete }) {
+export default function MessageCard({ reply, onClick,onDelete }) {
     const ref = useRef(null)
-    const [isExceed, setExceed] = useState(false)
-    const [isExtend, setExtend] = useState(false)
     useEffect(() => {
         if (ref.current?.scrollHeight > ref.current?.clientHeight) {
             setExceed(true)
@@ -21,7 +21,6 @@ export default function MessageCard({ reply, onClickReply, onClick,onDelete }) {
     return (
         <div
             className='card'
-            style={{ marginLeft: '16px', marginRight: '16px', marginTop: '13px' }}
             onClick={onClickJustify}
         >
             <div className='cardAvatar'>

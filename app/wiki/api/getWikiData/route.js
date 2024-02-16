@@ -18,7 +18,6 @@ export async function GET(request) {
         const queryPost = new QueryCommand({
             TableName:'Wiki',
             IndexName:'Type-Key-index',
-            ScanIndexForward:false,
             KeyConditionExpression: '#Type = :type AND #Key > :randomKey',
             ExpressionAttributeNames: {
                 '#Type' : 'Type',

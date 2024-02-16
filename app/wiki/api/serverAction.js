@@ -1,11 +1,12 @@
 'use server'
 
 import {Url} from "@/app/(app)/clientConfig";
-import {getCookie} from "@/app/component/function";
 import {sha256} from "js-sha256";
 import {docClient, transporter} from "@/app/api/server";
 import {GetCommand, QueryCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {sort} from "@/app/wiki/config";
+import {v5} from "uuid";
+import {cookies} from "next/headers";
 
 
 export async function fetchData() {
@@ -14,10 +15,11 @@ export async function fetchData() {
 }
 
 
-export async function getEvaluateList(cookie,institute,name,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getEvaluateList(institute,name,lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -49,10 +51,11 @@ export async function getEvaluateList(cookie,institute,name,lastKey) {
     })
 }
 
-export async function getMyEvaluate(cookie,PK,SK) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getMyEvaluate(PK,SK) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -75,10 +78,11 @@ export async function getMyEvaluate(cookie,PK,SK) {
     })
 }
 
-export async function getInstituteWiki(cookie,part,sortMethod,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getInstituteWiki(part,sortMethod,lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -110,10 +114,63 @@ export async function getInstituteWiki(cookie,part,sortMethod,lastKey) {
     })
 }
 
-export async function searchWiki(cookie,content,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getRandomWiki() {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
+    const jwtSecret = process.env.JWT_SECRET
+    if (token.split('#')[0] < Date.now()) {
+        return 401
+    }
+    if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
+        return 401
+    }
+    const randomKey = v5(new Date(new Date().setHours(0,0,0,0)).toString(),'74980c48-c4c6-11ee-8efe-325096b39f47')
+    let post = await docClient.send(new QueryCommand({
+        TableName:'Wiki',
+        IndexName:'Type-Key-index',
+        KeyConditionExpression: '#Type = :type AND #Key > :randomKey',
+        ExpressionAttributeNames: {
+            '#Type' : 'Type',
+            '#Key': 'Key'
+        },
+        ExpressionAttributeValues: {
+            ':type' : 'Wiki',
+            ':randomKey': randomKey
+        },
+        Limit:1
+    })).then(res => {
+        return res.Items
+    })
+    if (post.length > 0) {
+        return post[0]
+    } else {
+        return await docClient.send(new QueryCommand({
+            TableName:'Wiki',
+            IndexName:'Type-Key-index',
+            KeyConditionExpression: '#Type = :type AND #Key < :randomKey',
+            ExpressionAttributeNames: {
+                '#Type' : 'Type',
+                '#Key': 'Key'
+            },
+            ExpressionAttributeValues: {
+                ':type' : 'Wiki',
+                ':randomKey': randomKey
+            },
+            ScanIndexForward: false,
+            Limit:1
+        })).then(res => {
+            return res.Items[0]
+        })
+    }
+}
+
+export async function searchWiki(content,lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -150,10 +207,11 @@ export async function searchWiki(cookie,content,lastKey) {
     })
 }
 
-export async function getMyEvaluateList(cookie,lastKey) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getMyEvaluateList(lastKey) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -183,10 +241,11 @@ export async function getMyEvaluateList(cookie,lastKey) {
     })
 }
 
-export async function getMyEvaluateWiki(cookie,Key) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function getMyEvaluateWiki(Key) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return 401
@@ -208,10 +267,11 @@ export async function getMyEvaluateWiki(cookie,Key) {
     })
 }
 
-export async function likeEvaluate(cookie,key,other_name) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function likeEvaluate(key,other_name) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return {tip: '令牌过期', status: 401}
@@ -322,10 +382,11 @@ export async function likeEvaluate(cookie,key,other_name) {
     return {tip: 'ok',status:200}
 }
 
-export async function reportEvaluate(cookie,key,other_name,content) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function reportEvaluate(key,other_name,content) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return {tip: '令牌过期', status: 401}
@@ -358,10 +419,11 @@ export async function reportEvaluate(cookie,key,other_name,content) {
     return {tip:'感谢您的反馈',status:200}
 }
 
-export async function deleteEvaluate(cookie,key,evaluate) {
-    const jwt = getCookie('JWT',cookie)
-    const username = decodeURI(getCookie('UserName',cookie))
-    const token = getCookie('Token',cookie)
+export async function deleteEvaluate(key,evaluate) {
+    const cookie = cookies()
+    const jwt = cookie.get('JWT').value
+    const username = decodeURI(cookie.get('UserName').value)
+    const token = cookie.get('Token').value
     const jwtSecret = process.env.JWT_SECRET
     if (token.split('#')[0] < Date.now()) {
         return {tip: '令牌过期', status: 401}

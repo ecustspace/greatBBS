@@ -11,19 +11,18 @@ export async function GET(request) {
             status: 403
         })
     }
-    const postType = request.nextUrl.searchParams.get('postType')
-    if (!['Post','AnPost','Image'].includes(postType)) {
-        return NextResponse.json({res:'error'})
-    }
     const queryPost = new QueryCommand({
         TableName:'BBS',
-        IndexName:'PostType-SK-index',
-        KeyConditionExpression: 'PostType = :post_type',
+        IndexName:'Type-SK-index',
+        KeyConditionExpression: '#type = :post_type',
         ExpressionAttributeValues: {
-            ':post_type' : postType
+            ':post_type' : 'Post'
+        },
+        ExpressionAttributeNames: {
+            '#type': 'Type'
         },
         ScanIndexForward:false,
-        Limit:30
+        Limit:45
     })
     const data = await docClient.send(queryPost).then((res) => {
         return {

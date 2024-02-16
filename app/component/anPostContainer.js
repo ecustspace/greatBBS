@@ -3,19 +3,25 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {ActionSheet, Dialog, InfiniteScroll, Toast,} from "antd-mobile";
 import {PostCard} from "@/app/component/postCard";
-import {fetchData, getMessageCount, getPostLikeList, getPostList, Report} from "@/app/api/serverAction";
+import {
+    fetchDataWithPostType,
+    getMessageCount,
+    getPostLikeList,
+    getPostListWithType,
+    Report
+} from "@/app/api/serverAction";
 import {detailsContext, likeListContext ,messageCountContext} from "@/app/(app)/layout";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
 
-export default function CardContainer() {
+export default function AnPostCardContainer() {
     const [isHasMore, setHasMore] = useState(true)
     const [postList, setPostList] = useState([])
     const [loadPostList, setLoadPostList] = useState([])
-    const [lastKey,setKey] = useState()
+    const [lastKey,setKey] = useState([])
     const actionSheet = useRef()
-    const {showPostPopup, showAnPostPopup,showUserPopup,showImgPopup} = useContext(detailsContext)
+    const {showAnPostPopup,showUserPopup} = useContext(detailsContext)
     const {addLike} = useContext(likeListContext)
     const login = useContext(loginState)
     const {setMessageCount} =useContext(messageCountContext)
@@ -46,11 +52,11 @@ export default function CardContainer() {
         })
     }
 
-   useEffect(() => {
-       setMessageCount(typeof localStorage.getItem('messageCount') == 'string' ?
-           parseInt(localStorage.getItem('messageCount')) : 0)
-       refresh(false)
-   },[])
+    useEffect(() => {
+        setMessageCount(typeof localStorage.getItem('messageCount') == 'string' ?
+            parseInt(localStorage.getItem('messageCount')) : 0)
+        refresh(false)
+    },[])
 
     function refresh(showToast) {
         if (showToast === true) {
@@ -58,11 +64,27 @@ export default function CardContainer() {
                 icon:'loading'
             })
         }
-        fetchData().then(data => {
-            console.log(data)
+        fetchDataWithPostType('AnPost').then(data => {
             Toast.clear()
-            if (data.lastKey) {
+            let keysCount = 0
+            for (let i = 0; i < 20; i++) {
+                if (i === 0) {
+                    if (data.lastKey[0].lastKey_up !== 'null') {
+                        keysCount += 1
+                    }
+                    if (data.lastKey[0].lastKey_down !== 'null') {
+                        keysCount += 1
+                    }
+                } else {
+                    if (data.lastKey[i].lastKey !== 'null') {
+                        keysCount += 1
+                    }
+                }
+            }
+            if (keysCount !== 0) {
                 setKey(data.lastKey)
+            } else {
+                setHasMore(false)
             }
             if (data.posts.length > 0) {
                 setPostList(data.posts)
@@ -103,7 +125,7 @@ export default function CardContainer() {
                 setHasMore(false)
                 return
             }
-            await getPostList(lastKey).then(res => {
+            await getPostListWithType('AnPost',lastKey).then(res => {
                 if (res.posts) {
                     getPostLikeList(res.posts[0].PostID,res.posts[res.posts.length - 1].PostID).then(
                         res => {
@@ -114,7 +136,22 @@ export default function CardContainer() {
                     )
                     setLoadPostList([...loadPostList,...res.posts])
                 }
-                if (res.lastKey) {
+                let keysCount = 0
+                for (let i = 0; i < 20; i++) {
+                    if (i === 0) {
+                        if (res.lastKey[0].lastKey_up !== 'null') {
+                            keysCount += 1
+                        }
+                        if (res.lastKey[0].lastKey_down !== 'null') {
+                            keysCount += 1
+                        }
+                    } else {
+                        if (res.lastKey[i].lastKey !== 'null') {
+                            keysCount += 1
+                        }
+                    }
+                }
+                if (keysCount !== 0) {
                     setKey(res.lastKey)
                 } else {
                     setHasMore(false)
@@ -122,39 +159,33 @@ export default function CardContainer() {
             })
             return
         }
-            setLoadPostList([...loadPostList, ...postList.slice(loadPostList.length, loadPostList.length + 15)])
+        setLoadPostList(postList)
     }
     return (
         <div>
-                <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
-                    <UndoOutline fontSize={32} color='#fff'/>
-                </div>
-                {loadPostList.map(post => <PostCard
-                    post={post}
-                    avatarClick={() => {
-                        if (post.PostType === 'AnPost') {
-                            Toast.show({
-                                content:'树洞不能打开主页'
-                            })
-                            return
-                        }
-                        showUserPopup({
-                            name: post.PK,
-                            avatar:post.Avatar
+            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
+                <UndoOutline fontSize={32} color='#fff'/>
+            </div>
+            {loadPostList.map(post => <PostCard
+                post={post}
+                avatarClick={() => {
+                    if (post.PostType === 'AnPost') {
+                        Toast.show({
+                            content:'树洞不能打开主页'
                         })
-                    }}
-                    key={'post' + post.PostID}
-                    operateClick={() => operateClick(post)}
-                    onClick={() => {
-                        if (post.PostType === 'AnPost') {
-                            showAnPostPopup(post)
-                        } else if (post.PostType === 'Image') {
-                            showImgPopup(post)
-                        } else {
-                            showPostPopup(post)
-                        }
-                    }}/>)}
-                <InfiniteScroll loadMore={loadMore} hasMore={isHasMore} />
+                        return
+                    }
+                    showUserPopup({
+                        name: post.PK,
+                        avatar:post.Avatar
+                    })
+                }}
+                key={'post' + post.PostID}
+                operateClick={() => operateClick(post)}
+                onClick={() => {
+                    showAnPostPopup(post)
+                }}/>)}
+            <InfiniteScroll loadMore={loadMore} hasMore={isHasMore} />
         </div>
     )
 }

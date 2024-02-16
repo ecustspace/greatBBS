@@ -1,17 +1,16 @@
 'use client'
 
-import React, {useContext, useRef, useState} from "react";
+import React, {useContext,useState} from "react";
 import {Dialog, InfiniteScroll, Toast} from "antd-mobile";
 import {deleteOperation, getPostData, getUserOperations} from "@/app/api/serverAction";
 import {detailsContext} from "@/app/(app)/layout";
 import ReplyCard from "@/app/component/replyCard";
 
 export default function Home() {
-    const [lastKey,setKey] = useState()
+    const [lastKey,setKey] = useState(null)
     const [list,setList] = useState([])
     const [hasMore,setHasMore] = useState(true)
     const {showPostPopup,showImgPopup} = useContext(detailsContext)
-    const actionSheet = useRef()
     function deletePost(post) {
         Dialog.confirm({
             content:'确认要删除该评论吗',
@@ -21,7 +20,7 @@ export default function Home() {
                     content: '正在删除...',
                     duration:0
                 })
-                deleteOperation(document.cookie,post.SK,'Reply#',post.InWhere).then((res) => {
+                deleteOperation(post.SK,'Reply#',post.InWhere).then((res) => {
                     if (res === 200) {
                         setList(
                             list.filter(t => t !== post)
@@ -50,7 +49,7 @@ export default function Home() {
             icon:'loading',
             duration: 0
         })
-        getPostData(document.cookie,where).then(res => {
+        getPostData(where).then(res => {
             Toast.clear()
             if (!res) {
                 Toast.show({
@@ -67,7 +66,7 @@ export default function Home() {
         })
     }
     async function loadMore() {
-        await getUserOperations(document.cookie,lastKey !== null ? lastKey : null ,'Reply#').then(res => {
+        await getUserOperations(lastKey !== null ? lastKey : null ,'Reply#').then(res => {
             if (res === 500) {
                 setHasMore(false)
             }

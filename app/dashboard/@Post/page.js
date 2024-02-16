@@ -19,7 +19,7 @@ export default function Home() {
     const actionSheet = useRef()
 
     function deletePost(post) {
-        deleteTrends(document.cookie,post).then((res) => {
+        deleteTrends(post).then((res) => {
             if (res === 200) {
                 setList(
                     list.filter(t => t !== post)
@@ -61,7 +61,7 @@ export default function Home() {
         })
     }
     async function loadMore() {
-        await getTrends(document.cookie,lastKey? lastKey : null,date.getTime()).then(res => {
+        await getTrends(lastKey? lastKey : null,date.getTime()).then(res => {
             setList([...list,...res.items])
             if (res === 500) {
                 setHasMore(false)
@@ -105,7 +105,7 @@ export default function Home() {
                 max={now}
             >
             </DatePicker>
-            {list.filter(item => item.PostType !== 'Report').map(post => <div key={post.id} onClick={() => {operateClick(post)}}>
+            {list.map(post => <div key={post.id} onClick={() => {operateClick(post)}}>
                 <div>{post.PK.length <= 30 ? post.PK : '匿名用户'}</div>
                 <div>{timeConclude(post.SK)}</div>
                 <div>{post.Content}</div>

@@ -16,7 +16,7 @@ export default function Home() {
     const actionSheet = useRef()
 
     function deletePost(post) {
-        deleteTrends(document.cookie,post).then((res) => {
+        deleteTrends(post).then((res) => {
             if (res === 200) {
                 setList(
                     list.filter(t => t !== post)
@@ -54,7 +54,7 @@ export default function Home() {
                         setVisible(true)
                     }},
                 { text: '忽略举报', key: 'ignore',onClick: () => {
-                    deleteReport(document.cookie,post.PK,post.SK)
+                    deleteReport(post.PK,post.SK)
                     setList(
                         list.filter(t => t !== post)
                     )
@@ -64,7 +64,7 @@ export default function Home() {
         })
     }
     async function loadMore() {
-        await getReportList(document.cookie,lastKey? lastKey : null).then(res => {
+        await getReportList(lastKey? lastKey : null).then(res => {
             if (res === 500) {
                 setHasMore(false)
             }

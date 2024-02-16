@@ -1,6 +1,8 @@
+'use client'
+
 import CardContainer from "@/app/component/cardContainer";
 
-export default async function Home() {
+export default function Home() {
     return (
         <div>
             <CardContainer type='Post' />

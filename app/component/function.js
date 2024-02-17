@@ -1,6 +1,5 @@
 'use client'
 
-import Compressor from "compressorjs";
 import {Toast} from "antd-mobile";
 import './loginModal.css'
 import {createRoot} from "react-dom";
@@ -30,11 +29,13 @@ export function timeConclude(time) {
 
 export async function mockUpload(file) {
     try {
+        const Compressor = await import('compressorjs')
         return await new Promise((resolve,reject) => {
-            new Compressor(file, {
+            new Compressor.default(file, {
                 maxHeight:1080,
                 maxWidth:1080,
                 success(result) {
+                    const new_result = new File([result],file.name)
                     let reader = new FileReader();
                     reader.readAsDataURL(result);
                     reader.onload = function () {
@@ -44,7 +45,7 @@ export async function mockUpload(file) {
                             resolve({
                                 url: URL.createObjectURL(result),
                                 h_w: image.height/image.width,
-                                data: result
+                                data: new_result
                             })
                         }
                     }

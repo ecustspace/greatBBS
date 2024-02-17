@@ -70,6 +70,7 @@ export async function uploadImage(image) {
         },
         body: form
     }).then(res => res.json()).then(res => {
+        console.log(res)
         return {
             path:res.data.pathname,
             key:res.data.key

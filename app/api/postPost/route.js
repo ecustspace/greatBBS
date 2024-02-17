@@ -113,6 +113,7 @@ export async function POST(request) {
     await updateUserScore(username,'Post')
 
     if (mediaType === 'image') {
+        console.log(data.get('file[0]'))
         let image_list = []
         for (let i = 0; i < fileLength; i++) {
             const fileData = await uploadImage(data.get(`file[${i}]`))

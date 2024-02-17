@@ -86,7 +86,6 @@ export function EvaluateCard({evaluate,onClick,avatarClick}) {
 
    return <div
         className='card'
-        style={{marginLeft: '16px', marginRight: '16px', marginTop: '13px'}}
         onClick={onClickJustify}
     >
         <div className='cardAvatar'>
@@ -123,7 +122,6 @@ export function MyEvaluateCard({evaluate,onClick}) {
 
     return <div
         className='card'
-        style={{marginLeft: '16px', marginRight: '16px', marginTop: '13px'}}
         onClick={onClickJustify}
     >
         <div className='cardAvatar'>
@@ -223,7 +221,6 @@ export function EditEvaluateCard({myEvaluate,focusWiki,onDelete,refresh}) {
 
     return <div
         className='card'
-        style={{marginLeft: '16px', marginRight: '16px', marginTop: '13px'}}
     >
         <div className='cardAvatar'>
             <Avatar src={'evaluate/' + evaluate + '.png'} style={{'--size': '42px',"--border-radius":'4px'}}/>

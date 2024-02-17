@@ -99,7 +99,8 @@ export async function POST(request) {
         updateUserScore(username,'Post')
         revalidateTag('Post')
         return NextResponse.json({tip:'发布成功',status:200})
-    }).catch(() => {
+    }).catch((err) => {
+        console.log(err)
         return NextResponse.json({tip:'发布失败',status:500})
     })
 }

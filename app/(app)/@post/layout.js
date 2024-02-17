@@ -58,13 +58,14 @@ export default function Layout({ post,anPost,ins }) {
     },[])
 
     return (
-        <div id='post'>
-                <div className='FloatBubble' onClick={showPopup} style={{bottom:'65px'}}>
-                    <AddOutline fontSize={32} color='#fff' />
-                </div>
-            <SendPost ref={popup} />
+        <>
+            <div className='FloatBubble' onClick={showPopup} style={{bottom: '65px'}}>
+                <AddOutline fontSize={32} color='#fff'/>
+            </div>
+            <SendPost ref={popup}/>
+            <div id='post'>
                 <div className='TopItem'>
-                    <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25} />}>
+                    <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
                     </NavBar>
                 </div>
                 <div className='navigation'>
@@ -91,6 +92,7 @@ export default function Layout({ post,anPost,ins }) {
                 <br />
                 <br />
                 <br />
-        </div>
+            </div>
+        </>
     )
 }

@@ -63,12 +63,10 @@ export async function POST(request) {
         }).catch(() => {return 'err'})
 
     let image_list = []
-    console.log(data.get('file[0]'))
     for (let i = 0; i < fileLength; i++) {
-        const fileData =  uploadImage(data.get(`file[${i}]`))
+        const fileData = await uploadImage(data.get(`file[${i}]`))
         image_list.push(fileData)
     }
-    image_list = await Promise.all(image_list)
 
     let putInput = {
         TableName: 'BBS',

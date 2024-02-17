@@ -118,7 +118,7 @@ export async function POST(request) {
             const fileData = uploadImage(data.get(`file[${i}]`))
             image_list.push(fileData)
         }
-        image_list = Promise.all(image_list)
+        image_list = await Promise.all(image_list)
         if (image_list.length !== 0) {
             await docClient.send(new UpdateCommand({
                 TableName: 'BBS',

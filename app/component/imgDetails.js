@@ -83,7 +83,7 @@ const PostDetails = forwardRef(({post,like},ref) => {
     useEffect(() => {
         const loadHammer = async () => {
             const Hammer = await import('hammerjs');
-            const hammertime = new Hammer.default(document.getElementById("imgDetails"));
+            const hammertime = new Hammer.default(document.getElementById("reply"));
 
             // Verify if hammertime is an instance of Hammer
             console.log(typeof hammertime);

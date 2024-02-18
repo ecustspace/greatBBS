@@ -79,7 +79,6 @@ export default function Layout({ post,anPost,ins }) {
                             const index = tabItems.findIndex(item => item.key === key)
                             setActiveIndex(index)
                         }}
-                        className='tabs'
                     >
                         {tabItems.map(item => (
                             <Tabs.Tab title={item.title} key={item.key} />

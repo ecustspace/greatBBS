@@ -127,6 +127,7 @@ export async function POST(request) {
                         Type: 'ReplyTo'+postData[0].PostID,
                         Content: content.replace(/(\n)+/g, "\n"),
                         LikeCount: 0,
+                        InWhere: postName + '#' + postTime,
                         Avatar: user_item.Avatar,
                         ReplyID: replyID,
                         ReplyToID: postData[1].ReplyID,
@@ -138,6 +139,7 @@ export async function POST(request) {
                             Type: 'ReplyTo'+postData[0].PostID,
                             Content: content.replace(/(\n)+/g, "\n"),
                             LikeCount: 0,
+                            InWhere: postName + '#' + postTime,
                             Avatar: user_item.Avatar,
                             ReplyID: replyID
                         }

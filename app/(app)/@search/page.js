@@ -32,6 +32,9 @@ function ReplyCard({reply}) {
                 paddingBottom:'8px',
                 display:"flex"}}
             onClick={() => {
+                if (!reply.InWhere) {
+                    return
+                }
                 Toast.show({
                     icon:'loading',
                     duration: 0

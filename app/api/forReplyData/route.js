@@ -36,7 +36,7 @@ export async function GET(request) {
     } :
             {
                 TableName:'BBS',
-                IndexName:'PostType-SK-index',
+                IndexName:'Type-SK-index',
                 KeyConditionExpression: '#type = :post_type',
                 ExpressionAttributeValues: {
                     ':post_type' : 'ReplyTo' + postID

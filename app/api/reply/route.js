@@ -89,7 +89,7 @@ export async function POST(request) {
     if (postData === 500) {
         return NextResponse.json({tip:'帖子不存在',status:500})
     }
-    if (postData[0].PostType === 'AnPost') {
+    if (typeof postData[0].PostType == 'string' && postData[0].PostType === 'AnPost') {
         if (!data.get('anid')) {
             return NextResponse.json({tip:'匿名密钥错误',status:500})
         } else if (sha256(data.get('anid')) !== user_item.Anid) {

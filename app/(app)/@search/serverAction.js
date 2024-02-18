@@ -25,7 +25,7 @@ export async function searchItem(content,type,lastKey) {
                 ':content': content
             },
             FilterExpression: 'contains(Content, :content)',
-            PageSize:20
+            Limit: 100
         }
         if (lastKey !== null) {
             scanCommand.ExclusiveStartKey = lastKey

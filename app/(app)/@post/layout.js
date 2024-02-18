@@ -70,6 +70,7 @@ export default function Layout({ post,anPost,ins }) {
                 </div>
                 <div className='navigation'>
                     <Tabs
+                        className='topTabs'
                         activeKey={tabItems[activeIndex].key}
                         onChange={key => {
                             if (login.isLogin === false) {

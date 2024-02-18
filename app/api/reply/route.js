@@ -81,7 +81,7 @@ export async function POST(request) {
                postData = 500
            }
        } else if (postData.length === 2) {
-           if (('ReplyTo' + postData[0].PostID) !== postData[1].PostType){
+           if (('ReplyTo' + postData[0].PostID) !== postData[1].Type){
                postData = 500
            }
        }
@@ -110,7 +110,7 @@ export async function POST(request) {
     })
 
     let replyID
-    if (postData[0].PostType === 'AnPost') {
+    if (typeof postData[0].PostType == 'string' && postData[0].PostType === 'AnPost') {
         replyID = await docClient.send(updateReplyID)
             .then(res => {return res.Attributes.ReplyID})
             .catch(err => {console.log(err);return 'err'})

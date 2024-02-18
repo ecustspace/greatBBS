@@ -74,10 +74,6 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
         const loadHammer = async () => {
             const Hammer = await import('hammerjs');
             const hammertime = new Hammer.default(document.getElementById("anPostDetails"));
-
-            // Verify if hammertime is an instance of Hammer
-            console.log(typeof hammertime);
-
             hammertime.on("swiperight", () => {
                 setIsVisible(false);
             });
@@ -147,7 +143,7 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
         data.append('captchaToken',turnstile.getResponse())
 
         if (replyTo.reply_name !== undefined) {
-            data.append('reply_name',replyTo.reply_name)
+            data.append('reply_name',replyTo.reply_sha_name)
             data.append('reply_time',replyTo.reply_time)
         }
         if (!localStorage.getItem('Anid')) {

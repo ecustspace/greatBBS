@@ -46,6 +46,11 @@ export default function RootLayout({ children }) {
                 setLogin(false)
             } else {setLogin(true)}
         } else {setLogin(false)}
+        const handle = (e) => {
+            history.pushState(null, null, document.URL);
+        }
+        window.addEventListener('popstate',handle)
+        return () => {window.removeEventListener('popstate',handle)}
     },[])
     return (
         <html>

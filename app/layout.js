@@ -46,6 +46,7 @@ export default function RootLayout({ children }) {
                 setLogin(false)
             } else {setLogin(true)}
         } else {setLogin(false)}
+        history.pushState(null, null, document.URL);
         const handle = (e) => {
             history.pushState(null, null, document.URL);
         }

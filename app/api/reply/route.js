@@ -181,7 +181,6 @@ export async function POST(request) {
             putInput.ReplyToID = postData[1].ReplyID
             putInput.ReplyToName = replyName
         }
-        console.log(typeof data.get('showLevel'))
         if (data.get('showLevel') === 'true') {
             putInput.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
         }

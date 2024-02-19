@@ -90,7 +90,7 @@ export async function POST(request) {
                 Content: text.replace(/(\n)+/g, "\n")
             }
         }
-        if (data.get('showLevel') === true) {
+        if (data.get('showLevel') === 'true') {
             putInput.Item.UserScore = typeof user_item.UserScore == 'number' ? user_item.UserScore : 0
         }
         if (data.get('h_w')) {

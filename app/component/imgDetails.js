@@ -85,9 +85,6 @@ const PostDetails = forwardRef(({post,like},ref) => {
             const Hammer = await import('hammerjs');
             const hammertime = new Hammer.default(document.getElementById("reply"));
 
-            // Verify if hammertime is an instance of Hammer
-            console.log(typeof hammertime);
-
             hammertime.on("swiperight", () => {
                 setIsVisible(false);
             });

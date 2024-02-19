@@ -76,7 +76,7 @@ const SendPost = forwardRef(({topic}, ref) => {
             }
         }
         data.append('topic',activeTopic)
-        data.showLevel = typeof localStorage.getItem('ShowLevel') == 'string' ? JSON.parse(localStorage.getItem('ShowLevel')) : true
+        data.append('showLevel',typeof localStorage.getItem('ShowLevel') == 'string' ? JSON.parse(localStorage.getItem('ShowLevel')) : true)
         if (isAnonymity === true) {
             if (localStorage.getItem('Anid')) {
                 data.append('anid',localStorage.getItem('Anid'))

@@ -177,6 +177,11 @@ export default function Layout({ post,search,message,user }) {
                 })
             })
         }
+        const handle = (e) => {
+            history.pushState(null, null, document.URL);
+        }
+        window.addEventListener('popstate',handle)
+        return () => {window.removeEventListener('popstate',handle)}
     },[])
 
     useEffect(() => {

@@ -10,11 +10,6 @@
     /* background-color: pink; */
 }
 
-.TopItem {
-    display: block;
-    position: relative;
-}
-
 .navigation {
     position: -webkit-sticky;
     position: sticky;

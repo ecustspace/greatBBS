@@ -64,10 +64,8 @@ export default function Layout({ post,anPost,ins }) {
             </div>
             <SendPost ref={popup}/>
             <div id='post'>
-                <div className='TopItem'>
-                    <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
-                    </NavBar>
-                </div>
+                <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
+                </NavBar>
                 <div className='navigation'>
                     <Tabs
                         className='topTabs'

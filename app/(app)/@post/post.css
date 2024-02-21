@@ -1,6 +1,8 @@
 .topTabs {
     background-color: white;
-    transform: translateZ(0);
+    .adm-tabs-tab-list {
+        position: static;
+    }
 }
 
 .exchange {
@@ -13,7 +15,6 @@
 .navigation {
     position: -webkit-sticky;
     position: sticky;
-    transform: translateZ(0);
     top: 0;
     z-index: 800;
 }

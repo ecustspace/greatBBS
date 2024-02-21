@@ -72,7 +72,7 @@ export default function Home() {
             <div className='FloatBubble' onClick={refresh} style={{bottom:'65px'}}>
                 <UndoOutline fontSize={32} color='#fff' />
             </div>
-            <div className='navigation'>
+            <div className='navigation_message'>
                 <NavBar backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25} />}>
                 </NavBar>
             </div>

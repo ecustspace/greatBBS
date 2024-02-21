@@ -20,8 +20,10 @@ const tabItems = [
 export default function Layout({ post,anPost,ins }) {
     const childrenList = [<>{post}</>,<>{anPost}</>,<>{ins}</>]
     const [activeIndex, setActiveIndex] = useState(0)
+    const [topHeight,setTopHeight] = useState(0)
     const popup = useRef(null)
     const login = useContext(loginState)
+    const topRef = useRef(null)
     const router = useRouter()
     const right = (
         <Button
@@ -55,6 +57,13 @@ export default function Layout({ post,anPost,ins }) {
             });
         };
         loadHammer();
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                setTopHeight(entry.contentRect.height)
+            }
+        });
+        observer.observe(topRef.current);
+        return () => observer.disconnect();
     },[])
 
     return (
@@ -64,9 +73,10 @@ export default function Layout({ post,anPost,ins }) {
             </div>
             <SendPost ref={popup}/>
             <div id='post'>
-                <NavBar right={right} backArrow={false} left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
-                </NavBar>
-                <div className='navigation'>
+                <div className='navigation' ref={topRef}>
+                    <NavBar right={right} backArrow={false}
+                            left={<Image alt='logo' src='/logo.png' width={100} height={25}/>}>
+                    </NavBar>
                     <Tabs
                         className='topTabs'
                         activeKey={tabItems[activeIndex].key}
@@ -80,16 +90,17 @@ export default function Layout({ post,anPost,ins }) {
                         }}
                     >
                         {tabItems.map(item => (
-                            <Tabs.Tab title={item.title} key={item.key} />
+                            <Tabs.Tab title={item.title} key={item.key}/>
                         ))}
                     </Tabs>
                 </div>
+                <div style={{height:topHeight}}></div>
                 <div>
                     {childrenList[activeIndex]}
                 </div>
-                <br />
-                <br />
-                <br />
+                <br/>
+                <br/>
+                <br/>
             </div>
         </>
     )

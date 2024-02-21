@@ -1,8 +1,5 @@
 .topTabs {
     background-color: white;
-    .adm-tabs-tab-list {
-        position: static;
-    }
 }
 
 .exchange {
@@ -13,10 +10,10 @@
 }
 
 .navigation {
-    position: -webkit-sticky;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 800;
+    width: 100%;
+    background-color: white;
 }
 
 .tabItem {

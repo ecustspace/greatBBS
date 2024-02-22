@@ -11,7 +11,7 @@ export async function POST(request) {
     const data = await request.formData()
     const isHuman = await captchaVerify(data.get('captchaToken'))
     if (isHuman !== true) {
-        return NextResponse.json({tip:'未通过人机验证',status:500})
+        return NextResponse.json({tip:'未通过人机验证,请重试',status:500})
     }
     const text = data.get('text')
     const topic = data.get('topic')

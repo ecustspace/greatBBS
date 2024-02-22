@@ -138,7 +138,8 @@ export default function Layout({ post,search,message,user }) {
 
     const captchaContextContent = {
         turnstile,
-        captchaDisable
+        captchaDisable,
+        setCaptchaDisable
     }
 
     useEffect(() => {

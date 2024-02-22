@@ -162,19 +162,50 @@ const AnPostDetails = forwardRef(({post,like},ref) => {
             credentials: "include",
         }).then(res => {
             return res.json()})
-            .then(data => {
+            .then(res => {
                 turnstile.reset()
+                if (res.tip === '未通过人机验证,请重试') {
+                    data.set('captchaToken',turnstile.getResponse())
+                    fetch(window.location.origin + '/api/reply',{
+                        method:'POST',
+                        body: data,
+                        credentials: "include",
+                    }).then(res => {
+                        return res.json()})
+                        .then(res => {
+                            turnstile.reset()
+                            setDisable(false)
+                            if (res.tip === '匿名密钥错误') {
+                                localStorage.removeItem('Anid')
+                            }
+                            if (res.status === 200) {
+                                setPickerVisible(false)
+                                setMaskVisible(false)
+                                setTextContent('')
+                                setReplyTo({})
+                            }
+                            responseHandle(res)
+                        }).catch(() => {
+                        turnstile.reset()
+                        setDisable(false)
+                        Toast.show({
+                            icon:"fail",
+                            content:'error'
+                        })
+                    })
+                    return
+                }
                 setDisable(false)
-                if (data.tip === '匿名密钥错误') {
+                if (res.tip === '匿名密钥错误') {
                     localStorage.removeItem('Anid')
                 }
-                if (data.status === 200) {
+                if (res.status === 200) {
                     setPickerVisible(false)
                     setMaskVisible(false)
                     setTextContent('')
                     setReplyTo({})
                 }
-                responseHandle(data)
+                responseHandle(res)
             }).catch(() => {
                 turnstile.reset()
                 setDisable(false)

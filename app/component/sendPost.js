@@ -32,7 +32,7 @@ const SendPost = forwardRef(({topic}, ref) => {
     const [newTopic, setNewTopic] = useState('')
     const [topicVisible, setTopicVisible] = useState(false)
     const [activeTopic, setActiveTopic] = useState('')
-    const {captchaDisable,turnstile} = useContext(captchaContext)
+    const {captchaDisable,turnstile,setCaptchaDisable} = useContext(captchaContext)
     const [maxImgCount, setMaxImgCount] = useState(6)
     const [isAnonymity, setAnonymity] = useState(false)
     const [showOnePic, setShowOne] = useState(false)
@@ -123,6 +123,7 @@ const SendPost = forwardRef(({topic}, ref) => {
                 setBtnDisable(false)
                 Toast.clear()
                 if (xhr.readyState === 4) {
+                    setCaptchaDisable(true)
                     turnstile.reset()
                     responseHandle(xhr.response)
                     if (xhr.response.status === 200) {

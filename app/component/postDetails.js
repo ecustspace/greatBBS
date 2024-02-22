@@ -179,17 +179,46 @@ const PostDetails = forwardRef(({post},ref) => {
             credentials: "include"
         }).then(res => {
             return res.json()})
-            .then(data => {
+            .then(res => {
                 turnstile.reset()
-                setDisable(false)
-                if (data.status === 200) {
+                if (res.tip === '未通过人机验证,请重试') {
+                    data.set('captchaToken',turnstile.getResponse())
+                    fetch(window.location.origin + '/api/reply',{
+                        method:'POST',
+                        body: data,
+                        credentials: "include"
+                    }).then(res => {
+                        return res.json()})
+                        .then(res => {
+                            turnstile.reset()
+                            setDisable(false)
+                            if (res.status === 200) {
+                                setPickerVisible(false)
+                                setUploadImage(false)
+                                setMaskVisible(false)
+                                setTextContent('')
+                                setReplyTo({})
+                            }
+                            responseHandle(res)
+                        }).catch(() => {
+                        turnstile.reset()
+                        setDisable(false)
+                        Toast.show({
+                            icon:"fail",
+                            content:'error'
+                        })
+                    })
+                    return
+                }
+                if (res.status === 200) {
                     setPickerVisible(false)
                     setUploadImage(false)
                     setMaskVisible(false)
                     setTextContent('')
                     setReplyTo({})
                 }
-                responseHandle(data)
+                setDisable(false)
+                responseHandle(res)
             }).catch(() => {
                 turnstile.reset()
                 setDisable(false)

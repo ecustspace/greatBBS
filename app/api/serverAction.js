@@ -535,6 +535,57 @@ export async function like(PK,SK,avatar) {
         return 500
     }
     const now = Date.now()
+    if (post_data.Type.includes('ReplyTo')) {
+        let input =[{
+            Put: {
+                TableName: 'BBS',
+                Item : {
+                    PK: 'Like#' + username + '#' + post_data.PostType.split('o')[1],
+                    SK: post_data.ReplyID,
+                    ttl: now/1000 + 60*60*24*365
+                },
+                ConditionExpression: "attribute_not_exists(SK)"
+            }
+        },{
+            Update : {
+                TableName: 'BBS',
+                Key: {
+                    PK:PK,
+                    SK:SK
+                },
+                ConditionExpression: "attribute_exists(SK)",
+                UpdateExpression: "SET LikeCount = LikeCount + :incr",
+                ExpressionAttributeValues: {
+                    ":incr": 1
+                }
+            }
+        }]
+        if (post_data.InWhere) {
+            input.push({
+                Put: {
+                    TableName: 'BBS',
+                    Item : {
+                        PK: 'Notify#' + PK.split('#')[1],
+                        SK: now,
+                        Avatar: avatar,
+                        ttl: now/1000 + 60*60*24*7,
+                        From: username,
+                        Content: '点赞了你的评论：' + (post_data.Content.length > 12 ? post_data.Content.slice(0,12) + '...' : post_data.Content),
+                        InWhere: post_data.InWhere
+                    }
+                }
+            })
+        }
+        return await docClient.send(new TransactWriteCommand({
+            TransactItems: input
+        })).then(() => {
+            return 200
+        }).catch((err) => {
+            if (err.toString() === 'TransactionCanceledException: Transaction cancelled, please refer cancellation reasons for specific reasons [ConditionalCheckFailed, None]'){
+                return '已经喜欢过了'
+            } else {return '错误'}
+        })
+    }
     if (post_data.Type === 'Post') {
         let input = [{
             Put: {

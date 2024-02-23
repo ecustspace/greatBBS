@@ -540,7 +540,7 @@ export async function like(PK,SK,avatar) {
             Put: {
                 TableName: 'BBS',
                 Item : {
-                    PK: 'Like#' + username + '#' + post_data.PostType.split('o')[1],
+                    PK: 'Like#' + username + '#' + post_data.Type.split('o')[1],
                     SK: post_data.ReplyID,
                     ttl: now/1000 + 60*60*24*365
                 },

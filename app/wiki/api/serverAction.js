@@ -5,7 +5,7 @@ import {sha256} from "js-sha256";
 import {docClient, transporter} from "@/app/api/server";
 import {GetCommand, QueryCommand, TransactWriteCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
 import {sort} from "@/app/wiki/config";
-import {v5} from "uuid";
+import {v4} from "uuid";
 import {cookies} from "next/headers";
 
 
@@ -126,7 +126,7 @@ export async function getRandomWiki() {
     if (sha256(username+token.split('#')[0]+jwtSecret) !== jwt) {
         return 401
     }
-    const randomKey = v5(new Date(new Date().setHours(0,0,0,0)).toString(),'74980c48-c4c6-11ee-8efe-325096b39f47')
+    const randomKey = v4()
     let post = await docClient.send(new QueryCommand({
         TableName:'Wiki',
         IndexName:'Type-Key-index',

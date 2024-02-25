@@ -7,6 +7,7 @@ import {Button, NavBar, Tabs, Toast} from 'antd-mobile'
 import Image from 'next/image'
 import {AddOutline} from 'antd-mobile-icons'
 import {loginState} from "@/app/layout";
+import {showLoginModal} from "@/app/component/function";
 import {useRouter} from "next/navigation";
 
 
@@ -16,10 +17,11 @@ const tabItems = [
     { key: 'ershoujiaoyi', title: <div className='tabItem'>照片墙</div> },
 ]
 
-export default function Layout({ post,anPost,ins,children }) {
+export default function Layout({ post,anPost,ins }) {
     const childrenList = [<>{post}</>,<>{anPost}</>,<>{ins}</>]
     const [activeIndex, setActiveIndex] = useState(0)
     const [topHeight,setTopHeight] = useState(0)
+    const popup = useRef(null)
     const login = useContext(loginState)
     const topRef = useRef(null)
     const router = useRouter()
@@ -33,6 +35,15 @@ export default function Layout({ post,anPost,ins,children }) {
             校 内
         </Button>
     )
+    function showPopup(){
+        if (login.isLogin === false) {
+            showLoginModal(login.toLogin,function(){
+                popup.current.showPopup()
+            })
+            return
+        }
+        popup.current.showPopup()
+    }
 
     useEffect(() => {
         const loadHammer = async () => {
@@ -57,7 +68,10 @@ export default function Layout({ post,anPost,ins,children }) {
 
     return (
         <>
-            {children}
+            <div className='FloatBubble' onClick={showPopup} style={{bottom: '65px'}}>
+                <AddOutline fontSize={32} color='#fff'/>
+            </div>
+            <SendPost ref={popup}/>
             <div id='post'>
                 <div className='navigation' ref={topRef}>
                     <NavBar right={right} backArrow={false}

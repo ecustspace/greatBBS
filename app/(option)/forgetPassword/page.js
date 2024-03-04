@@ -21,7 +21,7 @@ export default function Home() {
     const router = useRouter()
     const onSubmit = () => {
             const values = form1.getFieldsValue(true)
-            values.recaptchaToken = turnstile.getResponse()
+            values.captchaToken = turnstile.getResponse()
             Toast.show({
                 icon:"loading",
                 duration:0

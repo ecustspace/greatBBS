@@ -1,5 +1,6 @@
 'use client'
 
+import '../globals.css'
 import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from 'react'
 import {
     AutoCenter,

@@ -306,8 +306,8 @@ const SendPost = forwardRef(({topic}, ref) => {
                                 {topics.map(value => <CapsuleTabs.Tab title={value} key={value}>
                                 </CapsuleTabs.Tab>)}
                             </CapsuleTabs>
-                                <AddCircleOutline className='moreIcon' onClick={() => setTopicVisible(true)}/>
-                                <PictureOutline color={mediaType === 'Image' ? '#2873d8' : 'black'} className='moreIcon'
+                                <AddCircleOutline style={{fontSize:25}} className='moreIcon' onClick={() => setTopicVisible(true)}/>
+                                <PictureOutline style={{fontSize:25}} color={mediaType === 'Image' ? '#2873d8' : 'black'} className='moreIcon'
                                     onClick={() => {
                                         if (mediaType !== 'Image') {
                                             setMediaType('Image')
@@ -315,7 +315,7 @@ const SendPost = forwardRef(({topic}, ref) => {
                                             setMediaType(null)
                                         }
                                     }}/>
-                                <MovieOutline color={mediaType === 'Video' ? '#2873d8' : 'black'} style={{marginRight:'10px'}} className='moreIcon'
+                                <MovieOutline color={mediaType === 'Video' ? '#2873d8' : 'black'} style={{marginRight:'10px',fontSize:25}} className='moreIcon'
                                     onClick={() => {
                                         if (mediaType !== 'Video') {
                                             setMediaType('Video')

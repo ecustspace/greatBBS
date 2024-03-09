@@ -110,16 +110,18 @@ body {
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--adm-color-border);
+}
 
-  .capsuleTabs {
-    flex: 1;
-    .adm-capsule-tabs-header {
-      border-bottom-width: 0;
-    }
-  }
-  .moreIcon {
-    font-size: 25px;
-    margin: 0 4px;
-    transform: translateY(0);
-  }
+.capsuleTabs {
+  flex: 1;
+}
+
+.adm-capsule-tabs-header {
+  border-bottom-width: 0;
+}
+
+.moreIcon {
+  font-size: 25px;
+  margin: 0 4px;
+  transform: translateY(0);
 }

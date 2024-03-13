@@ -37,7 +37,7 @@ export async function POST(request) {
         return NextResponse.json({tip:'请先获取链接',status:500})
     }
 
-    if (data.sign_up_token !== item.PK) {
+    if (data.sign_up_token !== item.PK || data.sign_up_token.split('#')[0] === 'mail') {
         return NextResponse.json({tip:'验证码错误',status:500})
     }
     else {

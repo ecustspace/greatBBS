@@ -5,7 +5,6 @@ import {Button, CenterPopup, Form, Input} from "antd-mobile";
 import './loginModal.css'
 import {emailAddress} from "@/app/(app)/clientConfig";
 import Turnstile, {useTurnstile} from "react-turnstile";
-import {createRoot} from "react-dom";
 
 // eslint-disable-next-line react/display-name
 export default function LoginModal({onSubmit,loginSuccess,root}){
@@ -45,8 +44,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                                 }
                                 setVisible(false)
                             } else {
-                                const loginRoot = createRoot(document.getElementById('loginRoot'))
-                                loginRoot.render(<LoginModal onSubmit={onSubmit} loginSuccess={loginSuccess} root={loginRoot} />)
+                                root.render(<LoginModal onSubmit={onSubmit} loginSuccess={loginSuccess} root={root} />)
                             }
                             alert(res.tip)
                         })

@@ -104,8 +104,8 @@ export default function Layout({ post,search,message,user }) {
     const showUserPopup = (user) => {
         if (login.isLogin === false) {
         showLoginModal(login.toLogin,function(){
-            setFocusAnPost(user)
-            anPostPopup.current.showPopup()
+            setFocusUser(user)
+            userPopup.current.showPopup()
         })
         return
     }

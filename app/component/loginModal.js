@@ -46,6 +46,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                         values.captchaToken = turnstile.getResponse()
                         onSubmit(values).then(res => {
                             setLoading(false)
+                            setPass(true)
                             if (res.status === 200) {
                                 if(loginSuccess) {
                                     loginSuccess()

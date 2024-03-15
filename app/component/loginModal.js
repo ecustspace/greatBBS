@@ -44,6 +44,7 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                                 }
                                 setVisible(false)
                             } else {
+                                root.unmount()
                                 root.render(<LoginModal onSubmit={onSubmit} loginSuccess={loginSuccess} root={root} />)
                             }
                             alert(res.tip)

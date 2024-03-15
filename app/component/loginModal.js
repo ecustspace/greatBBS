@@ -10,6 +10,7 @@ import Turnstile, {useTurnstile} from "react-turnstile";
 export default function LoginModal({onSubmit,loginSuccess,root}){
     const [isVisible,setVisible] = useState(false)
     const [captchaDisable,setCaptchaDisable] = useState(true)
+    const [isPass,setPass] = useState(true)
     const [isLoading,setLoading] = useState(false)
     const turnstile = useTurnstile()
     useEffect(() => {
@@ -22,7 +23,14 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
             onMaskClick={() => {
                 setVisible(false)
             }}
-            afterClose={root.unmount}
+            destroyOnClose
+            afterClose={() => {
+                if (isPass === true) {
+                    root.unmount()
+                } else {
+                    setVisible(true)
+                }
+            }}
             style={{'--max-width':'100vw',
                 '--min-width':'90vw',
                 '--border-radius':'16px'}}>
@@ -44,8 +52,8 @@ export default function LoginModal({onSubmit,loginSuccess,root}){
                                 }
                                 setVisible(false)
                             } else {
-                                root.unmount()
-                                root.render(<LoginModal onSubmit={onSubmit} loginSuccess={loginSuccess} root={root} />)
+                                setPass(false)
+                                setVisible(false)
                             }
                             alert(res.tip)
                         })

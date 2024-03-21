@@ -1,6 +1,6 @@
 export const imageUrl = 'https://pic.ecust.space/i/'
 
-export const Url = 'https://ecust.space'
+export const Url = 'https://test.ecust.space'
 
 export const admin = '方昆亮'
 

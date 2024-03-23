@@ -240,6 +240,7 @@ export async function loadMoreRandomPost(keys,type) {
     let posts = []
     let batchQueryInput = []
     let limit = 0
+    console.log(keys)
     for (let i = 0; i < 20 ; i++) {
         if (i === 0) {
             if (keys[0].lastKey_up !== 'null') {

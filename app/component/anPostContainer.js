@@ -6,23 +6,20 @@ import {PostCard} from "@/app/component/postCard";
 import {
     fetchDataWithPostType,
     getMessageCount,
-    getPostLikeList,
     getPostListWithType,
     Report
 } from "@/app/api/serverAction";
-import {detailsContext, likeListContext ,messageCountContext} from "@/app/(app)/layout";
+import {detailsContext ,messageCountContext} from "@/app/(app)/layout";
 import {showLoginModal} from "@/app/component/function";
 import {loginState} from "@/app/layout";
 import {UndoOutline} from "antd-mobile-icons";
 
 export default function AnPostCardContainer() {
     const [isHasMore, setHasMore] = useState(true)
-    const [postList, setPostList] = useState([])
     const [loadPostList, setLoadPostList] = useState([])
     const [lastKey,setKey] = useState([])
     const actionSheet = useRef()
     const {showAnPostPopup,showUserPopup} = useContext(detailsContext)
-    const {addLike} = useContext(likeListContext)
     const login = useContext(loginState)
     const {setMessageCount} =useContext(messageCountContext)
     function operateClick(post) {
@@ -55,49 +52,13 @@ export default function AnPostCardContainer() {
     useEffect(() => {
         setMessageCount(typeof localStorage.getItem('messageCount') == 'string' ?
             parseInt(localStorage.getItem('messageCount')) : 0)
-        refresh(false)
+        refresh()
     },[])
 
-    function refresh(showToast) {
-        if (showToast === true) {
-            Toast.show({
-                icon:'loading'
-            })
-        }
-        fetchDataWithPostType('AnPost').then(data => {
-            Toast.clear()
-            let keysCount = 0
-            for (let i = 0; i < 20; i++) {
-                if (i === 0) {
-                    if (data.lastKey[0].lastKey_up !== 'null') {
-                        keysCount += 1
-                    }
-                    if (data.lastKey[0].lastKey_down !== 'null') {
-                        keysCount += 1
-                    }
-                } else {
-                    if (data.lastKey[i].lastKey !== 'null') {
-                        keysCount += 1
-                    }
-                }
-            }
-            if (keysCount !== 0) {
-                setKey(data.lastKey)
-            } else {
-                setHasMore(false)
-            }
-            if (data.posts.length > 0) {
-                setPostList(data.posts)
-                setLoadPostList([])
-                setHasMore(true)
-            } else {setHasMore(false)}
-        }).catch((err) => {
-            console.log(err)
-            Toast.show({
-                icon:'fail',
-                content:'刷新失败'
-            })
-            setPostList('err')})
+    function refresh() {
+        setLoadPostList([])
+        setHasMore(true)
+        setKey([])
         if (login.isLogin === true) {
             getMessageCount().then(res => {
                 setMessageCount(count => {
@@ -109,11 +70,7 @@ export default function AnPostCardContainer() {
     }
 
     async function loadMore() {
-        if (postList === 'err') {
-            refresh(true)
-            throw new Error('mock request failed')
-        }
-        if (postList.length !== 0 && postList.length <= loadPostList.length) {
+        if (lastKey.length > 0) {
             if (login.isLogin === false) {
                 showLoginModal(login.toLogin,function () {
                     refresh(true)
@@ -127,13 +84,6 @@ export default function AnPostCardContainer() {
             }
             await getPostListWithType('AnPost',lastKey).then(res => {
                 if (res.posts) {
-                    getPostLikeList(res.posts[0].PostID,res.posts[res.posts.length - 1].PostID).then(
-                        res => {
-                            addLike(res.map(item => {
-                                return item.SK
-                            }))
-                        }
-                    )
                     setLoadPostList([...loadPostList,...res.posts])
                 }
                 let keysCount = 0
@@ -157,13 +107,39 @@ export default function AnPostCardContainer() {
                     setHasMore(false)
                 }
             })
-            return
+        } else {
+            await fetchDataWithPostType('AnPost').then(data => {
+                Toast.clear()
+                let keysCount = 0
+                for (let i = 0; i < 20; i++) {
+                    if (i === 0) {
+                        if (data.lastKey[0].lastKey_up !== 'null') {
+                            keysCount += 1
+                        }
+                        if (data.lastKey[0].lastKey_down !== 'null') {
+                            keysCount += 1
+                        }
+                    } else {
+                        if (data.lastKey[i].lastKey !== 'null') {
+                            keysCount += 1
+                        }
+                    }
+                }
+                if (keysCount !== 0) {
+                    setKey(data.lastKey)
+                } else {
+                    setHasMore(false)
+                }
+                if (data.posts.length > 0) {
+                    setLoadPostList(data.posts)
+                } else {setHasMore(false)}
+            }).catch(() => {
+                throw new Error('mock request failed')})
         }
-        setLoadPostList(postList)
     }
     return (
         <div>
-            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
+            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh()}>
                 <UndoOutline fontSize={32} color='#fff'/>
             </div>
             {loadPostList.map(post => <PostCard

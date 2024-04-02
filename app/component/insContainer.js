@@ -16,7 +16,6 @@ import {UndoOutline} from "antd-mobile-icons";
 export default function InsContainer() {
     const [isHasMore, setHasMore] = useState(true)
     const [width,setWidth] = useState(0)
-    const [postList, setPostList] = useState([])
     const [loadLeftList, setLoadLeftList] = useState([])
     const [leftHeight,setLeftHeight] = useState(0)
     const [rightHeight,setRightHeight] = useState(0)
@@ -29,53 +28,16 @@ export default function InsContainer() {
 
     useEffect(() => {
         setWidth(containerRef.current.offsetWidth)
-        refresh(false)
+        refresh()
     },[])
 
-    function refresh(showToast) {
-        if (showToast === true) {
-            Toast.show({
-                icon:'loading'
-            })
-        }
-       fetchDataWithPostType('Image').then(data => {
-            Toast.clear()
-            if (data.posts.length > 0) {
-                setPostList(data.posts)
-                setLoadRightList([])
-                setLeftHeight(0)
-                setRightHeight(0)
-                setLoadLeftList([])
-            }
-            let keysCount = 0
-            for (let i = 0; i < 20; i++) {
-                if (i === 0) {
-                    if (data.lastKey[0].lastKey_up !== 'null') {
-                        keysCount += 1
-                    }
-                    if (data.lastKey[0].lastKey_down !== 'null') {
-                        keysCount += 1
-                    }
-                } else {
-                    if (data.lastKey[i].lastKey !== 'null') {
-                        keysCount += 1
-                    }
-                }
-            }
-            if (keysCount !== 0) {
-                setKey(data.lastKey)
-                setHasMore(true)
-            } else {
-                setHasMore(false)
-            }
-        }).catch(() => {
-           setPostList('err')
-           Toast.show({
-               icon:'fail',
-               content:'刷新失败'
-           })
-           }
-       )
+    function refresh() {
+        setLeftHeight(0)
+        setRightHeight(0)
+        setLoadLeftList([])
+        setLoadRightList([])
+        setKey([])
+        setHasMore(true)
         if (login.isLogin === true) {
             getMessageCount().then(res => {
                 setMessageCount(count => {
@@ -137,15 +99,11 @@ export default function InsContainer() {
         }
     }
     async function loadMore() {
-        if (postList === 'err') {
-            refresh(true)
-            throw new Error('mock request failed')
-        }
         if (width === 0) {
+            setTimeout(null,1000)
             return
         }
-        const hasLoad = loadLeftList.length + loadRightList.length
-        if (postList.length !== 0 && postList.length <= hasLoad) {
+        if (lastKey.length > 0) {
             if (!lastKey) {
                 setHasMore(false)
                 return
@@ -182,14 +140,43 @@ export default function InsContainer() {
                     setHasMore(false)
                 }
             })
-            return
+        } else {
+            await fetchDataWithPostType('Image').then(data => {
+                Toast.clear()
+                if (data.posts.length > 0) {
+                    loadImage(data.posts)
+                }
+                let keysCount = 0
+                for (let i = 0; i < 20; i++) {
+                    if (i === 0) {
+                        if (data.lastKey[0].lastKey_up !== 'null') {
+                            keysCount += 1
+                        }
+                        if (data.lastKey[0].lastKey_down !== 'null') {
+                            keysCount += 1
+                        }
+                    } else {
+                        if (data.lastKey[i].lastKey !== 'null') {
+                            keysCount += 1
+                        }
+                    }
+                }
+                if (keysCount !== 0) {
+                    setKey(data.lastKey)
+                    setHasMore(true)
+                } else {
+                    setHasMore(false)
+                }
+            }).catch(() => {
+                throw new Error('mock request failed')
+                }
+            )
         }
-        loadImage(postList)
     }
 
     return (
         <div>
-            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh(true)}>
+            <div className='FloatBubble' style={{bottom:'130px'}} onClick={() => refresh()}>
                 <UndoOutline fontSize={32} color='#fff'/>
             </div>
             <div style={{display:'flex',width:'96%',margin:'auto',marginTop:'12px'}} ref={containerRef}>

@@ -1,8 +1,8 @@
 export const imageUrl = 'https://pic.ecust.space/i/'
 
-export const Url = 'https://demo.ecust.space'
+export const Url = 'https://ecust.space'
 
-export const admin = 'demo'
+export const admin = '方昆亮'
 
 export const appName = 'Ecust Space'
 

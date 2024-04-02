@@ -50,9 +50,17 @@ export default function Layout({ post,anPost,ins }) {
             const Hammer = await import('hammerjs');
             const hammertime = new Hammer.default(document.getElementById("post"));
             hammertime.on("swiperight", function () {
+                if (login.isLogin === false) {
+                    router.replace('/login')
+                    return
+                }
                 setActiveIndex(value => (value === 0 ? value : value - 1))
             });
             hammertime.on("swipeleft", function () {
+                if (login.isLogin === false) {
+                    router.replace('/login')
+                    return
+                }
                 setActiveIndex(value => (value === 2 ? value : value + 1))
             });
         };
@@ -65,6 +73,8 @@ export default function Layout({ post,anPost,ins }) {
         observer.observe(topRef.current);
         return () => observer.disconnect();
     },[])
+
+    useEffect()
 
     return (
         <>

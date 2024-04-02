@@ -74,8 +74,6 @@ export default function Layout({ post,anPost,ins }) {
         return () => observer.disconnect();
     },[])
 
-    useEffect()
-
     return (
         <>
             <div className='FloatBubble' onClick={showPopup} style={{bottom: '65px'}}>

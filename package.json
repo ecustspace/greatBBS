@@ -21,7 +21,7 @@
     "hammerjs": "^2.0.8",
     "js-sha256": "^0.10.1",
     "next": "^14.1.0",
-    "nodemailer": "6.9.9",
+    "nodemailer": "6.9.13",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",

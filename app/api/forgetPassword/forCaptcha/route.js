@@ -37,7 +37,7 @@ export async function POST(request) {
     }
     const link = Url + '/api/forgetPassword/verify/' + sha256(user_email + new_password + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(user_email)  + '/' + encodeURIComponent(new_password) +'/' + now
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
+        from: process.env.MAIL_SENDER, // sender address
         to: user_email + emailAddress, // list of receivers
         subject: `【${appName}】修改密码`, // Subject line
         text: "你正在修改密码，请点击这个链接证明是你本人操作:" + link, // plain text body

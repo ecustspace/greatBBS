@@ -51,7 +51,7 @@ export async function POST(request) {
     }
     const link = Url + '/api/changeNotifyEmail/verify/' + sha256(notify_email + username + now + process.env.JWT_SECRET) + '/' + encodeURIComponent(notify_email) + '/' + encodeURIComponent(username) + '/' + now
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
+        from: process.env.MAIL_SENDER, // sender address
         to: notify_email, // list of receivers
         subject: `【${appName}】验证通知邮箱`, // Subject line
         text: "你正在修改你的通知邮箱\n点此链接完成验证:" + link, // plain text body

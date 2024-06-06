@@ -395,8 +395,8 @@ export async function reportEvaluate(key,other_name,content) {
         return {tip: '令牌错误', status: 401}
     }
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
-        to: process.env.SMTP_USERNAME, // list of receivers
+        from: process.env.MAIL_SENDER, // sender address
+        to: '2166391095@qq.com', // list of receivers
         subject: `${username}对【${key}】词条下的${other_name}的评价的举报`, // Subject line
         text: content
     };

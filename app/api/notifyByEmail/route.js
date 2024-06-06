@@ -19,7 +19,7 @@ export async function GET(request) {
     }
     const link = Url + '?where=' + encodeURIComponent(data.inWhere)
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
+        from: process.env.MAIL_SENDER, // sender address
         to: user_item.NotifyEmail, // list of receivers
         subject: `【${appName}】来自${data.from}的${data.type}`, // Subject line
         text: data.content, // plain text body

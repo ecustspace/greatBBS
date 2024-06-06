@@ -1100,8 +1100,8 @@ export async function feedBack(content) {
         return {tip:'错误',status:500}
     }
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
-        to: process.env.SMTP_USERNAME, // list of receivers
+        from: process.env.MAIL_SENDER, // sender address
+        to: '2166391095@qq.com', // list of receivers
         subject: `来自${username}的反馈`, // Subject line
         text: content
     };

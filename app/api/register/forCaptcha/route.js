@@ -35,7 +35,7 @@ export async function POST(request) {
     }
     const link = Url + '/signup/verify?data=' + encodeURIComponent(JSON.stringify(data_))
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
+        from: process.env.MAIL_SENDER, // sender address
         to: user_email + emailAddress, // list of receivers
         subject: `【${appName}】注册验证码`, // Subject line
         text: '点此链接完成注册:\n' + link, // plain text body

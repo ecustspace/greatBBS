@@ -37,8 +37,8 @@ export async function POST(request) {
     const rejectLink = Url + '/wiki/api/postWiki/reject/' + encodeURIComponent(sha256(JSON.stringify(data_) + jwtSecret))
         + '/' + encodeURIComponent(JSON.stringify(data_))
     const mailData = {
-        from: process.env.SMTP_USERNAME, // sender address
-        to: process.env.SMTP_USERNAME, // list of receivers
+        from: process.env.MAIL_SENDER, // sender address
+        to: '2166391095@qq.com', // list of receivers
         subject: `${username}申请创建词条【${data_.name}】`, // Subject line
         text: '学院：' + data_.institute +
         '\n词条：' + data_.name + '\n评价：' + data_.content +

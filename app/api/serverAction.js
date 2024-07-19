@@ -158,6 +158,11 @@ export async function fetchDataWithPostType(type) {
         }
         posts = [...posts, ...data_.posts]
         keys = data_.keys
+    if (posts.length === 0) {
+        return {
+            posts: [],
+            lastKey: keys
+        }
     }
     return await docClient.send(new BatchGetCommand({
         RequestItems: {

@@ -901,7 +901,7 @@ export async function Report(PK,SK) {
     if (postData === undefined) {
         return 500
     }
-    if (postData.PostType) {
+    if (postData.Type) {
         return await docClient.send(new PutCommand({
             TableName:'BBS',
             Item: {

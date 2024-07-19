@@ -888,9 +888,9 @@ export async function Report(PK,SK) {
             PK:PK,
             SK:SK
         },
-        ProjectionExpression:':type',
+        ProjectionExpression:'#type',
         ExpressionAttributeNames: {
-            ':type': 'Type'
+            '#type': 'Type'
         }
     })).then(res => {
         return res.Item

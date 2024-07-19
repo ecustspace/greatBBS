@@ -888,7 +888,10 @@ export async function Report(PK,SK) {
             PK:PK,
             SK:SK
         },
-        ProjectionExpression:'Type'
+        ProjectionExpression:':type',
+        ExpressionAttributeNames: {
+            ':type': 'Type'
+        }
     })).then(res => {
         return res.Item
     }).catch(err => {

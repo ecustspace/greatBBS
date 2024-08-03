@@ -70,7 +70,7 @@ export async function POST(request) {
     }
     let image_list = []
     for (let i = 0; i < fileLength; i++) {
-        console.log(data.get(`file[${i}]`))
+    
         const fileData = await uploadImage(data.get(`file[${i}]`))
         image_list.push(fileData)
     }

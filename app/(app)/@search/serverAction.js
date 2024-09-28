@@ -50,6 +50,7 @@ export async function searchItem(content,type,lastKey) {
             ExpressionAttributeValues: {
                 ':content': content.slice(1)
             },
+            Limit: 25
         }
         if (lastKey !== null) {
             queryInput.ExclusiveStartKey = lastKey
